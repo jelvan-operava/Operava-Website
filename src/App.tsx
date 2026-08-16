@@ -28,6 +28,34 @@ function RouteManager() {
     // Scroll to top on navigation
     window.scrollTo({ top: 0, behavior: 'smooth' })
 
+    // Update document title dynamically based on route
+    const path = location.pathname
+    if (path === '/' || path === '') {
+      document.title = 'OPERAVA'
+    } else if (path.startsWith('/about')) {
+      document.title = 'About Us | OPERAVA'
+    } else if (path.startsWith('/services/it')) {
+      document.title = 'Information Technology Services | OPERAVA'
+    } else if (path.startsWith('/services/bpo')) {
+      document.title = 'Business Process Outsourcing Services | OPERAVA'
+    } else if (path.startsWith('/services')) {
+      document.title = 'Services & Solutions | OPERAVA'
+    } else if (path.startsWith('/industries')) {
+      document.title = 'Industries | OPERAVA'
+    } else if (path.startsWith('/careers')) {
+      document.title = 'Careers | OPERAVA'
+    } else if (path.startsWith('/insights')) {
+      document.title = 'Insights & Thought Leadership | OPERAVA'
+    } else if (path.startsWith('/contact')) {
+      document.title = 'Contact Us | OPERAVA'
+    } else if (path.startsWith('/privacy')) {
+      document.title = 'Privacy Policy | OPERAVA'
+    } else if (path.startsWith('/terms')) {
+      document.title = 'Terms of Service | OPERAVA'
+    } else {
+      document.title = 'OPERAVA'
+    }
+
     // Trigger subtle route loading progress bar
     setLoading(true)
     const timer = setTimeout(() => {
