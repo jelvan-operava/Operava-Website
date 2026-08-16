@@ -41,7 +41,7 @@ interface QuickTopic {
 
 const QUICK_TOPICS: QuickTopic[] = [
   { label: 'IT & Cloud Services', query: 'What IT and cloud engineering services does OPERAVA offer?', icon: Cpu, category: 'services' },
-  { label: '24/7 BPO Operations', query: 'Tell me about your 24/7 customer support and BPO solutions.', icon: Users, category: 'services' },
+  { label: 'Business Process Outsourcing Operations', query: 'Tell me about your customer support and business process outsourcing solutions.', icon: Users, category: 'services' },
   { label: 'Open Careers & Perks', query: 'What remote job positions and benefits are currently open?', icon: Briefcase, category: 'careers' },
   { label: 'About OPERAVA', query: 'Can you tell me about OPERAVA, locations, and certifications?', icon: Building2, category: 'about' },
   { label: 'Pricing & Engagement', query: 'How does your dedicated team and project pricing model work?', icon: Calendar, category: 'contact' },
@@ -152,7 +152,7 @@ export default function AvaAssistant() {
   const initialMessage: ChatMessage = {
     id: 'welcome-1',
     sender: 'ava',
-    text: "Hello! I'm AVA, your AI assistant at OPERAVA Global Solutions.\n\nAsk me anything directly about our cloud engineering, custom software development, 24/7 BPO operations, career opportunities, or how our team works. I will answer your questions directly right here in our chat.\n\nHow can I help you today?",
+    text: "Hello! I'm AVA, your virtual assistant at OPERAVA.\n\nAsk me anything directly about our cloud engineering, custom software development, workforce or business process outsourcing operations, career opportunities, or how our team works. I will answer your questions directly right here in our chat.\n\nHow can I help you today?",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }
 
@@ -374,7 +374,7 @@ export default function AvaAssistant() {
   }
 
   return (
-    <aside aria-label="AVA AI Assistant" className="relative">
+    <aside aria-label="AVA - Operava Virtual Assistant" className="relative">
       {/* ── WELCOME PROMO BUBBLE (Appears initially when widget is closed) ── */}
       {!isOpen && showWelcomeBubble && (
         <div
@@ -449,7 +449,7 @@ export default function AvaAssistant() {
                     AI Active
                   </span>
                 </div>
-                <p className="text-[11px] text-gray-400">OPERAVA Global Solutions</p>
+                <p className="text-[11px] text-gray-400">OPERAVA</p>
               </div>
             </div>
 
@@ -488,7 +488,7 @@ export default function AvaAssistant() {
           <div className="px-4 py-1.5 bg-violet-50 border-b border-violet-100 flex items-center justify-between text-[11px] text-violet-800 shrink-0">
             <span className="flex items-center gap-1.5 font-medium">
               <Sparkles className="w-3.5 h-3.5 text-violet-600 shrink-0" />
-              <span>Direct AI Answers • Ask any question</span>
+              <span>Ask any question</span>
             </span>
             <span className="text-[10px] text-violet-600/80 uppercase font-semibold tracking-wider">Live</span>
           </div>
@@ -755,8 +755,7 @@ export default function AvaAssistant() {
             </form>
 
             <div className="mt-1.5 flex items-center justify-between text-[10px] text-gray-400 px-1">
-              <span>Direct AI Intelligence</span>
-              <span>3s Reasoning • 24/7 Support</span>
+              <span>24/7 Support</span>
             </div>
           </div>
         </div>
