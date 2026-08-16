@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    margin: 0;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .circle-icon {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    padding: 12px;
+    background: conic-gradient(from 0deg, #8A2BE2, #FF00FF, #7F00FF, #8A2BE2);
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.8), inset 0 0 20px rgba(255,0,255,0.5);
+    pointer-events: none;
+  }
+  .inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #000;
+    position: relative;
+  }
+  .inner video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div class="circle-icon">
+    <div class="inner">
+      <video autoplay loop muted playsinline>
+        <source src="https://res.cloudinary.com/mgyosgsm/video/upload/Video_vpaaxl.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</body>
+</html>

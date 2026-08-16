@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operava Global Solutions | Global IT & BPO Architecture</title>
+    <meta name="description" content="SEC Registered Philippines BPO & IT Managed Services. Delivering world-class infrastructure and talent to global enterprises.">
+    
+    <!-- Premium Fonts -->
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #141414;
+            --accent: #dcfc33; /* Cyber Lime */
+            --text-main: #ededed;
+            --text-dim: #a1a1aa;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Smooth Grain Overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .glass {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bento-card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bento-card:hover {
+            border: 1px solid var(--accent);
+            transform: translateY(-5px);
+        }
+
+        /* Horizontal Scroll Container */
+        .horizontal-container {
+            width: 400%; /* Increased for more slides */
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .text-reveal {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .accent-gradient {
+            background: linear-gradient(90deg, var(--accent), #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-glow:hover {
+            box-shadow: 0 0 25px rgba(220, 252, 51, 0.5);
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CUSTOM CURSOR -->
+    <div id="cursor" class="fixed w-4 h-4 bg-[#dcfc33] rounded-full pointer-events-none z-[100] mix-blend-difference hidden md:block"></div>
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 w-full z-50 px-6 py-8">
+        <div class="max-w-7xl mx-auto flex justify-between items-center glass px-8 py-4 rounded-full border border-white/5">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#dcfc33] rounded-lg rotate-12 flex items-center justify-center text-black font-black">O</div>
+                <span class="font-bold tracking-tighter text-xl uppercase">OPERAVA</span>
+            </div>
+            <div class="hidden lg:flex space-x-10 text-[11px] font-bold uppercase tracking-widest text-zinc-400">
+                <a href="#solutions" class="hover:text-[#dcfc33] transition-colors">IT Services</a>
+                <a href="#bpo" class="hover:text-[#dcfc33] transition-colors">BPO Ops</a>
+                <a href="#how" class="hover:text-[#dcfc33] transition-colors">Framework</a>
+                <a href="#stats" class="hover:text-[#dcfc33] transition-colors">Global Impact</a>
+            </div>
+            <a href="https://tally.so/r/wzDV1q" class="bg-[#dcfc33] text-black px-6 py-2 rounded-full font-bold text-[11px] btn-glow transition-all uppercase tracking-tighter">
+                Request Proposal
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="relative h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(220,252,51,0.08),transparent_50%)]"></div>
+        
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <div class="mb-6 inline-flex items-center gap-2 px-4 py-2 border border-white/10 rounded-full glass reveal">
+                <span class="w-2 h-2 bg-[#dcfc33] rounded-full animate-ping"></span>
+                <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-[#dcfc33]">SEC REGISTERED PH HUB</span>
+            </div>
+            
+            <h1 class="text-6xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tighter reveal" id="hero-title">
+                ARCHITECTURE FOR <br> <span class="accent-gradient">GLOBAL SCALE.</span>
+            </h1>
+            
+            <p class="max-w-2xl mx-auto text-zinc-400 text-lg md:text-xl mb-12 font-light leading-relaxed reveal">
+                We build proprietary decision systems and high-performance talent engines. SEC-registered in the Philippines, delivering IT & BPO excellence globally.
+            </p>
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-center items-center reveal">
+                <a href="#solutions" class="px-10 py-4 bg-white text-black font-bold rounded-full text-sm hover:scale-105 transition-transform uppercase tracking-widest">
+                    Explore Capabilities
+                </a>
+                <div class="flex items-center -space-x-3">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-10 h-10 rounded-full border-2 border-black">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-10 h-10 rounded-full border-2 border-black">
+                    <img src="https://randomuser.me/api/portraits/men/46.jpg" class="w-10 h-10 rounded-full border-2 border-black">
+                    <div class="pl-6 text-[10px] text-left uppercase tracking-widest">
+                        <p class="font-bold text-[#dcfc33]">Trusted by Global 500</p>
+                        <p class="text-white/40 italic">24/7 Managed Infrastructure</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HORIZONTAL SCROLL (THE ENGINE / HOW WE WORK) -->
+    <section id="how" class="bg-white text-black overflow-hidden">
+        <div class="horizontal-container">
+            <!-- Slide 1: The Advantage -->
+            <section class="slide bg-zinc-950 text-white flex-shrink-0">
+                <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
+                    <div class="reveal">
+                        <span class="text-[#dcfc33] font-bold text-xs uppercase tracking-widest">The PH Advantage</span>
+                        <h2 class="text-6xl font-black tracking-tighter mt-4 mb-8 leading-none">THE OPERAVA <br>ENGINE.</h2>
+                        <p class="text-zinc-400 text-xl leading-relaxed">We leverage the top 1% of Philippine technical talent, integrating them into your workflow with proprietary systems that ensure zero friction and maximum output.</p>
+                    </div>
+                    <div class="relative">
+                        <div class="w-full aspect-video bg-[#dcfc33] rounded-[40px] rotate-3 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=800" class="w-full h-full object-cover -rotate-3 scale-125 grayscale hover:grayscale-0 transition-all duration-700">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 2: Compliance -->
+            <section class="slide bg-[#dcfc33] text-black flex-shrink-0">
+                <div class="max-w-5xl mx-auto px-6 flex flex-col items-center text-center">
+                    <span class="text-sm font-bold uppercase tracking-widest mb-4 italic">Corporate Integrity</span>
+                    <h2 class="text-7xl font-black tracking-tighter mb-10 leading-[0.85]">SEC REGISTERED. <br>GLOBAL READY.</h2>
+                    <p class="max-w-2xl text-2xl font-medium leading-tight opacity-80">Legally registered in the Philippines, operating under international data protection standards (GDPR, SOC2 Type II, HIPAA Compliant).</p>
+                    <div class="mt-12 flex gap-10">
+                        <div class="flex flex-col items-center"><i class="fa fa-certificate text-4xl mb-2"></i><span class="text-[10px] font-bold uppercase">ISO 27001</span></div>
+                        <div class="flex flex-col items-center"><i class="fa fa-lock text-4xl mb-2"></i><span class="text-[10px] font-bold uppercase">SOC2 Ready</span></div>
+                        <div class="flex flex-col items-center"><i class="fa fa-globe text-4xl mb-2"></i><span class="text-[10px] font-bold uppercase">SEC PH</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 3: Speed to Market -->
+            <section class="slide bg-zinc-900 text-white flex-shrink-0">
+                <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="h-40 bg-zinc-800 rounded-3xl p-6 flex flex-col justify-end border border-white/5">
+                            <span class="text-3xl font-black text-[#dcfc33]">14 Days</span>
+                            <p class="text-[10px] uppercase font-bold text-zinc-500">Rapid Deployment</p>
+                        </div>
+                        <div class="h-40 bg-zinc-800 rounded-3xl p-6 flex flex-col justify-end border border-white/5">
+                            <span class="text-3xl font-black text-[#dcfc33]">24/7/365</span>
+                            <p class="text-[10px] uppercase font-bold text-zinc-500">Always Active</p>
+                        </div>
+                        <div class="h-40 bg-zinc-800 rounded-3xl p-6 flex flex-col justify-end border border-white/5">
+                            <span class="text-3xl font-black text-[#dcfc33]">0%</span>
+                            <p class="text-[10px] uppercase font-bold text-zinc-500">Security Breach</p>
+                        </div>
+                        <div class="h-40 bg-zinc-800 rounded-3xl p-6 flex flex-col justify-end border border-white/5">
+                            <span class="text-3xl font-black text-[#dcfc33]">60%</span>
+                            <p class="text-[10px] uppercase font-bold text-zinc-500">Cost Reduction</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-6xl font-black tracking-tighter mb-8 leading-none">SCALABILITY <br>UNLOCKED.</h2>
+                        <p class="text-zinc-400 text-xl leading-relaxed">Whether you need a specialized DevSecOps team or a 100-person CX department, our infrastructure scales with your growth in real-time.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Final Framework -->
+            <section class="slide bg-white text-black flex-shrink-0">
+                <div class="max-w-5xl mx-auto px-6 text-center">
+                    <h2 class="text-6xl font-black tracking-tighter mb-12">The Operava <br><span class="text-zinc-400 italic">4-Step Framework</span></h2>
+                    <div class="grid md:grid-cols-4 gap-8 text-left">
+                        <div class="border-l-4 border-[#dcfc33] pl-6 py-4">
+                            <span class="font-black text-2xl">01</span>
+                            <h4 class="font-bold uppercase text-xs mt-2">Audit</h4>
+                            <p class="text-zinc-500 text-sm mt-2">Deep-dive into your existing IT stack & BPO needs.</p>
+                        </div>
+                        <div class="border-l-4 border-zinc-200 pl-6 py-4">
+                            <span class="font-black text-2xl text-zinc-400">02</span>
+                            <h4 class="font-bold uppercase text-xs mt-2">Build</h4>
+                            <p class="text-zinc-500 text-sm mt-2">Custom team assembly & Infrastructure setup.</p>
+                        </div>
+                        <div class="border-l-4 border-zinc-200 pl-6 py-4">
+                            <span class="font-black text-2xl text-zinc-400">03</span>
+                            <h4 class="font-bold uppercase text-xs mt-2">Manage</h4>
+                            <p class="text-zinc-500 text-sm mt-2">24/7 ongoing operations and QA oversight.</p>
+                        </div>
+                        <div class="border-l-4 border-zinc-200 pl-6 py-4">
+                            <span class="font-black text-2xl text-zinc-400">04</span>
+                            <h4 class="font-bold uppercase text-xs mt-2">Optimize</h4>
+                            <p class="text-zinc-500 text-sm mt-2">Monthly audits to drive efficiency and ROI.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <!-- EXPANDED BENTO GRID (CAPABILITIES) -->
+    <section id="solutions" class="py-40 px-6">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-5xl font-black tracking-tighter mb-4 text-center">Engineered for <span class="text-[#dcfc33]">Precision.</span></h2>
+            <p class="text-zinc-500 text-center mb-20 max-w-xl mx-auto uppercase text-[10px] font-bold tracking-[0.3em]">Comprehensive Global Service Portfolio</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]">
+                <!-- Managed IT -->
+                <div class="md:col-span-2 bento-card p-10 flex flex-col justify-end relative overflow-hidden group">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc51?w=800" class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-30 transition-opacity">
+                    <div class="relative z-10">
+                        <i class="fa fa-server text-[#dcfc33] text-2xl mb-4"></i>
+                        <h3 class="text-3xl font-bold mb-2">Managed IT & Cloud</h3>
+                        <p class="text-zinc-400 max-w-sm text-sm">End-to-end cloud infrastructure management, server maintenance, and 24/7 DevSecOps support.</p>
+                    </div>
+                </div>
+
+                <!-- 24/7 Support -->
+                <div class="bento-card p-10 bg-[#dcfc33] text-black flex flex-col justify-center">
+                    <div class="text-7xl font-black mb-2">24/7</div>
+                    <p class="font-bold uppercase tracking-widest text-xs">Follow-the-Sun <br>Global Support</p>
+                    <p class="mt-4 text-[10px] font-medium opacity-70">Uptime Guaranteed: 99.9%</p>
+                </div>
+
+                <!-- BPO CX -->
+                <div class="bento-card p-10 flex flex-col justify-between">
+                    <i class="fa fa-headset text-[#dcfc33] text-3xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Global BPO & CX</h3>
+                        <p class="text-zinc-500 text-xs">Tier 1-3 technical support and omnichannel customer success delivered in 5+ languages.</p>
+                    </div>
+                </div>
+
+                <!-- Cybersecurity -->
+                <div id="bpo" class="bento-card p-10 flex flex-col justify-between bg-zinc-900 border-none">
+                    <i class="fa fa-shield-halved text-white text-3xl"></i>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2 text-[#dcfc33]">Cybersecurity SOC</h3>
+                        <p class="text-zinc-400 text-xs">Continuous threat monitoring, SIEM/SOAR management, and rapid incident response.</p>
+                    </div>
+                </div>
+
+                <!-- Staff Augmentation -->
+                <div class="md:col-span-1 bento-card p-10 flex flex-col justify-between overflow-hidden relative group">
+                    <div class="relative z-10">
+                        <h3 class="text-xl font-bold mb-2">AI Data Ops</h3>
+                        <p class="text-zinc-500 text-xs">Specialized labeling, annotation, and RLHF data pipelines for cutting-edge AI models.</p>
+                    </div>
+                    <div class="h-24 w-full bg-zinc-800 rounded-xl mt-4 flex items-center justify-center border border-white/5">
+                        <div class="flex gap-2">
+                            <div class="w-1 h-6 bg-[#dcfc33] animate-pulse"></div>
+                            <div class="w-1 h-10 bg-[#dcfc33] animate-pulse" style="animation-delay: 0.2s"></div>
+                            <div class="w-1 h-8 bg-[#dcfc33] animate-pulse" style="animation-delay: 0.4s"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Back Office -->
+                <div class="md:col-span-2 bento-card p-10 bg-zinc-900 group relative overflow-hidden">
+                    <div class="flex h-full items-center justify-between">
+                        <div>
+                            <h3 class="text-3xl font-bold mb-4">Back-Office Scaling</h3>
+                            <p class="text-zinc-400 max-w-sm text-sm">Finance, Accounting, KYC/AML, and high-volume data processing with SEC-registered oversight.</p>
+                            <div class="mt-6 flex gap-4">
+                                <span class="text-[10px] font-bold px-3 py-1 border border-white/10 rounded-full">FinTech</span>
+                                <span class="text-[10px] font-bold px-3 py-1 border border-white/10 rounded-full">HealthCare</span>
+                                <span class="text-[10px] font-bold px-3 py-1 border border-white/10 rounded-full">E-Com</span>
+                            </div>
+                        </div>
+                        <div class="hidden lg:block w-48 h-48 bg-zinc-800 rounded-2xl rotate-12 group-hover:rotate-0 transition-all border border-[#dcfc33]/20 flex items-center justify-center">
+                            <i class="fa fa-chart-line text-4xl text-[#dcfc33]"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CASE STUDIES / PROJECTS -->
+    <section class="py-40 bg-zinc-950">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-5xl font-black tracking-tighter mb-20 text-white">Proven <span class="text-[#dcfc33]">Projects.</span></h2>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="reveal">
+                    <div class="aspect-video rounded-[30px] overflow-hidden mb-8 border border-white/5">
+                        <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[#dcfc33] font-bold text-xs uppercase tracking-[0.2em]">FinTech Compliance</span>
+                    <h3 class="text-3xl font-bold mt-4 mb-4 leading-tight">Scaling KYC for a European Neobank</h3>
+                    <p class="text-zinc-500 text-sm leading-relaxed mb-6">Built a dedicated 45-person AML/KYC desk in 21 days. Reduced customer onboarding time from 48 hours to 4 hours with 99.8% accuracy.</p>
+                    <a href="#" class="text-white font-bold text-xs border-b border-[#dcfc33] pb-1 uppercase tracking-widest hover:text-[#dcfc33] transition-colors">Read Case Study</a>
+                </div>
+                <div class="reveal" style="transition-delay: 0.2s">
+                    <div class="aspect-video rounded-[30px] overflow-hidden mb-8 border border-white/5">
+                        <img src="https://images.unsplash.com/photo-1551288049-bbb653240296?w=800" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[#dcfc33] font-bold text-xs uppercase tracking-[0.2em]">Infrastructure</span>
+                    <h3 class="text-3xl font-bold mt-4 mb-4 leading-tight">Global SOC for US Tech Giant</h3>
+                    <p class="text-zinc-500 text-sm leading-relaxed mb-6">Deployed a 24/7 Security Operations Center monitoring over 1,500 endpoints. Successfully mitigated 120+ high-level threats in the first 90 days.</p>
+                    <a href="#" class="text-white font-bold text-xs border-b border-[#dcfc33] pb-1 uppercase tracking-widest hover:text-[#dcfc33] transition-colors">Read Case Study</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section id="stats" class="py-40 bg-zinc-900 overflow-hidden relative">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_0%_0%,_rgba(220,252,51,0.05),transparent_50%)]"></div>
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-center relative z-10">
+            <div class="reveal">
+                <div class="text-6xl font-black text-[#dcfc33] mb-2">$15M+</div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Client Cost Savings</p>
+            </div>
+            <div class="reveal" style="transition-delay: 0.1s">
+                <div class="text-6xl font-black mb-2">92%</div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Staff Retention Rate</p>
+            </div>
+            <div class="reveal" style="transition-delay: 0.2s">
+                <div class="text-6xl font-black mb-2">5+</div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Countries Served</p>
+            </div>
+            <div class="reveal" style="transition-delay: 0.3s">
+                <div class="text-6xl font-black mb-2">350+</div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Expert Engineers</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER / CTA -->
+    <footer class="py-20 bg-black pt-40">
+        <div class="max-w-7xl mx-auto px-6 border-b border-white/10 pb-20">
+            <h2 class="text-5xl md:text-8xl font-black tracking-tighter mb-10 leading-none reveal">READY TO <br>ACTIVATE?</h2>
+            <a href="https://tally.so/r/wzDV1q" class="text-3xl md:text-5xl font-bold underline decoration-[#dcfc33] hover:text-[#dcfc33] transition-colors reveal">Start your journey here →</a>
+        </div>
+        <div class="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-2 gap-10 text-zinc-500 text-[11px] font-medium uppercase tracking-[0.2em]">
+            <div>
+                <p>© 2024 OPERAVA GLOBAL SOLUTIONS INC.</p>
+                <p class="mt-2 text-zinc-700 font-bold tracking-tighter">SEC REGISTRATION: CS202209143 (SAMPLE)</p>
+            </div>
+            <div class="flex space-x-12 md:justify-end mt-4 md:mt-0">
+                <a href="#" class="hover:text-white transition-colors">LinkedIn</a>
+                <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                <div class="text-zinc-200">Manila, Philippines HQ</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth Scrolling with Lenis
+        const lenis = new Lenis()
+        function raf(time) {
+            lenis.raf(time)
+            requestAnimationFrame(raf)
+        }
+        requestAnimationFrame(raf)
+
+        gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+        // Custom Cursor Movement
+        const cursor = document.querySelector('#cursor');
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
+        });
+
+        // Hero Text Reveal
+        gsap.from("#hero-title", {
+            y: 100,
+            opacity: 0,
+            duration: 1.5,
+            ease: "power4.out"
+        });
+
+        // Horizontal Scroll Animation
+        let sections = gsap.utils.toArray(".slide");
+        gsap.to(sections, {
+            xPercent: -100 * (sections.length - 1),
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".horizontal-container",
+                pin: true,
+                scrub: 1,
+                end: () => "+=" + document.querySelector(".horizontal-container").offsetWidth
+            }
+        });
+
+        // Reveal on Scroll
+        const reveals = document.querySelectorAll('.reveal');
+        reveals.forEach((el) => {
+            gsap.from(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 85%",
+                },
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+
+        // Bento Grid Staggered Entrance
+        gsap.from(".bento-card", {
+            scrollTrigger: {
+                trigger: "#solutions",
+                start: "top 70%",
+            },
+            scale: 0.95,
+            opacity: 0,
+            y: 30,
+            stagger: 0.1,
+            duration: 1,
+            ease: "expo.out"
+        });
+
+        // Navbar interaction
+        ScrollTrigger.create({
+            start: "top -100",
+            onUpdate: (self) => {
+                if(self.direction === 1) {
+                    gsap.to("nav", { y: -100, opacity: 0 });
+                } else {
+                    gsap.to("nav", { y: 0, opacity: 1 });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

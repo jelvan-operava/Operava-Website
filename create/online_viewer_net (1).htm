@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Draggable Infinite Marquee</title>
+  <style>
+    /* Reset and Page Styling */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #f7f7f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+      padding-top: 100px;
+    }
+
+    /* Outer Wrapper: Controls visibility and clips overflow */
+    .marquee-container {
+      width: 100%;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      padding: 40px 0;
+    }
+    .marquee-container:active {
+      cursor: grabbing;
+    }
+
+    /* Inner Track: Moves automatically or via drag */
+    .marquee-track {
+      display: flex;
+      gap: 24px;
+      width: max-content;
+      will-change: transform;
+    }
+
+    /* Individual Card Designs */
+    .card {
+      width: 380px;
+      height: 380px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 32px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+    }
+    .card-yellow {
+      background-color: #f6ff00;
+    }
+    .card-title {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #111;
+    }
+    .card-footer {
+      font-size: 14px;
+      color: #555;
+    }
+    .card-footer strong {
+      display: block;
+      color: #111;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- The Marquee Viewport -->
+  <div class="marquee-container" id="marqueeContainer">
+    <!-- The Moving Track -->
+    <div class="marquee-track" id="marqueeTrack">
+      
+      <!-- Card 1 -->
+      <div class="card">
+        <h2 class="card-title">Chakkraa Performance Marketing Case</h2>
+        <div class="card-footer">
+          <strong>Chakkraa</strong>
+          Our Scope: Performance Marketing
+        </div>
+      </div>
+
+      <!-- Card 2 (Yellow Style) -->
+      <div class="card card-yellow">
+        <h2 class="card-title">We built the complete digital storefront & helped them setup a profitable performance system</h2>
+        <div class="card-footer">
+          <strong>Sureena Chowdhri</strong>
+          Our Scope: Website & Performance Marketing
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="card">
+        <h2 class="card-title">Sureena Chowdhri Website & Performance</h2>
+        <div class="card-footer">
+          <strong>Sureena Chowdhri</strong>
+          Our Scope: Website & Performance Marketing
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="card">
+        <h2 class="card-title">6meal Custom Flow System Built</h2>
+        <div class="card-footer">
+          <strong>6meal</strong>
+          Our Scope: Website & Performance Marketing
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('marqueeContainer');
+    const track = document.getElementById('marqueeTrack');
+
+    // 1. DUPLICATE CARDS FOR SEAMLESS INFINITE LOOPing
+    // We clone the elements so the track is long enough to never reveal an empty edge.
+    const originalCards = Array.from(track.children);
+    originalCards.forEach(card => {
+      const clone = card.cloneNode(true);
+      track.appendChild(clone);
+    });
+    // Add a second set for safety buffering at high desktop widths
+    originalCards.forEach(card => {
+      const clone = card.cloneNode(true);
+      track.appendChild(clone);
+    });
+
+    // 2. STATE VARIABLES
+    let currentX = 0;       // Current translation position of track
+    let speed = -1.2;       // Auto-scroll speed (negative moves items leftward)
+    let isDragging = false;
+    let startX = 0;
+    let dragX = 0;
+
+    // Calculate half point boundary where loop resets cleanly
+    // A single full set width = overall track width divided by total sets (3)
+    const getResetThreshold = () => track.offsetWidth / 3;
+
+    // 3. THE ANIMATION LOOP (Runs continuously)
+    function animate() {
+      if (!isDragging) {
+        // Apply constant leftward drift
+        currentX += speed;
+
+        const threshold = getResetThreshold();
+        // Seamless Loop Reset Rule:
+        // If drifted past one full set width, snap back quietly by that width amount
+        if (currentX <= -threshold) {
+          currentX += threshold;
+        } else if (currentX > 0) {
+          currentX -= threshold;
+        }
+
+        track.style.transform = `translateX(${currentX}px)`;
+      }
+      requestAnimationFrame(animate);
+    }
+
+    // 4. MOUSE & TOUCH EVENT HANDLERS
+    function handleDragStart(e) {
+      isDragging = true;
+      // Normalizes desktop mouse events vs mobile touch events
+      const pageX = e.touches ? e.touches[0].pageX : e.pageX;
+      startX = pageX - currentX;
+    }
+
+    function handleDragMove(e) {
+      if (!isDragging) return;
+      // Prevent browser default behaviors like text highlight or bouncing page scrolls
+      e.preventDefault(); 
+      
+      const pageX = e.touches ? e.touches[0].pageX : e.pageX;
+      currentX = pageX - startX;
+
+      const threshold = getResetThreshold();
+      // Manage loop reset logic *during* manual drag motions too
+      if (currentX <= -threshold) {
+        startX -= threshold;
+        currentX += threshold;
+      } else if (currentX > 0) {
+        startX += threshold;
+        currentX -= threshold;
+      }
+
+      track.style.transform = `translateX(${currentX}px)`;
+    }
+
+    function handleDragEnd() {
+      isDragging = false;
+    }
+
+    // 5. ATTACH LISTENERS
+    container.addEventListener('mousedown', handleDragStart);
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('mouseup', handleDragEnd);
+
+    container.addEventListener('touchstart', handleDragStart, { passive: false });
+    window.addEventListener('touchmove', handleDragMove, { passive: false });
+    window.addEventListener('touchend', handleDragEnd);
+
+    // Kick off animation
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
