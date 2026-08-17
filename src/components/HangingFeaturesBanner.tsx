@@ -17,7 +17,7 @@ export default function HangingFeaturesBanner() {
       id: 1,
       icon: Award,
       title: 'SEC Registered',
-      sub: 'Philippines HQ',
+      sub: 'Philippine-Based',
       delay: '0.0s',
       badgeColor: 'text-violet-400',
     },

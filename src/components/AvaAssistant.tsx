@@ -40,11 +40,11 @@ interface QuickTopic {
 }
 
 const QUICK_TOPICS: QuickTopic[] = [
-  { label: 'IT & Cloud Services', query: 'What IT and cloud engineering services does OPERAVA offer?', icon: Cpu, category: 'services' },
-  { label: 'Business Process Outsourcing Operations', query: 'Tell me about your customer support and business process outsourcing solutions.', icon: Users, category: 'services' },
-  { label: 'Open Careers & Perks', query: 'What remote job positions and benefits are currently open?', icon: Briefcase, category: 'careers' },
-  { label: 'About OPERAVA', query: 'Can you tell me about OPERAVA, locations, and certifications?', icon: Building2, category: 'about' },
-  { label: 'Pricing & Engagement', query: 'How does your dedicated team and project pricing model work?', icon: Calendar, category: 'contact' },
+  { label: 'IT & Software Services', query: 'What IT and software development services does OPERAVA offer?', icon: Cpu, category: 'services' },
+  { label: 'BPO & Customer Operations', query: 'Tell me about your 8 BPO and customer support services.', icon: Users, category: 'services' },
+  { label: 'Company Profile & SEC Registration', query: 'Can you tell me about OPERAVA, SEC registration, and your initial office?', icon: Building2, category: 'about' },
+  { label: '1 Pro to Dedicated Teams', query: 'How do your delivery models work for small businesses and enterprises?', icon: Calendar, category: 'contact' },
+  { label: 'Careers & Remote Talent', query: 'What remote career opportunities, benefits, and talent initiatives do you offer?', icon: Briefcase, category: 'careers' },
   { label: 'Hiring & Interview Steps', query: 'What are the steps in your recruitment and interview process?', icon: ShieldCheck, category: 'careers' },
 ]
 
@@ -152,7 +152,7 @@ export default function AvaAssistant() {
   const initialMessage: ChatMessage = {
     id: 'welcome-1',
     sender: 'ava',
-    text: "Hello! I'm AVA, your virtual assistant at OPERAVA.\n\nAsk me anything directly about our cloud engineering, custom software development, workforce or business process outsourcing operations, career opportunities, or how our team works. I will answer your questions directly right here in our chat.\n\nHow can I help you today?",
+    text: "Hello! I'm AVA, your virtual intelligence assistant at OPERAVA Global Solutions.\n\nAsk me anything directly about our IT & software development services, 8 BPO and customer operations, company registration (SEC & BIR), remote delivery models (from 1 professional to dedicated teams), career opportunities, or how our team works.\n\nHow can I help you today?",
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   }
 

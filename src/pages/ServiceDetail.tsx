@@ -1,7 +1,9 @@
 import { useParams, Link } from 'react-router-dom'
-import { getServiceBySlug } from '../data/services'
+import { itServices, bpoServices, getServiceBySlug } from '../data/services'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getLocalizedService } from '../i18n/translations/services'
+import ServiceAnimatedIcon from '../components/ServiceAnimatedIcon'
+import ServiceCard from '../components/ServiceCard'
 
 function FAQAccordion({ items }: { items: { q: string; a: string }[] }) {
   return (
@@ -80,17 +82,28 @@ export default function ServiceDetail() {
             <span className="text-gray-700">{service.name}</span>
           </nav>
 
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="px-3 py-1 text-xs font-semibold text-violet-700 bg-violet-50 rounded-full">
-                {categoryLabel}
-              </span>
-              <span className="text-xs font-mono text-gray-400">{service.number}</span>
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="max-w-3xl">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="px-3 py-1 text-xs font-semibold text-violet-700 bg-violet-50 rounded-full">
+                  {categoryLabel}
+                </span>
+                <span className="text-xs font-mono text-gray-400">#{service.number}</span>
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6">
+                {service.name}
+              </h1>
+              <p className="text-xl text-gray-500 leading-relaxed">{service.shortDescription}</p>
             </div>
-            <h1 className="text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6">
-              {service.name}
-            </h1>
-            <p className="text-xl text-gray-500 leading-relaxed">{service.shortDescription}</p>
+
+            {/* Prominent Hero Animated Service Icon */}
+            <div className="shrink-0 flex items-center justify-center py-4 lg:py-0">
+              <ServiceAnimatedIcon
+                icon={service.icon}
+                size="xl"
+                interactive={true}
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -100,12 +113,32 @@ export default function ServiceDetail() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-3 gap-12 lg:gap-16">
           {/* Main */}
           <div className="lg:col-span-2 space-y-12">
-            {/* Overview */}
+            {/* Overview & Service Message */}
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 {t('serviceDetail.overview', 'Service Overview')}
               </h2>
-              <p className="text-base text-gray-600 leading-relaxed">{service.description}</p>
+              <p className="text-base text-gray-600 leading-relaxed mb-6">{service.description}</p>
+              
+              {service.serviceMessage && (
+                <div className="p-6 rounded-2xl bg-violet-50/70 border border-violet-100 text-violet-950">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-8 h-8 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0 mt-0.5">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-violet-700 mb-1.5">
+                        Strategic Perspective
+                      </h3>
+                      <p className="text-sm font-medium leading-relaxed text-gray-800 italic">
+                        "{service.serviceMessage}"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Capabilities */}
@@ -142,6 +175,28 @@ export default function ServiceDetail() {
               </div>
             </div>
 
+            {/* Related Positions / Available Talent */}
+            {service.relatedPositions && service.relatedPositions.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  {t('serviceDetail.relatedPositions', 'Relevant Positions & Roles')}
+                </h2>
+                <p className="text-sm text-gray-500 mb-4">
+                  Talent and specialized roles Operava can provide for individual placement, dedicated pods, or multi-tiered teams:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {service.relatedPositions.map((pos) => (
+                    <span
+                      key={pos}
+                      className="px-3.5 py-1.5 text-xs font-semibold text-violet-900 bg-violet-50/80 border border-violet-100 rounded-lg hover:bg-violet-100 transition-colors"
+                    >
+                      {pos}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Industries */}
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -161,7 +216,7 @@ export default function ServiceDetail() {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 {t('serviceDetail.faq', 'Frequently Asked Questions')}
               </h2>
-              <FAQAccordion items={faqItems} />
+              <FAQAccordion items={service.faqs && service.faqs.length > 0 ? service.faqs : faqItems} />
             </div>
           </div>
 
@@ -205,6 +260,42 @@ export default function ServiceDetail() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Related Services Section */}
+      <section className="py-16 lg:py-24 bg-gray-50/60 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.14em] uppercase text-violet-700 mb-2">
+                {categoryLabel}
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+                {t('serviceDetail.relatedHeading', 'More Services in this Area')}
+              </h2>
+            </div>
+            <Link
+              to={categoryHref}
+              className="text-xs font-bold uppercase tracking-wider text-violet-700 hover:text-violet-900 transition-colors"
+            >
+              {t('serviceDetail.viewAll', 'View all')} {categoryLabel} →
+            </Link>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(service.category === 'it' ? itServices : bpoServices)
+              .filter((s) => s.slug !== service.slug)
+              .slice(0, 4)
+              .map((s, idx) => (
+                <ServiceCard
+                  key={s.id}
+                  service={getLocalizedService(s, language)}
+                  index={idx}
+                  showCapabilities={false}
+                />
+              ))}
           </div>
         </div>
       </section>

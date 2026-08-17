@@ -7,9 +7,12 @@ export default function Footer() {
   const footerServices = [
     { label: t('nav.services.it', 'Information Technology'), href: '/services/it' },
     { label: t('nav.services.bpo', 'Business Process Outsourcing'), href: '/services/bpo' },
-    { label: 'Cloud Services', href: '/services/it/cloud-services' },
-    { label: 'Data Processing', href: '/services/it/data-processing-it' },
+    { label: 'Software Development', href: '/services/it/software-development' },
+    { label: 'Web & Mobile Apps', href: '/services/it/web-mobile-development' },
+    { label: 'Cloud Services & Infrastructure', href: '/services/it/cloud-services' },
+    { label: 'Customer Service', href: '/services/bpo/customer-service' },
     { label: 'Technical Support', href: '/services/bpo/technical-support' },
+    { label: 'Back-Office Operations', href: '/services/bpo/back-office-operations' },
   ]
 
   const footerCompany = [

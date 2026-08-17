@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { itServices } from '../data/services'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getLocalizedService } from '../i18n/translations/services'
+import ServiceCard from '../components/ServiceCard'
 import DraggableMarquee from '../components/DraggableMarquee'
 
 function useReveal() {
@@ -44,42 +45,19 @@ export default function ITServices() {
       </section>
 
       {/* Services grid */}
-      <section ref={ref} className="py-16 lg:py-24 bg-white">
+      <section ref={ref} className="py-16 lg:py-24 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {itServices.map((rawService, i) => {
               const service = getLocalizedService(rawService, language)
               return (
-                <Link
+                <ServiceCard
                   key={service.id}
-                  to={`/services/it/${service.slug}`}
-                  className={`reveal reveal-delay-${Math.min((i % 3) + 1, 5)} group flex flex-col bg-white border border-gray-100 rounded-2xl p-7 hover:border-violet-200 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300`}
-                >
-                  <div className="flex items-start justify-between mb-5">
-                    <div className="w-11 h-11 rounded-xl bg-violet-50 flex items-center justify-center text-violet-700 group-hover:bg-violet-100 group-hover:scale-110 transition-all duration-300">
-                      <span className="text-xs font-bold font-mono text-violet-700">{service.number}</span>
-                    </div>
-                  </div>
-                  <h2 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-violet-700 transition-colors">
-                    {service.name}
-                  </h2>
-                  <p className="text-sm text-gray-500 leading-relaxed flex-1 mb-5">
-                    {service.shortDescription}
-                  </p>
-                  <ul className="flex flex-wrap gap-1.5 mb-5">
-                    {service.capabilities.slice(0, 3).map((cap) => (
-                      <li key={cap} className="px-2.5 py-1 text-xs font-medium bg-gray-50 text-gray-600 rounded-lg">
-                        {cap}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-700 group-hover:gap-2.5 transition-all duration-200 mt-auto">
-                    {t('common.exploreService', 'Explore service')}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
-                    </svg>
-                  </div>
-                </Link>
+                  service={service}
+                  index={i}
+                  showCapabilities={true}
+                  maxCapabilities={3}
+                />
               )
             })}
           </div>

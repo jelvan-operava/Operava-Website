@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle2, Shield, Activity, Users, Globe, Cpu, Zap, BarChart3, Sparkles } from 'lucide-react'
-import { itServices, bpoServices, type Service } from '../data/services'
+import { itServices, bpoServices } from '../data/services'
 import { useLanguage } from '../i18n/LanguageContext'
+import { getLocalizedService } from '../i18n/translations/services'
+import ServiceCard from '../components/ServiceCard'
 import DraggableMarquee from '../components/DraggableMarquee'
 import StackedPlaybooks from '../components/StackedPlaybooks'
 import VideoBackground from '../components/VideoBackground'
@@ -41,74 +43,8 @@ const techCategories = [
   'RPA Automation', 'Cybersecurity', 'Data Pipelines', 'Digital Platforms', 'Enterprise Systems Integration',
 ]
 
-const ServiceIcon = ({ icon }: { icon: string }) => {
-  const icons: Record<string, ReactNode> = {
-    code: <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />,
-    monitor: <><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /></>,
-    layers: <><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></>,
-    settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>,
-    terminal: <><polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" /></>,
-    lightbulb: <><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z" /></>,
-    'git-merge': <><circle cx="18" cy="18" r="3" /><circle cx="6" cy="6" r="3" /><path d="M6 21V9a9 9 0 0 0 9 9" /></>,
-    database: <><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></>,
-    cloud: <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />,
-    server: <><rect x="2" y="2" width="20" height="8" rx="2" /><rect x="2" y="14" width="20" height="8" rx="2" /><line x1="6" y1="6" x2="6.01" y2="6" /><line x1="6" y1="18" x2="6.01" y2="18" /></>,
-    'bar-chart': <><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></>,
-    shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
-    headphones: <><path d="M3 18v-6a9 9 0 0 1 18 0v6" /><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" /></>,
-    tool: <><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /></>,
-    'life-buoy': <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="4" /><line x1="4.93" y1="4.93" x2="9.17" y2="9.17" /><line x1="14.83" y1="14.83" x2="19.07" y2="19.07" /><line x1="14.83" y1="9.17" x2="19.07" y2="4.93" /><line x1="14.83" y1="9.17" x2="18.36" y2="5.64" /><line x1="4.93" y1="19.07" x2="9.17" y2="14.83" /></>,
-    briefcase: <><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></>,
-    edit: <><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></>,
-    'file-text': <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></>,
-    'user-check': <><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><polyline points="17 11 19 13 23 9" /></>,
-    'dollar-sign': <><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></>,
-    users: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>,
-    'user-plus': <><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><line x1="20" y1="8" x2="20" y2="14" /><line x1="23" y1="11" x2="17" y2="11" /></>,
-    clock: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>,
-    search: <><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></>,
-    'book-open': <><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></>,
-    truck: <><rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /></>,
-    inbox: <><polyline points="22 12 16 12 14 15 10 15 8 12 2 12" /><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" /></>,
-  }
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="w-5 h-5">
-      {icons[icon] || <circle cx="12" cy="12" r="10" />}
-    </svg>
-  )
-}
-
-function ServiceCard({ service, index }: { service: Service; index: number }) {
-  const { t } = useLanguage()
-  return (
-    <div
-      className={`reveal reveal-delay-${Math.min((index % 4) + 1, 5)} group bg-white border border-gray-100 rounded-2xl p-6 hover:border-violet-200 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300 cursor-pointer flex flex-col justify-between`}
-    >
-      <div>
-        <div className="flex items-start justify-between mb-4">
-          <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-700 group-hover:bg-violet-100 group-hover:scale-110 transition-all duration-300">
-            <ServiceIcon icon={service.icon} />
-          </div>
-          <span className="text-xs font-mono text-gray-300 font-semibold">{service.number}</span>
-        </div>
-        <h3 className="text-base font-semibold text-gray-900 mb-2 group-hover:text-violet-700 transition-colors duration-200">
-          {service.name}
-        </h3>
-        <p className="text-sm text-gray-500 leading-relaxed mb-4">{service.shortDescription}</p>
-      </div>
-      <Link
-        to={`/services/${service.category}/${service.slug}`}
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-700 hover:gap-2.5 transition-all duration-200 pt-2"
-      >
-        <span>{t('common.exploreService', 'Explore service')}</span>
-        <ArrowRight className="w-3.5 h-3.5" />
-      </Link>
-    </div>
-  )
-}
-
 export default function Home() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
 
   const trustRef = useIntersection()
   const itRef = useIntersection()
@@ -337,9 +273,9 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
             {itServices.slice(0, 8).map((s, i) => (
-              <ServiceCard key={s.id} service={s} index={i} />
+              <ServiceCard key={s.id} service={getLocalizedService(s, language)} index={i} />
             ))}
           </div>
         </div>
@@ -373,9 +309,9 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
             {bpoServices.slice(0, 8).map((s, i) => (
-              <ServiceCard key={s.id} service={s} index={i} />
+              <ServiceCard key={s.id} service={getLocalizedService(s, language)} index={i} />
             ))}
           </div>
         </div>
@@ -509,36 +445,22 @@ export default function Home() {
             </div>
           </div>
           {/* Globe visualization */}
-          <div className="reveal reveal-delay-2 flex items-center justify-center">
-            <svg viewBox="0 0 400 320" className="w-full max-w-sm opacity-85" fill="none" aria-hidden="true">
-              <ellipse cx="200" cy="160" rx="130" ry="130" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
-              <ellipse cx="200" cy="160" rx="80" ry="130" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
-              <ellipse cx="200" cy="160" rx="130" ry="40" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-              <ellipse cx="200" cy="160" rx="130" ry="80" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-              {[
-                [120, 100], [280, 90], [90, 180], [310, 160], [160, 220], [240, 200], [200, 130], [175, 175],
-              ].map(([cx, cy], i) => (
-                <g key={i}>
-                  <circle cx={cx} cy={cy} r="5" fill="rgba(255,255,255,0.95)" />
-                  <circle cx={cx} cy={cy} r="5" fill="rgba(255,255,255,0.4)">
-                    <animate attributeName="r" values="5;14;5" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
-                    <animate attributeName="fill-opacity" values="0.4;0;0.4" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
-                  </circle>
-                </g>
-              ))}
-              {[
-                [120, 100, 280, 90], [90, 180, 160, 220], [310, 160, 240, 200],
-                [200, 130, 175, 175], [280, 90, 310, 160], [120, 100, 90, 180],
-              ].map(([x1, y1, x2, y2], i) => (
-                <line
-                  key={i}
-                  x1={x1} y1={y1} x2={x2} y2={y2}
-                  stroke="rgba(255,255,255,0.3)"
-                  strokeWidth="1"
-                  strokeDasharray="4 4"
-                />
-              ))}
-            </svg>
+          <div className="flex items-center justify-center w-full">
+            <div className="w-full max-w-sm sm:max-w-md aspect-square relative flex items-center justify-center select-none overflow-hidden">
+              <iframe
+                src="https://player.cloudinary.com/embed/?cloud_name=mgyosgsm&public_id=Copy_of_Untitled_f9yslx&profile=cld-looping"
+                width="100%"
+                height="100%"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                tabIndex={-1}
+                aria-hidden="true"
+                className="w-full h-full border-0 bg-transparent pointer-events-none select-none"
+                style={{ border: 'none', background: 'transparent', pointerEvents: 'none' }}
+                title="Global Workforce Globe"
+              />
+              {/* Invisible touch & pointer barrier to ensure no click or hover triggers controls */}
+              <div className="absolute inset-0 z-10 bg-transparent cursor-default select-none" aria-hidden="true" />
+            </div>
           </div>
         </div>
       </section>

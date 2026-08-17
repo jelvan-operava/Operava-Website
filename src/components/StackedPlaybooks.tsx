@@ -70,7 +70,7 @@ export default function StackedPlaybooks() {
         'bg-gradient-to-r from-transparent via-yellow-500 to-transparent shadow-[0_0_25px_#eab308]',
       ],
       labels: [
-        { text: 'SEC Registered Philippines HQ', top: '20%', left: '15%', color: 'text-yellow-400' },
+        { text: 'SEC Registered Corporation', top: '20%', left: '15%', color: 'text-yellow-400' },
         { text: 'Zero Security Breaches', top: '50%', right: '12%', color: 'text-lime-400' },
         { text: '60% Cost Efficiency Unlocked', bottom: '20%', left: '30%', color: 'text-amber-300' },
       ],
