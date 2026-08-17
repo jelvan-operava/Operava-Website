@@ -201,6 +201,6 @@ For complete, detailed instructions on deploying to **Cloudflare Pages**, config
 
 **OPERAVA Global Solutions**  
 - **Website**: [https://operava.com](https://operava.com)  
-- **Headquarters**: Manila & Clark, Philippines  
+- **Location**: Philippine-Based, operating remotely and globally  
 - **Global Delivery**: North America &bull; Europe &bull; Australia &bull; Asia-Pacific  
 - **Enterprise Support**: `contact@operava.com`
