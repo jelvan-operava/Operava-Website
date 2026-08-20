@@ -1,0 +1,162 @@
+# OPERAVA GLOBAL SOLUTIONS
+## TERMS AND CONDITIONS
+### Website, Services, Employment Applications, Client Engagements and Digital Platforms
+
+**Effective Date: 17 August 2026**
+
+### IMPORTANT NOTICE
+This is a general corporate and website framework for OPERAVA Global Solutions OPC. Specific client agreements, employment agreements, statements of work, NDAs, data-processing agreements, and other contracts may supplement or supersede these Terms for the applicable relationship. This document should be reviewed by qualified Philippine counsel before publication or contractual use.
+
+### 1. ABOUT OPERAVA
+OPERAVA Global Solutions is a Philippine-based technology, workforce, and Business Process Outsourcing organization focused on Information Technology, digital services, cloud-related solutions, business operations, customer service, data processing, and remote professional services.
+
+OPERAVA may serve startups, small businesses, SMEs, growing organizations, established businesses, and enterprises.
+
+OPERAVA operates with a remote-first model and may work with professionals and clients in different countries, subject to applicable laws and contractual requirements.
+
+OPERAVA is an SEC-registered Philippine corporation. Corporate registration is not represented as a blanket government license, accreditation, certification, or authorization for every possible technology, professional, staffing, financial, regulated, or specialized activity. Separate permits, licenses, certifications, professional qualifications, or authorizations may apply to particular activities.
+
+### 2. ACCEPTANCE
+By accessing or using an OPERAVA website, platform, service, form, portal, or other digital property, you acknowledge these Terms to the extent applicable. If you do not agree, discontinue use of the relevant service or platform.
+
+Specific written agreements may contain additional or conflicting terms. The applicable specific agreement controls for that relationship and subject matter.
+
+### 3. SERVICES
+OPERAVA services may include:
+• Software development
+• Web and mobile application development
+• SaaS and platform development
+• IT systems development
+• Computer programming
+• IT consulting
+• Systems integration
+• Database services
+• Cloud-related solutions
+• Cloud application environments
+• Hosting-related services
+• Cloud migration and infrastructure support
+• Application deployment
+• Systems administration
+• Customer service
+• Technical support
+• Help desk
+• Back-office operations
+• Data processing
+• Data entry
+• Document processing
+• Virtual assistance
+• Other related technology and business-process services
+
+The exact scope, deliverables, staffing, technologies, service levels, and responsibilities are determined by the applicable agreement or assignment.
+
+### 4. NO AUTOMATIC SERVICE OBLIGATION
+Descriptions on an OPERAVA website do not create an automatic obligation to provide every listed service to every customer. A service becomes applicable when accepted, contracted, assigned, or otherwise confirmed.
+
+### 5. GENERALIST AND SPECIALIST WORKFORCE MODEL
+OPERAVA may use broad professional titles such as:
+• OPERAVA Technology Executive
+• OPERAVA Customer Service Executive
+• OPERAVA Business Operations Executive
+
+These titles are intentionally broad. Employees will not necessarily perform every function associated with a position.
+
+Actual assignments depend on client requirements, education, experience, demonstrated competency, assessments, training, and project requirements.
+
+A Business Operations Executive may be assigned to HR operations, accounting support, finance operations, data processing, administrative operations, or another related function.
+
+A Technology Executive may be assigned to IT, cloud, web, software, application, systems, database, programming, or another related technology function.
+
+A Customer Service Executive may be assigned to voice, chat, email, customer support, account support, or another related customer-service function.
+
+### 6. CLIENT RESPONSIBILITIES
+Clients must provide accurate and timely information, instructions, approvals, systems, access, and other resources reasonably required for contracted services. Clients must not request unlawful, unsafe, unauthorized, or out-of-scope activities.
+
+### 7. SERVICE QUALITY
+OPERAVA aims to provide professional, reliable, technology-enabled services and appropriately qualified personnel. Outcomes may depend on client systems, information, third parties, technical environments, scope, and other factors outside OPERAVA's reasonable control. Unless expressly stated in writing, OPERAVA does not guarantee uninterrupted service or a particular commercial outcome.
+
+### 8. TALENT ASSIGNMENTS
+OPERAVA may assign qualified personnel based on requirements, qualifications, assessments, training, availability, and operational needs.
+
+Passing an assessment or interview does not guarantee employment, a specific client, specialization, schedule, compensation, or long-term assignment.
+
+### 9. HIRING PROCESS
+Where applicable:
+1. Initial / AI-assisted interview
+2. Skills or role assessment
+3. OPERAVA Talent Acquisition interview
+4. Client interview
+5. Final selection and applicable employment/engagement documentation
+
+The process may vary by role, client, jurisdiction, and business requirements. AI-assisted screening does not itself create an employment relationship.
+
+### 10. REMOTE WORK
+OPERAVA is primarily remote-first. Personnel may be required to maintain appropriate connectivity, equipment, professional communication, secure information handling, an appropriate work environment, agreed availability, and compliance with remote-work and security procedures.
+
+### 11. ACCOUNTS AND SECURITY
+Users must protect credentials and report suspected unauthorized access or security incidents. OPERAVA may restrict, suspend, or terminate access when reasonably necessary to protect systems, users, clients, personnel, or information.
+
+### 12. ACCEPTABLE USE
+Users must not use OPERAVA systems unlawfully, attempt unauthorized access, introduce malware, interfere with systems, bypass security controls, impersonate others, upload malicious or unlawful material, infringe rights, access information without authorization, or facilitate fraud, abuse, harassment, or other unlawful activity.
+
+### 13. INTELLECTUAL PROPERTY
+Unless otherwise agreed, OPERAVA and its licensors retain rights in OPERAVA websites, branding, software, templates, systems, documentation, processes, designs, and proprietary materials. Client deliverable ownership or licensing is governed by the applicable agreement.
+
+### 14. CLIENT MATERIALS
+Clients retain rights in materials supplied to OPERAVA, subject to the rights necessary to perform contracted services. Clients must have lawful authority to provide such materials.
+
+### 15. THIRD-PARTY SERVICES
+OPERAVA may use or integrate third-party hosting, cloud, communication, payment, software, API, and other services. Third parties may have separate terms, privacy policies, limitations, and security practices.
+
+### 16. CONFIDENTIALITY
+Confidential information may include business, client, customer, employee, technical, credential, source-code, financial, document, trade-secret, and non-public operational information. Additional confidentiality duties may arise under NDAs, employment agreements, and client contracts.
+
+### 17. DATA PRIVACY
+OPERAVA processes personal information under applicable privacy and data-protection requirements. Processing is addressed further in OPERAVA's Privacy Policy and applicable privacy notices. Client processing may be governed by data-processing provisions.
+
+### 18. SECURITY
+OPERAVA seeks to implement reasonable organizational, physical, and technical safeguards appropriate to the nature and risks of information and systems. No internet-connected system can be guaranteed completely secure.
+
+### 19. PAYMENTS AND COMMERCIAL TERMS
+Prices, billing, payment schedules, taxes, refunds, service credits, expenses, and other commercial terms are governed by the applicable quotation, invoice, statement of work, or signed agreement.
+
+### 20. TAXES
+Applicable taxes and legally required charges are handled according to applicable law and the relevant contract.
+
+### 21. CANCELLATION AND TERMINATION
+Termination, suspension, notice, refunds, transition support, and related conditions are governed by the applicable agreement. OPERAVA may suspend access or services for security, unlawful use, non-payment, material breach, or legitimate operational reasons, subject to applicable law and contract.
+
+### 22. PROFESSIONAL ADVICE DISCLAIMER
+Unless expressly agreed and appropriately qualified, OPERAVA does not provide legal, tax, medical, investment, or other regulated professional advice. Clients should obtain appropriate qualified advice where required.
+
+### 23. LIMITATION OF LIABILITY
+To the maximum extent permitted by applicable law, liability is governed by the applicable written agreement. Nothing in these Terms excludes liability that cannot lawfully be excluded or limited.
+
+### 24. FORCE MAJEURE
+OPERAVA is not responsible for delays or failures caused by circumstances beyond reasonable control, including major outages, natural disasters, government actions, war, civil disturbance, telecommunications failures, cyber incidents, third-party failures, or other extraordinary events, subject to applicable law and contractual obligations.
+
+### 25. MODIFICATIONS
+OPERAVA may update these Terms. Material changes may be communicated through the website, platform, email, or other reasonable means.
+
+### 26. GOVERNING LAW
+Unless otherwise required by applicable law or agreed in a valid written contract, these general Terms are intended to be governed by the laws of the Republic of the Philippines.
+
+### 27. SEVERABILITY
+If any provision is invalid or unenforceable, the remaining provisions continue to the extent permitted by law.
+
+### 28. NO WAIVER
+Failure to enforce a provision does not waive the right to enforce it later.
+
+### 29. ENTIRE AGREEMENT
+These Terms operate together with applicable privacy notices, service agreements, statements of work, employment agreements, NDAs, and other written agreements. A specific written agreement controls where there is a conflict.
+
+### 30. CONTACT
+OPERAVA Global Solutions  
+Initial Philippine office:  
+Pagudpud, Ilocos Norte 2919, Philippines  
+
+Current official contact channels should be used for inquiries.
+
+### 31. FINAL NOTICE
+This document is a general framework and is not a substitute for a signed client service agreement, employment agreement, NDA, data-processing agreement, or other legally required document.
+
+**OPERAVA — OPERATING IN ADVANCE.**
