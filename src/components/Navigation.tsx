@@ -74,36 +74,16 @@ export default function Navigation() {
       <nav className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16 lg:h-18">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="OPERAVA Global Solutions — Home">
-          <div className="relative h-10 w-10 sm:h-11 sm:w-11 overflow-hidden bg-white flex items-center justify-center">
-            <video
-              ref={(el) => {
-                if (el) {
-                  el.muted = true
-                  el.defaultMuted = true
-                  el.play().catch(() => {})
-                }
-              }}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-              disablePictureInPicture
-              controls={false}
+          <div className="relative h-10 w-10 sm:h-11 sm:w-11 overflow-hidden bg-transparent flex items-center justify-center">
+            <img
+              src="https://res.cloudinary.com/sdaxzncs/image/upload/v1786248668/Operava_Logo_Official.svg"
+              alt="OPERAVA Logo"
               className="h-full w-full object-contain pointer-events-none select-none transition-transform duration-200 group-hover:scale-105"
-              onLoadedMetadata={(e) => {
-                e.currentTarget.muted = true
-                e.currentTarget.play().catch(() => {})
-              }}
-              onCanPlay={(e) => {
-                e.currentTarget.play().catch(() => {})
-              }}
-            >
-              <source src="https://res.cloudinary.com/mgyosgsm/video/upload/Video_ffvnwd.mp4" type="video/mp4" />
-            </video>
+              loading="eager"
+            />
           </div>
           <div className="flex flex-col leading-none">
-            <span className="text-xl font-black tracking-tight text-gray-900 group-hover:text-violet-700 transition-colors duration-200">
+            <span className="operava-text text-xl sm:text-2xl font-black tracking-tight select-none">
               {t('brand.name', 'OPERAVA')}
             </span>
           </div>

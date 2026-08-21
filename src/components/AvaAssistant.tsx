@@ -147,6 +147,8 @@ export default function AvaAssistant() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const chatWindowRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   // Initial welcome message (Natural, friendly, human, clear, direct)
   const initialMessage: ChatMessage = {
@@ -192,6 +194,40 @@ export default function AvaAssistant() {
     }, 12000)
     return () => clearTimeout(timer)
   }, [])
+
+  // Isolate scroll so wheel/trackpad scrolling inside the chat window applies only to the chat box
+  useEffect(() => {
+    const chatEl = chatWindowRef.current
+    if (!chatEl || !isOpen) return
+
+    const handleWheel = (e: WheelEvent) => {
+      // Prevent event from propagating to window/document
+      e.stopPropagation()
+
+      // Check if user is scrolling over the horizontal quick topics bar
+      const target = e.target as HTMLElement | null
+      const horizontalEl = target?.closest('.ava-horizontal-scroll') as HTMLElement | null
+      if (horizontalEl && (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey)) {
+        horizontalEl.scrollLeft += e.deltaX || e.deltaY
+        e.preventDefault()
+        return
+      }
+
+      // Route all vertical mouse wheel scrolling to the chat messages feed
+      const messagesEl = messagesContainerRef.current
+      if (messagesEl) {
+        messagesEl.scrollTop += e.deltaY
+      }
+
+      // Always prevent default to strictly isolate scrolling from the background page
+      e.preventDefault()
+    }
+
+    chatEl.addEventListener('wheel', handleWheel, { passive: false })
+    return () => {
+      chatEl.removeEventListener('wheel', handleWheel)
+    }
+  }, [isOpen])
 
   const handleOpen = () => {
     setIsOpen(true)
@@ -432,8 +468,9 @@ export default function AvaAssistant() {
       {/* ── EXPANDED CHAT DIALOG CONTAINER ── */}
       {isOpen && (
         <div
+          ref={chatWindowRef}
           id="ava-chat-window"
-          className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] max-h-[85vh] sm:max-h-[640px] h-[580px] flex flex-col rounded-3xl bg-white shadow-2xl border border-gray-200/90 overflow-hidden animate-scale-up"
+          className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[420px] max-h-[85vh] sm:max-h-[640px] h-[580px] flex flex-col rounded-3xl bg-white shadow-2xl border border-gray-200/90 overflow-hidden animate-scale-up overscroll-contain"
         >
           {/* Header */}
           <div className="px-5 py-4 bg-gradient-to-r from-gray-950 via-gray-900 to-purple-950 text-white flex items-center justify-between border-b border-gray-800 shrink-0">
@@ -494,7 +531,10 @@ export default function AvaAssistant() {
           </div>
 
           {/* Messages Feed */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50/60 text-sm">
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 p-4 overflow-y-auto overscroll-y-contain space-y-4 bg-gray-50/60 text-sm"
+          >
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -708,7 +748,7 @@ export default function AvaAssistant() {
           </div>
 
           {/* Quick Topics Direct Question Bar */}
-          <div className="px-3 py-2 bg-white border-t border-gray-100 overflow-x-auto scrollbar-none flex items-center gap-1.5 shrink-0">
+          <div className="ava-horizontal-scroll px-3 py-2 bg-white border-t border-gray-100 overflow-x-auto overscroll-x-contain scrollbar-none flex items-center gap-1.5 shrink-0">
             {QUICK_TOPICS.map((topic, i) => {
               const IconComp = topic.icon
               return (

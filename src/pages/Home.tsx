@@ -128,40 +128,34 @@ export default function Home() {
               {
                 title: 'Technology & Software',
                 desc: 'Digital platforms, custom cloud applications, API networks and IT infrastructure.',
-                icon: <Cpu className="w-6 h-6" />,
                 videoSrc: 'https://res.cloudinary.com/mgyosgsm/video/upload/Video_otwv5l.mp4',
                 coverPhoto: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=80',
                 link: '/services/it',
-                tag: 'Cloud & Tech',
                 beamDuration: 4.2,
                 beamDelay: 0,
               },
               {
                 title: 'Global Workforce',
                 desc: 'Skilled remote professionals and managed teams supporting 24/7 global operations.',
-                icon: <Users className="w-6 h-6" />,
                 videoSrc: 'https://res.cloudinary.com/mgyosgsm/video/upload/Video_nmdtfe.mp4',
                 coverPhoto: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80',
                 link: '/careers',
-                tag: 'Talent & Teams',
                 beamDuration: 5.2,
                 beamDelay: -1.8,
               },
               {
                 title: 'Business Processes',
                 desc: 'Reliable outsourced operations designed for measurable accuracy, speed and scale.',
-                icon: <Activity className="w-6 h-6" />,
                 videoSrc: 'https://res.cloudinary.com/mgyosgsm/video/upload/Video_pmorrn.mp4',
                 coverPhoto: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
                 link: '/services/bpo',
-                tag: 'Operations & BPO',
                 beamDuration: 4.6,
                 beamDelay: -3.4,
               },
             ].map((item, i) => (
               <div
                 key={item.title}
-                className={`reveal reveal-delay-${i + 2} relative overflow-hidden rounded-3xl min-h-[380px] p-8 sm:p-9 flex flex-col justify-between group hover:-translate-y-1.5 transition-all duration-500 shadow-xl border border-white/20 hover:border-white/50 hover:shadow-2xl bg-gray-950`}
+                className={`reveal reveal-delay-${i + 2} relative overflow-hidden rounded-3xl min-h-[380px] p-8 sm:p-9 flex flex-col justify-end group hover:-translate-y-1.5 transition-all duration-500 shadow-xl border border-white/20 hover:border-white/50 hover:shadow-2xl bg-gray-950`}
               >
                 {/* Running Purple Glowing Light Beam along the Box Perimeter - Staggered Timings */}
                 <PurpleRunningBorderBeam
@@ -178,6 +172,7 @@ export default function Home() {
                         if (el) {
                           el.muted = true
                           el.defaultMuted = true
+                          el.playsInline = true
                           el.play().catch(() => {})
                         }
                       }}
@@ -188,7 +183,9 @@ export default function Home() {
                       preload="auto"
                       disablePictureInPicture
                       controls={false}
-                      className="w-full h-full min-w-full min-h-full object-cover object-center absolute inset-0 pointer-events-none select-none"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      className="w-full h-full min-w-full min-h-full object-cover object-center absolute inset-0 pointer-events-none select-none no-media-controls"
                       poster={item.coverPhoto}
                       onLoadedMetadata={(e) => {
                         e.currentTarget.muted = true
@@ -213,18 +210,8 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/20 pointer-events-none" />
                 </div>
 
-                {/* Top Badge & Icon - Clear Glass Aesthetic */}
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-white shadow-sm group-hover:bg-violet-600/90 group-hover:border-violet-300 transition-colors duration-300">
-                    {item.icon}
-                  </div>
-                  <span className="px-3 py-1 rounded-full bg-white/20 border border-white/30 text-white text-xs font-semibold tracking-wide shadow-sm">
-                    {item.tag}
-                  </span>
-                </div>
-
                 {/* Bottom Content with Same Color Text & Crisp Shadow for High Contrast */}
-                <div className="relative z-10 pt-12">
+                <div className="relative z-10">
                   <h3 className="text-2xl font-black text-white mb-2.5 tracking-tight group-hover:text-violet-200 transition-colors drop-shadow-[0_2px_4px_rgba(0,0,0,0.85)]">
                     {item.title}
                   </h3>

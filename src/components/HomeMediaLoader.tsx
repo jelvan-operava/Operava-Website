@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { CheckCircle2, Loader2, Sparkles, Video, ShieldCheck, Zap } from 'lucide-react'
 
 interface AssetToLoad {
@@ -35,15 +35,21 @@ const CRITICAL_ASSETS: AssetToLoad[] = [
   },
   {
     id: 'brand-logo',
-    name: 'OPERAVA Motion Logo',
-    type: 'video',
-    url: 'https://res.cloudinary.com/mgyosgsm/video/upload/Video_ffvnwd.mp4',
+    name: 'OPERAVA Official Logo',
+    type: 'image',
+    url: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1786248668/Operava_Logo_Official.svg',
   },
   {
     id: 'ava-avatar',
     name: 'AVA Intelligence Stream',
     type: 'video',
     url: 'https://res.cloudinary.com/mgyosgsm/video/upload/Video_vpaaxl.mp4',
+  },
+  {
+    id: 'digital-grid',
+    name: 'Digital Architecture Stream',
+    type: 'video',
+    url: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-data-31912-large.mp4',
   },
 ]
 
@@ -53,7 +59,7 @@ interface HomeMediaLoaderProps {
 
 export default function HomeMediaLoader({ onLoadingComplete }: HomeMediaLoaderProps) {
   const [completedMap, setCompletedMap] = useState<Record<string, boolean>>({})
-  const [displayProgress, setDisplayProgress] = useState(12)
+  const [displayProgress, setDisplayProgress] = useState(10)
   const [statusText, setStatusText] = useState('Initializing OPERAVA Systems...')
   const [isFinished, setIsFinished] = useState(false)
   const [shouldUnmount, setShouldUnmount] = useState(false)
@@ -61,23 +67,38 @@ export default function HomeMediaLoader({ onLoadingComplete }: HomeMediaLoaderPr
   const startTimeRef = useRef(Date.now())
   const hasFinishedRef = useRef(false)
 
+  // Wake all videos in the page to ensure guaranteed autoplay without user needing to interact
+  const wakeAllVideos = useCallback(() => {
+    try {
+      const allVideos = document.querySelectorAll('video')
+      allVideos.forEach((vid) => {
+        vid.muted = true
+        vid.defaultMuted = true
+        vid.playsInline = true
+        const playPromise = vid.play()
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {})
+        }
+      })
+    } catch {
+      // Handled silently
+    }
+  }, [])
+
   useEffect(() => {
     // Disable body scroll while loading
     document.body.style.overflow = 'hidden'
 
     const total = CRITICAL_ASSETS.length
-    let loadedCount = 0
 
     const markLoaded = (id: string) => {
       setCompletedMap((prev) => {
         if (prev[id]) return prev
-        const next = { ...prev, [id]: true }
-        loadedCount = Object.keys(next).length
-        return next
+        return { ...prev, [id]: true }
       })
     }
 
-    // Preload each asset
+    // Preload each asset and verify ready state
     const videoElements: HTMLVideoElement[] = []
     const imageElements: HTMLImageElement[] = []
 
@@ -122,10 +143,10 @@ export default function HomeMediaLoader({ onLoadingComplete }: HomeMediaLoaderPr
       }
     })
 
-    // Safety fallback timeout: maximum 4.2s to guarantee smooth loading even on slow 3G
+    // Safety fallback timeout: maximum 8s only for extremely restricted networks
     const fallbackTimer = setTimeout(() => {
       CRITICAL_ASSETS.forEach((a) => markLoaded(a.id))
-    }, 4200)
+    }, 8000)
 
     return () => {
       clearTimeout(fallbackTimer)
@@ -140,48 +161,55 @@ export default function HomeMediaLoader({ onLoadingComplete }: HomeMediaLoaderPr
     }
   }, [])
 
-  // Smooth Progress & Status Updater Loop
+  // Smooth Progress & Status Updater Loop based on actual loaded assets
   useEffect(() => {
     const total = CRITICAL_ASSETS.length
 
     const interval = setInterval(() => {
       const actualCount = Object.values(completedMap).filter(Boolean).length
-      const targetPercent = Math.min(100, Math.round((actualCount / total) * 100))
+      // Target progress is strictly tied to how many assets have truly finished loading
+      const targetPercent = Math.round((actualCount / total) * 100)
 
       setDisplayProgress((prev) => {
         if (prev < targetPercent) {
-          return Math.min(targetPercent, prev + Math.max(2, Math.round((targetPercent - prev) * 0.25)))
-        } else if (prev < 90 && actualCount < total) {
-          // Slow trickle progress while waiting
-          return prev + 0.5
+          const step = Math.max(1, Math.ceil((targetPercent - prev) * 0.3))
+          return Math.min(targetPercent, prev + step)
         }
         return prev
       })
-    }, 45)
+    }, 35)
 
     return () => clearInterval(interval)
   }, [completedMap])
 
-  // Update status messages according to progress
+  // Update status messages according to real progress and trigger completion ONLY when all loaded
   useEffect(() => {
+    const total = CRITICAL_ASSETS.length
+    const actualCount = Object.values(completedMap).filter(Boolean).length
+    const allLoaded = actualCount >= total
+
     if (displayProgress < 25) {
       setStatusText('Connecting to OPERAVA Cloud Ingress...')
     } else if (displayProgress < 50) {
       setStatusText('Preloading High-Definition Capabilities Videos...')
     } else if (displayProgress < 75) {
       setStatusText('Buffering Technology, Workforce & BPO Streams...')
-    } else if (displayProgress < 95) {
+    } else if (displayProgress < 99) {
       setStatusText('Optimizing GPU Acceleration & Video Canvas...')
     } else {
       setStatusText('All Systems & Media Streams Loaded. Launching...')
     }
 
-    if (displayProgress >= 100 && !hasFinishedRef.current) {
+    // Only proceed when actual assets are 100% loaded AND display progress reached 100%
+    if (displayProgress >= 100 && allLoaded && !hasFinishedRef.current) {
       hasFinishedRef.current = true
       const elapsed = Date.now() - startTimeRef.current
-      const delay = Math.max(300, 700 - elapsed)
+      const delay = Math.max(300, 600 - elapsed)
 
       setTimeout(() => {
+        // Pre-activate all video elements on page so they autoplay instantly
+        wakeAllVideos()
+
         setIsFinished(true)
         document.body.style.overflow = ''
         if (onLoadingComplete) {
@@ -194,7 +222,7 @@ export default function HomeMediaLoader({ onLoadingComplete }: HomeMediaLoaderPr
         }, 800)
       }, delay)
     }
-  }, [displayProgress, onLoadingComplete])
+  }, [displayProgress, completedMap, onLoadingComplete, wakeAllVideos])
 
   if (shouldUnmount) return null
 
@@ -230,20 +258,31 @@ export default function HomeMediaLoader({ onLoadingComplete }: HomeMediaLoaderPr
           <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-violet-400 via-fuchsia-300 to-purple-400 opacity-40 blur-xl animate-pulse-slow" />
 
           <div
-            className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[3px] shadow-xl flex items-center justify-center bg-white"
+            className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-[3px] shadow-xl flex items-center justify-center bg-white pointer-events-none select-none"
             style={{
               background: 'conic-gradient(from 0deg, #8A2BE2, #FF00FF, #7F00FF, #8A2BE2)',
               boxShadow: '0 10px 30px rgba(138, 43, 226, 0.25), inset 0 0 10px rgba(255, 0, 255, 0.35)',
             }}
           >
-            <div className="w-full h-full rounded-full overflow-hidden bg-black flex items-center justify-center">
+            <div className="w-full h-full rounded-full overflow-hidden bg-black flex items-center justify-center pointer-events-none">
               <video
                 autoPlay
                 loop
                 muted
                 playsInline
                 preload="auto"
-                className="w-full h-full object-cover pointer-events-none"
+                disablePictureInPicture
+                controls={false}
+                tabIndex={-1}
+                aria-hidden="true"
+                className="w-full h-full object-cover pointer-events-none select-none no-media-controls"
+                onLoadedMetadata={(e) => {
+                  e.currentTarget.muted = true
+                  e.currentTarget.play().catch(() => {})
+                }}
+                onCanPlay={(e) => {
+                  e.currentTarget.play().catch(() => {})
+                }}
               >
                 <source src="https://res.cloudinary.com/mgyosgsm/video/upload/Video_vpaaxl.mp4" type="video/mp4" />
               </video>
@@ -251,7 +290,7 @@ export default function HomeMediaLoader({ onLoadingComplete }: HomeMediaLoaderPr
           </div>
 
           {/* Mini active pulse indicator */}
-          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-violet-600 border-2 border-white flex items-center justify-center shadow-md">
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-violet-600 border-2 border-white flex items-center justify-center shadow-md pointer-events-none">
             <Zap className="w-3 h-3 text-white fill-white" />
           </div>
         </div>

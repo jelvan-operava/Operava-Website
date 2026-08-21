@@ -326,6 +326,12 @@ export const en: Record<string, string> = {
   // Testimonials
   'testimonials.badge': 'Verified Enterprise Outcomes',
   'testimonials.title': 'Trusted by Global Engineering & Operations Leaders',
+
+  // Operational Insights & Innovations Marquee
+  'marquee.badge': 'OPERATIONAL INSIGHTS & INNOVATIONS',
+  'marquee.title': 'Operava Operational Insights & Innovations',
+  'marquee.dragPrompt': 'Drag sideways to inspect innovations or explore details.',
+  'marquee.subtitle': 'Real-world execution, modern technology frameworks, and high-impact operational methodologies across engineering, data, and workforce operations.',
   'testimonials.verified': 'Verified Client',
   'testimonials.metric': 'Key Performance Impact',
   'testimonials.retention': 'Client Retention',

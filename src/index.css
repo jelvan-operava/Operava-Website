@@ -59,6 +59,48 @@ body {
   outline-offset: 2px;
 }
 
+/* ── STRICT VIDEO & MEDIA CONTROLS SUPPRESSION ── */
+/* Completely hides and disables any native browser play/pause buttons, start playback overlays, and control bars */
+video::-webkit-media-controls,
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-start-playback-button,
+video::-webkit-media-controls-overlay-play-button,
+video::-webkit-media-controls-enclosure,
+video::-webkit-media-controls-panel,
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display,
+video::-webkit-media-controls-timeline,
+video::-webkit-media-controls-mute-button,
+video::-webkit-media-controls-fullscreen-button,
+video::-webkit-media-controls-toggle-closed-captions-button,
+video::-webkit-media-controls-volume-slider {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  position: absolute !important;
+  clip: rect(0, 0, 0, 0) !important;
+}
+
+video::-moz-media-controls {
+  display: none !important;
+}
+
+video {
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.no-media-controls::-webkit-media-controls {
+  display: none !important;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -152,6 +194,149 @@ body {
   100% {
     stroke-dashoffset: 0;
   }
+}
+
+/* ── OPERAVA ANIMATED BRAND TEXT ── */
+.operava-text {
+  font-family: 'Arial Black', 'Impact', system-ui, -apple-system, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  background: linear-gradient(
+    90deg, 
+    #000000 0%, 
+    #000000 20%, 
+    #8a2be2 40%, 
+    #ff1493 60%, 
+    #000000 80%, 
+    #000000 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: lightWave 9s ease-in-out infinite;
+}
+
+@keyframes lightWave {
+  0% {
+    background-position: 100% 0%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* ── SERVICE CARD REFERENCE STYLES (#5e42be Purple Theme) ── */
+.operava-card-frame {
+  position: relative;
+  background: #5e42be;
+  border-radius: 16px;
+  padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 15px 40px rgba(94, 66, 190, 0.25);
+  border: 1px solid #4a32a3;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.operava-card-frame:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(94, 66, 190, 0.38);
+  border-color: #6d4fdb;
+}
+
+.operava-image-container {
+  width: 100%;
+  height: 210px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  position: relative;
+  background-color: #5e42be;
+  background-image: 
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 65%),
+    radial-gradient(rgba(255, 0, 127, 0.35) 10%, transparent 11%);
+  background-size: 100% 100%, 16px 16px;
+  background-position: center, center;
+  background-repeat: no-repeat, repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.operava-image-container::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  right: 15%;
+  bottom: 15%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  filter: blur(15px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.operava-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.4s ease-out;
+}
+
+.operava-card-frame:hover .operava-image-container img {
+  transform: scale(1.05);
+}
+
+.operava-card-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.25;
+}
+
+.operava-card-description {
+  color: #e2dbff;
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.operava-learn-more-btn {
+  width: 100%;
+  padding: 13px;
+  background-color: #ffffff;
+  border: 1px solid #ffffff;
+  color: #5e42be;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.operava-learn-more-btn:hover {
+  background-color: #4a32a3;
+  color: #ffffff;
+  border-color: #4a32a3;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
 .animate-scale-up {

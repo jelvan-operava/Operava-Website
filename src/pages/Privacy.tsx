@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ShieldCheck, ShieldAlert, ArrowLeft, Mail, Building, FileText, CheckCircle } from 'lucide-react'
+import { ShieldCheck, ShieldAlert, ArrowLeft, Mail, FileText, CheckCircle } from 'lucide-react'
 
 export default function Privacy() {
   const sections = [
@@ -226,10 +226,8 @@ export default function Privacy() {
         'OPERAVA should maintain a designated privacy contact or Data Protection Officer where required or appropriate.',
       ],
       contactDetails: {
-        name: '[INSERT CURRENT DESIGNATED PRIVACY CONTACT / DPO]',
-        email: '[INSERT PRIVACY EMAIL]',
-        address: 'OPERAVA Global Solutions, Pagudpud, Ilocos Norte 2919, Philippines',
-        footerNote: 'The published notice should be updated with the current authorized privacy contact before implementation.',
+        team: 'Operava Compliance Team',
+        email: 'compliance@operavaglobal.com',
       },
     },
     {
@@ -458,29 +456,21 @@ export default function Privacy() {
                       PRIVACY CONTACT:
                     </p>
                     <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2.5">
-                        <span className="font-semibold text-gray-800">Name:</span>
-                        <span className="text-gray-700 font-mono text-xs sm:text-sm bg-gray-100 px-2 py-0.5 rounded">
-                          {section.contactDetails.name}
-                        </span>
-                      </div>
+                      {section.contactDetails.team && (
+                        <div className="font-semibold text-gray-900 text-base">
+                          {section.contactDetails.team}
+                        </div>
+                      )}
                       <div className="flex items-center gap-2.5">
                         <Mail className="w-4 h-4 text-violet-600 shrink-0" />
                         <span className="font-semibold text-gray-800">Email:</span>
-                        <span className="text-gray-700 font-mono text-xs sm:text-sm bg-gray-100 px-2 py-0.5 rounded">
+                        <a
+                          href={`mailto:${section.contactDetails.email}`}
+                          className="text-violet-700 hover:text-violet-900 font-medium hover:underline transition-colors"
+                        >
                           {section.contactDetails.email}
-                        </span>
+                        </a>
                       </div>
-                      <div className="flex items-start gap-2.5">
-                        <Building className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-semibold text-gray-800 mr-2">Address:</span>
-                          <span className="text-gray-700">{section.contactDetails.address}</span>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 italic mt-3 pt-2 border-t border-slate-200">
-                        {section.contactDetails.footerNote}
-                      </p>
                     </div>
                   </div>
                 )}

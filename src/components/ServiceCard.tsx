@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import type { Service } from '../data/services'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -22,6 +21,7 @@ export default function ServiceCard({
   className = '',
 }: ServiceCardProps) {
   const { t } = useLanguage()
+  const [imgError, setImgError] = useState(false)
 
   return (
     <motion.div
@@ -30,37 +30,37 @@ export default function ServiceCard({
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: (index % 4) * 0.08 }}
       id={`service-card-${service.slug}`}
-      className={`group relative bg-white border border-gray-100/90 rounded-2xl p-7 hover:border-violet-300/80 hover:shadow-xl hover:shadow-violet-500/8 transition-all duration-300 flex flex-col justify-between items-center text-center ${className}`}
+      className={`operava-card-frame group w-full ${className}`}
     >
-      {/* Top Number Pill & Category Indicator */}
-      <div className="w-full flex items-center justify-between mb-2">
-        <span className="px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-violet-700 bg-violet-50 rounded-full border border-violet-100/60">
-          {service.category.toUpperCase()}
-        </span>
-        <span className="text-xs font-mono font-bold text-gray-400 group-hover:text-violet-600 transition-colors">
-          #{service.number}
-        </span>
+      {/* Image Container with Spotlight Glow & Pink Dot Grid Pattern */}
+      <div className="operava-image-container">
+        {service.image && !imgError ? (
+          <img
+            src={service.image}
+            alt={service.name}
+            onError={() => setImgError(true)}
+            referrerPolicy="no-referrer"
+            loading="lazy"
+          />
+        ) : (
+          <div className="relative z-10 flex items-center justify-center p-4">
+            <ServiceAnimatedIcon
+              icon={service.icon}
+              size="lg"
+              interactive={true}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Prominent Centered Animated Floating Icon */}
-      <div className="my-4 flex items-center justify-center">
-        <ServiceAnimatedIcon
-          icon={service.icon}
-          size="lg"
-          interactive={true}
-        />
-      </div>
-
-      {/* Centered Structured Content */}
-      <div className="w-full flex flex-col items-center">
-        {/* Title */}
-        <h3 className="text-lg font-bold text-gray-900 mb-2.5 group-hover:text-violet-700 transition-colors duration-200 line-clamp-2 min-h-[3.25rem] flex items-center justify-center text-center">
+      {/* Typography Section */}
+      <div className="w-full flex flex-col items-center flex-1">
+        <h2 className="operava-card-title line-clamp-2 min-h-[3.25rem] flex items-center justify-center">
           {service.name}
-        </h3>
+        </h2>
 
-        {/* Short Description */}
-        <p className="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3 min-h-[3.75rem] text-center max-w-sm">
-          {service.shortDescription}
+        <p className="operava-card-description line-clamp-3 min-h-[3.75rem]">
+          {service.shortDescription || service.description}
         </p>
 
         {/* Optional Capability Badges */}
@@ -69,7 +69,7 @@ export default function ServiceCard({
             {service.capabilities.slice(0, maxCapabilities).map((cap) => (
               <li
                 key={cap}
-                className="px-2.5 py-1 text-xs font-medium bg-gray-50/90 text-gray-600 rounded-lg border border-gray-100/60 group-hover:border-violet-100 group-hover:bg-violet-50/30 transition-colors"
+                className="px-2.5 py-1 text-xs font-medium bg-white/10 text-white/90 rounded-lg border border-white/15 backdrop-blur-xs transition-colors"
               >
                 {cap}
               </li>
@@ -78,15 +78,15 @@ export default function ServiceCard({
         )}
       </div>
 
-      {/* Bottom Explore Link */}
+      {/* Action Button */}
       <Link
         to={`/services/${service.category}/${service.slug}`}
         id={`btn-explore-${service.slug}`}
-        className="w-full pt-3 mt-auto border-t border-gray-100 flex items-center justify-center gap-1.5 text-xs font-bold text-violet-700 hover:text-violet-800 transition-all duration-200 group/btn"
+        className="operava-learn-more-btn mt-auto"
       >
-        <span>{t('common.exploreService', 'Explore service')}</span>
-        <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform duration-200" />
+        <span>{t('common.learnMore', 'Learn More')}</span>
       </Link>
     </motion.div>
   )
 }
+

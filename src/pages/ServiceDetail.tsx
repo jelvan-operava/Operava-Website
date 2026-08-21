@@ -82,8 +82,8 @@ export default function ServiceDetail() {
             <span className="text-gray-700">{service.name}</span>
           </nav>
 
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            <div className="max-w-3xl">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12">
+            <div className="max-w-2xl lg:max-w-xl xl:max-w-2xl">
               <div className="flex items-center gap-3 mb-5">
                 <span className="px-3 py-1 text-xs font-semibold text-violet-700 bg-violet-50 rounded-full">
                   {categoryLabel}
@@ -96,13 +96,24 @@ export default function ServiceDetail() {
               <p className="text-xl text-gray-500 leading-relaxed">{service.shortDescription}</p>
             </div>
 
-            {/* Prominent Hero Animated Service Icon */}
+            {/* Prominent Hero Animated Service Visual (2x scale) */}
             <div className="shrink-0 flex items-center justify-center py-4 lg:py-0">
-              <ServiceAnimatedIcon
-                icon={service.icon}
-                size="xl"
-                interactive={true}
-              />
+              {service.image ? (
+                <div className="relative w-72 h-72 sm:w-96 sm:h-96 lg:w-[480px] lg:h-[480px] xl:w-[520px] xl:h-[520px] flex items-center justify-center bg-transparent">
+                  <img
+                    src={service.image}
+                    alt={service.name}
+                    className="w-full h-full object-contain drop-shadow-xl transition-transform duration-300 hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              ) : (
+                <ServiceAnimatedIcon
+                  icon={service.icon}
+                  size="xl"
+                  interactive={true}
+                />
+              )}
             </div>
           </div>
         </div>

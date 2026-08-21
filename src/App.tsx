@@ -21,6 +21,7 @@ import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
 import NotFound from './pages/NotFound'
 import { getMetadataForPath, updatePageSEO } from './utils/seo'
+import { injectSchemaMarkup } from './utils/schema'
 
 function RouteManager() {
   const location = useLocation()
@@ -37,6 +38,14 @@ function RouteManager() {
     // Update document title, meta description, keywords, OpenGraph, and Twitter tags dynamically
     const metadata = getMetadataForPath(location.pathname)
     updatePageSEO(metadata)
+
+    // Dynamically inject path-specific BreadcrumbList and FAQPage Schema JSON-LD markup into document head
+    injectSchemaMarkup(location.pathname, {
+      title: metadata.title,
+      description: metadata.description,
+      breadcrumbs: metadata.breadcrumbs,
+      faqs: metadata.faqs,
+    })
 
     // Trigger subtle route loading progress bar
     setLoading(true)

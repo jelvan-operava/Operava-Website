@@ -222,6 +222,12 @@ export const ar: Record<string, string> = {
   'footer.privacy': 'سياسة الخصوصية',
   'footer.terms': 'الشروط والأحكام',
 
+  // Operational Insights & Innovations Marquee
+  'marquee.badge': 'رؤى وابتكارات تشغيلية',
+  'marquee.title': 'رؤى وابتكارات OPERAVA التشغيلية',
+  'marquee.dragPrompt': 'اسحب جانباً لاستعراض الابتكارات أو استكشاف التفاصيل.',
+  'marquee.subtitle': 'تنفيذ واقعي، وأطر تقنية حديثة، ومنهجيات تشغيلية عالية التأثير عبر الهندسة والبيانات والقوى العاملة.',
+
   'common.exploreService': 'استكشف الخدمة',
   'common.learnMore': 'اعرف المزيد',
   'common.contactUs': 'اتصل بنا',

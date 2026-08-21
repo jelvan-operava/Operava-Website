@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useCallback } from 'react'
 
 interface AvaVideoAvatarProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | number
@@ -13,16 +13,63 @@ export default function AvaVideoAvatar({
 }: AvaVideoAvatarProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  useEffect(() => {
+  const ensurePlayback = useCallback(() => {
     const video = videoRef.current
     if (video) {
       video.muted = true
       video.defaultMuted = true
-      video.play().catch(() => {
-        // Autoplay policy handled silently
-      })
+      video.playsInline = true
+      const playPromise = video.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Retry playback on next tick if restricted by policy
+          setTimeout(() => {
+            if (video && video.paused) {
+              video.muted = true
+              video.play().catch(() => {})
+            }
+          }, 100)
+        })
+      }
     }
   }, [])
+
+  useEffect(() => {
+    ensurePlayback()
+
+    const video = videoRef.current
+    if (!video) return
+
+    // Auto-resume if accidentally paused or when tab becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        ensurePlayback()
+      }
+    }
+
+    const handleUserTouchOrClick = () => {
+      ensurePlayback()
+    }
+
+    const handlePause = () => {
+      // Re-trigger play immediately to prevent any frozen frame or browser pause UI
+      ensurePlayback()
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleVisibilityChange)
+    window.addEventListener('touchstart', handleUserTouchOrClick, { passive: true })
+    window.addEventListener('click', handleUserTouchOrClick, { passive: true })
+    video.addEventListener('pause', handlePause)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleVisibilityChange)
+      window.removeEventListener('touchstart', handleUserTouchOrClick)
+      window.removeEventListener('click', handleUserTouchOrClick)
+      video.removeEventListener('pause', handlePause)
+    }
+  }, [ensurePlayback])
 
   let sizeClass = 'w-10 h-10'
   let paddingClass = 'p-[2.5px]'
@@ -33,7 +80,7 @@ export default function AvaVideoAvatar({
   if (typeof size === 'number') {
     return (
       <div
-        className={`rounded-full shrink-0 relative ${className}`}
+        className={`rounded-full shrink-0 relative select-none pointer-events-none ${className}`}
         style={{
           width: `${size}px`,
           height: `${size}px`,
@@ -42,7 +89,7 @@ export default function AvaVideoAvatar({
           boxShadow: shadowStyle,
         }}
       >
-        <div className="w-full h-full rounded-full overflow-hidden bg-black relative">
+        <div className="w-full h-full rounded-full overflow-hidden bg-black relative pointer-events-none">
           <video
             ref={videoRef}
             autoPlay
@@ -52,8 +99,14 @@ export default function AvaVideoAvatar({
             preload="auto"
             disablePictureInPicture
             controls={false}
-            className="w-full h-full object-cover block pointer-events-none"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="w-full h-full object-cover block pointer-events-none select-none no-media-controls"
             onLoadedMetadata={(e) => {
+              e.currentTarget.muted = true
+              e.currentTarget.play().catch(() => {})
+            }}
+            onLoadedData={(e) => {
               e.currentTarget.muted = true
               e.currentTarget.play().catch(() => {})
             }}
@@ -99,13 +152,13 @@ export default function AvaVideoAvatar({
 
   return (
     <div
-      className={`rounded-full shrink-0 relative ${sizeClass} ${paddingClass} ${className}`}
+      className={`rounded-full shrink-0 relative select-none pointer-events-none ${sizeClass} ${paddingClass} ${className}`}
       style={{
         background: 'conic-gradient(from 0deg, #8A2BE2, #FF00FF, #7F00FF, #8A2BE2)',
         boxShadow: shadowStyle,
       }}
     >
-      <div className="w-full h-full rounded-full overflow-hidden bg-black relative">
+      <div className="w-full h-full rounded-full overflow-hidden bg-black relative pointer-events-none">
         <video
           ref={videoRef}
           autoPlay
@@ -115,8 +168,14 @@ export default function AvaVideoAvatar({
           preload="auto"
           disablePictureInPicture
           controls={false}
-          className="w-full h-full object-cover block pointer-events-none"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="w-full h-full object-cover block pointer-events-none select-none no-media-controls"
           onLoadedMetadata={(e) => {
+            e.currentTarget.muted = true
+            e.currentTarget.play().catch(() => {})
+          }}
+          onLoadedData={(e) => {
             e.currentTarget.muted = true
             e.currentTarget.play().catch(() => {})
           }}

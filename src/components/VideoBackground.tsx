@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 interface VideoBackgroundProps {
   videoUrl?: string
@@ -14,18 +14,42 @@ export default function VideoBackground({
   className = '',
 }: VideoBackgroundProps) {
   const [videoError, setVideoError] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (video) {
+      video.muted = true
+      video.defaultMuted = true
+      video.playsInline = true
+      video.play().catch(() => {})
+    }
+  }, [videoUrl])
 
   return (
-    <div className={`absolute inset-0 w-full h-full overflow-hidden pointer-events-none ${className}`}>
+    <div className={`absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none ${className}`}>
       {!videoError ? (
         <video
+          ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
+          preload="auto"
+          disablePictureInPicture
+          controls={false}
+          tabIndex={-1}
+          aria-hidden="true"
           poster={posterUrl}
           onError={() => setVideoError(true)}
-          className="w-full h-full object-cover object-center scale-105 filter brightness-75 contrast-125"
+          onLoadedMetadata={(e) => {
+            e.currentTarget.muted = true
+            e.currentTarget.play().catch(() => {})
+          }}
+          onCanPlay={(e) => {
+            e.currentTarget.play().catch(() => {})
+          }}
+          className="w-full h-full object-cover object-center scale-105 filter brightness-75 contrast-125 pointer-events-none select-none no-media-controls"
         >
           <source src={videoUrl} type="video/mp4" />
         </video>

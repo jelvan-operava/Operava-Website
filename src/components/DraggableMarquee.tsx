@@ -1,131 +1,70 @@
-import { useEffect, useRef, useState } from 'react'
-import { ArrowUpRight, Sparkles, Shield, Cpu, Headphones, Database } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 
-export interface StatementCardItem {
-  type: 'statement'
+export interface PlainImageCardItem {
+  type: 'image'
   id: string
+  imageUrl: string
+  alt: string
+}
+
+export interface InsightCardItem {
+  type: 'insight'
+  id: string
+  category: string
   title: string
-  client: string
+  description: string
   scope: string
-  metric: string
   variant?: 'default' | 'accent' | 'dark' | 'purple'
-  icon: typeof Sparkles
   link: string
 }
 
-export interface VideoCardItem {
-  type: 'video'
-  id: string
-  title: string
-  subtitle: string
-  badge: string
-  metric: string
-  videoUrl: string
-  posterUrl: string
-  link: string
-}
+export type MarqueeCardItem = PlainImageCardItem | InsightCardItem
 
-export type MarqueeCardItem = StatementCardItem | VideoCardItem
-
-function VideoCardComponent({ item, idx }: { item: VideoCardItem; idx: number }) {
-  const [videoError, setVideoError] = useState(false)
-
+function PlainImageCardComponent({ item, idx }: { item: PlainImageCardItem; idx: number }) {
   return (
     <div
       key={`${item.id}-${idx}`}
-      className="w-[420px] sm:w-[480px] h-[480px] rounded-3xl overflow-hidden relative flex-shrink-0 shadow-2xl border border-gray-800 select-none group transition-transform duration-300 hover:scale-[1.02] bg-gray-950 flex flex-col justify-between p-9"
+      className="w-[420px] sm:w-[480px] h-[480px] rounded-3xl overflow-hidden relative flex-shrink-0 shadow-2xl border border-gray-200/80 select-none group transition-transform duration-300 hover:scale-[1.02] bg-gray-950"
     >
-      {/* Background Live Video / Motion Photo */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        {!videoError ? (
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={item.posterUrl}
-            onError={() => setVideoError(true)}
-            className="w-full h-full object-cover object-center filter brightness-90 contrast-110 group-hover:scale-105 transition-transform duration-700"
-          >
-            <source src={item.videoUrl} type="video/mp4" />
-          </video>
-        ) : (
-          <img
-            src={item.posterUrl}
-            alt={item.title}
-            className="w-full h-full object-cover object-center filter brightness-90 group-hover:scale-105 transition-transform duration-700"
-          />
-        )}
-        {/* Dark Gradient Overlay for Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-gray-950/60" />
-        <div className="absolute inset-0 bg-violet-950/20 mix-blend-overlay" />
-      </div>
-
-      {/* Top Header */}
-      <div className="relative z-10">
-        <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/30 shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            {item.badge}
-          </span>
-          <Link
-            to={item.link}
-            className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-violet-600 group-hover:text-white transition-all shadow-md"
-          >
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
-
-      {/* Bottom Information */}
-      <div className="relative z-10 pt-4 border-t border-white/20">
-        <h3 className="text-xl sm:text-2xl font-black leading-snug tracking-tight text-white mb-2 drop-shadow-md">
-          {item.title}
-        </h3>
-        <p className="text-xs text-gray-200 leading-relaxed mb-3 drop-shadow-sm font-medium">
-          {item.subtitle}
-        </p>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-violet-600/80 backdrop-blur-sm text-xs font-semibold text-white border border-violet-400/40 shadow-sm">
-          <span>⚡ {item.metric}</span>
-        </div>
-      </div>
+      <img
+        src={item.imageUrl}
+        alt={item.alt || 'Operava Operational Image'}
+        className="w-full h-full object-cover object-center filter brightness-95 contrast-105 group-hover:scale-105 transition-transform duration-700 pointer-events-none select-none"
+        referrerPolicy="no-referrer"
+        loading="lazy"
+      />
     </div>
   )
 }
 
-function StatementCardComponent({ item, idx }: { item: StatementCardItem; idx: number }) {
-  const Icon = item.icon
-
+function InsightCardComponent({ item, idx }: { item: InsightCardItem; idx: number }) {
   if (item.variant === 'accent') {
     return (
       <div
         key={`${item.id}-${idx}`}
-        className="w-[420px] sm:w-[480px] h-[480px] rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-700 text-white p-9 flex flex-col justify-between flex-shrink-0 shadow-2xl shadow-violet-700/25 border border-violet-400/30 select-none group transition-transform duration-300 hover:scale-[1.02]"
+        className="w-[420px] sm:w-[480px] h-[480px] rounded-3xl bg-gradient-to-br from-violet-600 via-violet-700 to-indigo-800 text-white p-9 flex flex-col justify-between flex-shrink-0 shadow-2xl shadow-violet-700/25 border border-violet-400/30 select-none group transition-transform duration-300 hover:scale-[1.02]"
       >
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-[11px] font-bold uppercase tracking-wider text-white">
-              <Icon className="w-3.5 h-3.5" />
-              Featured Case
-            </span>
+          <div className="flex items-center justify-end mb-4">
             <Link
               to={item.link}
-              className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white group-hover:bg-white group-hover:text-violet-700 transition-colors"
+              className="w-9 h-9 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center text-white group-hover:bg-white group-hover:text-violet-700 transition-all shadow-md"
             >
-              <ArrowUpRight className="w-4 h-4" />
+              <ArrowUpRight className="w-4 h-4 text-white group-hover:text-violet-700" />
             </Link>
           </div>
           <h3 className="text-2xl sm:text-3xl font-black leading-snug tracking-tight text-white mb-3">
             {item.title}
           </h3>
-          <div className="inline-block px-3.5 py-1.5 rounded-lg bg-white/15 text-xs font-semibold text-violet-100">
-            ⚡ {item.metric}
-          </div>
+          <p className="text-sm text-violet-100/90 leading-relaxed">
+            {item.description}
+          </p>
         </div>
         <div className="pt-4 border-t border-white/20 text-xs">
-          <strong className="block text-sm font-bold text-white mb-0.5">{item.client}</strong>
+          <strong className="block text-sm font-bold text-white mb-0.5">{item.category}</strong>
           <span className="text-violet-200">{item.scope}</span>
         </div>
       </div>
@@ -138,29 +77,25 @@ function StatementCardComponent({ item, idx }: { item: StatementCardItem; idx: n
         key={`${item.id}-${idx}`}
         className="w-[420px] sm:w-[480px] h-[480px] rounded-3xl bg-gray-950 text-white p-9 flex flex-col justify-between flex-shrink-0 shadow-2xl border border-gray-800 select-none group transition-transform duration-300 hover:scale-[1.02] relative overflow-hidden"
       >
-        <div className="absolute -right-10 -top-10 w-32 h-32 bg-violet-600/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -right-10 -top-10 w-36 h-36 bg-violet-600/15 rounded-full blur-2xl pointer-events-none" />
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-800 text-[11px] font-bold uppercase tracking-wider text-violet-300 border border-violet-500/20">
-              <Icon className="w-3.5 h-3.5" />
-              Operational Proof
-            </span>
+          <div className="flex items-center justify-end mb-4">
             <Link
               to={item.link}
-              className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-white group-hover:bg-violet-600 group-hover:text-white transition-colors"
+              className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center text-white group-hover:bg-violet-600 group-hover:text-white transition-all shadow-md"
             >
-              <ArrowUpRight className="w-4 h-4" />
+              <ArrowUpRight className="w-4 h-4 text-white" />
             </Link>
           </div>
           <h3 className="text-2xl sm:text-3xl font-black leading-snug tracking-tight text-white mb-3">
             {item.title}
           </h3>
-          <div className="inline-block px-3.5 py-1.5 rounded-lg bg-violet-950/60 border border-violet-700/40 text-xs font-semibold text-violet-300">
-            ✓ {item.metric}
-          </div>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            {item.description}
+          </p>
         </div>
         <div className="pt-4 border-t border-gray-800 text-xs">
-          <strong className="block text-sm font-bold text-white mb-0.5">{item.client}</strong>
+          <strong className="block text-sm font-bold text-white mb-0.5">{item.category}</strong>
           <span className="text-gray-400">{item.scope}</span>
         </div>
       </div>
@@ -174,27 +109,23 @@ function StatementCardComponent({ item, idx }: { item: StatementCardItem; idx: n
         className="w-[420px] sm:w-[480px] h-[480px] rounded-3xl bg-violet-50 text-gray-900 p-9 flex flex-col justify-between flex-shrink-0 shadow-xl border border-violet-200/80 select-none group transition-transform duration-300 hover:scale-[1.02]"
       >
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-100 text-[11px] font-bold uppercase tracking-wider text-violet-700">
-              <Icon className="w-3.5 h-3.5" />
-              AI & Data Ops
-            </span>
+          <div className="flex items-center justify-end mb-4">
             <Link
               to={item.link}
-              className="w-8 h-8 rounded-full bg-violet-200/60 flex items-center justify-center text-gray-700 group-hover:bg-violet-700 group-hover:text-white transition-colors"
+              className="w-9 h-9 rounded-full bg-violet-200/70 flex items-center justify-center text-gray-800 group-hover:bg-violet-700 group-hover:text-white transition-all shadow-sm"
             >
-              <ArrowUpRight className="w-4 h-4" />
+              <ArrowUpRight className="w-4 h-4 text-violet-900 group-hover:text-white" />
             </Link>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-black leading-snug tracking-tight text-gray-900 mb-3">
+          <h3 className="text-2xl sm:text-3xl font-black leading-snug tracking-tight text-gray-950 mb-3">
             {item.title}
           </h3>
-          <div className="inline-block px-3.5 py-1.5 rounded-lg bg-white text-xs font-semibold text-violet-700 border border-violet-200">
-            📊 {item.metric}
-          </div>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            {item.description}
+          </p>
         </div>
-        <div className="pt-4 border-t border-violet-200/60 text-xs">
-          <strong className="block text-sm font-bold text-gray-900 mb-0.5">{item.client}</strong>
+        <div className="pt-4 border-t border-violet-200/70 text-xs">
+          <strong className="block text-sm font-bold text-gray-900 mb-0.5">{item.category}</strong>
           <span className="text-gray-600">{item.scope}</span>
         </div>
       </div>
@@ -204,30 +135,26 @@ function StatementCardComponent({ item, idx }: { item: StatementCardItem; idx: n
   return (
     <div
       key={`${item.id}-${idx}`}
-      className="w-[420px] sm:w-[480px] h-[480px] rounded-3xl bg-white text-gray-900 p-9 flex flex-col justify-between flex-shrink-0 shadow-2xl shadow-gray-200/50 border border-gray-100 select-none group transition-transform duration-300 hover:scale-[1.02]"
+      className="w-[420px] sm:w-[480px] h-[480px] rounded-3xl bg-white text-gray-900 p-9 flex flex-col justify-between flex-shrink-0 shadow-2xl shadow-gray-200/60 border border-gray-100 select-none group transition-transform duration-300 hover:scale-[1.02]"
     >
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-[11px] font-bold uppercase tracking-wider text-gray-700">
-            <Icon className="w-3.5 h-3.5" />
-            Production Track
-          </span>
+        <div className="flex items-center justify-end mb-4">
           <Link
             to={item.link}
-            className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 group-hover:bg-violet-700 group-hover:text-white transition-colors"
+            className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 group-hover:bg-violet-700 group-hover:text-white transition-all shadow-sm"
           >
-            <ArrowUpRight className="w-4 h-4" />
+            <ArrowUpRight className="w-4 h-4 text-gray-700 group-hover:text-white" />
           </Link>
         </div>
-        <h3 className="text-xl sm:text-2xl font-black leading-snug tracking-tight text-gray-900 mb-3">
+        <h3 className="text-2xl sm:text-3xl font-black leading-snug tracking-tight text-gray-950 mb-3">
           {item.title}
         </h3>
-        <div className="inline-block px-3 py-1 rounded-lg bg-gray-50 text-xs font-semibold text-gray-700 border border-gray-200">
-          ★ {item.metric}
-        </div>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          {item.description}
+        </p>
       </div>
       <div className="pt-4 border-t border-gray-100 text-xs">
-        <strong className="block text-sm font-bold text-gray-900 mb-0.5">{item.client}</strong>
+        <strong className="block text-sm font-bold text-gray-900 mb-0.5">{item.category}</strong>
         <span className="text-gray-500">{item.scope}</span>
       </div>
     </div>
@@ -239,139 +166,146 @@ export default function DraggableMarquee() {
   const containerRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
 
-  // Alternating items: Live Video -> Statement -> Live Video -> Statement ...
+  // Alternating items: Purely Plain Image -> Operational Insight & Innovation -> Purely Plain Image -> ...
   const items: MarqueeCardItem[] = [
+    // 1. Image 1: Business Handshake
     {
-      type: 'video',
-      id: 'v1',
-      title: 'Cloud Infrastructure & High-Availability Clusters',
-      subtitle: 'Real-time telemetry, auto-scaling Kubernetes nodes & edge delivery network.',
-      badge: 'Live Cloud Feed',
-      metric: '99.99% Monitored Uptime',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-data-31912-large.mp4',
-      posterUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
-      link: '/services/it/cloud-infrastructure',
+      type: 'image',
+      id: 'img-1',
+      imageUrl: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787283729/filipino_business_handshake_zpu4sb.webp',
+      alt: 'Operava Strategic Partnerships',
     },
+    // 1. Insight 1: Strategic Global Partnerships
     {
-      type: 'statement',
-      id: 's1',
-      title: 'Global Cloud Architecture & 99.99% Uptime DevSecOps Migration',
-      client: 'European FinTech Enterprise',
-      scope: 'Managed Cloud & Kubernetes Infrastructure',
-      metric: 'Zero-Downtime Migration',
-      variant: 'dark',
-      icon: Cpu,
-      link: '/services/it/cloud-infrastructure',
-    },
-    {
-      type: 'video',
-      id: 'v2',
-      title: '24/7 Global BPO Operations & Support Floor',
-      subtitle: 'Dedicated multichannel support squads delivering tier 1–3 technical resolution.',
-      badge: 'Live Operations Floor',
-      metric: 'Follow-The-Sun Coverage',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-top-view-of-people-working-in-an-office-42777-large.mp4',
-      posterUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-      link: '/services/bpo/customer-service',
-    },
-    {
-      type: 'statement',
-      id: 's2',
-      title: 'Omnichannel CX & Tier 1–3 Global Technical Support Scaling',
-      client: 'North American SaaS Unicorn',
-      scope: 'BPO Operations & 24/7 Multilingual Desk',
-      metric: 'Scaled to 85 Agents in 14 Days',
+      type: 'insight',
+      id: 'insight-1',
+      category: 'Strategic Global Partnerships',
+      title: 'Agile Cross-Border Operating Models for Enterprise Growth',
+      description:
+        'Aligning executive leadership, compliant legal frameworks, and SLA-backed governance to establish seamless multi-region operations with zero delivery friction.',
+      scope: 'Global Expansion & Executive Alignment',
       variant: 'accent',
-      icon: Headphones,
-      link: '/services/bpo/customer-service',
+      link: '/about',
     },
+
+    // 2. Image 2: Developer Coding
     {
-      type: 'video',
-      id: 'v3',
-      title: 'Security Operations Center (SOC) Threat Matrix',
-      subtitle: 'Continuous threat intelligence, SIEM anomaly detection & zero-breach protocols.',
-      badge: 'Live SOC Feed',
-      metric: 'Zero-Breach SLA',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-motherboard-with-integrated-circuits-and-lights-42998-large.mp4',
-      posterUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
-      link: '/services/it/cybersecurity',
+      type: 'image',
+      id: 'img-2',
+      imageUrl: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787283770/filipino_developer_coding_daztmy.webp',
+      alt: 'Operava Developer Engineering',
     },
+    // 2. Insight 2: Full-Stack Engineering & Microservices
     {
-      type: 'statement',
-      id: 's3',
-      title: 'Automated KYC / AML Compliance & High-Volume Back-Office Engine',
-      client: 'Pan-Asian Digital Payments Hub',
-      scope: 'Risk Screening & Data Processing',
-      metric: '48h to 4h Turnaround · 99.8% Accuracy',
-      variant: 'default',
-      icon: Shield,
-      link: '/services/bpo/back-office',
-    },
-    {
-      type: 'video',
-      id: 'v4',
-      title: 'Full-Stack Software Engineering & CI/CD Pipelines',
-      subtitle: 'Modern React, TypeScript, GraphQL microservices and distributed queue workflows.',
-      badge: 'Live Engineering Lab',
-      metric: 'Continuous Automated Deploy',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-programmer-typing-on-a-keyboard-41334-large.mp4',
-      posterUrl: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80',
-      link: '/services/it/custom-software',
-    },
-    {
-      type: 'statement',
-      id: 's4',
-      title: 'Enterprise AI Data Pipeline & RLHF Annotation Ops',
-      client: 'Healthcare AI Diagnostics Lab',
-      scope: 'Data Labeling & Model Evaluation',
-      metric: '500,000+ Verified Clinical Datasets',
-      variant: 'purple',
-      icon: Database,
-      link: '/services/it/managed-it',
-    },
-    {
-      type: 'video',
-      id: 'v5',
-      title: 'Enterprise Data Lake & Real-Time Analytics Engine',
-      subtitle: 'High-throughput ETL pipelines streaming actionable operational business metrics.',
-      badge: 'Live Data Streams',
-      metric: 'Sub-second Latency',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-futuristic-technology-digital-grid-31911-large.mp4',
-      posterUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-      link: '/services/it/managed-it',
-    },
-    {
-      type: 'statement',
-      id: 's5',
-      title: 'Full-Stack Modernization & Resilient Microservices Pipeline',
-      client: 'Global E-Commerce Logistics Group',
-      scope: 'React, Node, GraphQL & Distributed Queues',
-      metric: '3.4x Faster Checkout Throughput',
-      variant: 'default',
-      icon: Sparkles,
-      link: '/services/it/custom-software',
-    },
-    {
-      type: 'video',
-      id: 'v6',
-      title: 'Global Compliance & Enterprise QA Command Desk',
-      subtitle: 'ISO 27001 aligned monitoring, financial reconciliation, and continuous audit trails.',
-      badge: 'Live QA Command',
-      metric: '100% Audit Compliance',
-      videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-data-and-analysis-of-a-finance-app-42996-large.mp4',
-      posterUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
-      link: '/services/bpo/back-office',
-    },
-    {
-      type: 'statement',
-      id: 's6',
-      title: '24/7 Follow-the-Sun Global Security Operations Center (SOC)',
-      client: 'Critical Supply Chain Enterprise',
-      scope: 'Continuous Threat Intelligence & SIEM',
-      metric: '120+ Mitigated High Threats in 90 Days',
+      type: 'insight',
+      id: 'insight-2',
+      category: 'Software Engineering & Microservices',
+      title: 'High-Velocity Engineering with Microservices & CI/CD Pipelines',
+      description:
+        'Modern React, TypeScript, and distributed GraphQL microservice architectures engineered for zero-downtime rollouts and accelerated time-to-market.',
+      scope: 'Custom Software & Digital Platforms',
       variant: 'dark',
-      icon: Shield,
-      link: '/services/it/cybersecurity',
+      link: '/services/it/custom-software',
+    },
+
+    // 3. Image 3: Data Analyst Operava
+    {
+      type: 'image',
+      id: 'img-3',
+      imageUrl: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787283803/data_analyst_operava_ekwjft.webp',
+      alt: 'Operava Data Analyst',
+    },
+    // 3. Insight 3: Enterprise Data Analytics & BI
+    {
+      type: 'insight',
+      id: 'insight-3',
+      category: 'Data Operations & BI Analytics',
+      title: 'Enterprise Data Pipelines & Predictive Business Intelligence',
+      description:
+        'Ingesting high-volume transactional streams into centralized data warehouses with automated ETL workflows and sub-second decision intelligence.',
+      scope: 'Data Pipelines & Business Intelligence',
+      variant: 'purple',
+      link: '/services/it/managed-it',
+    },
+
+    // 4. Image 4: Cloud Engineer AWS Dashboard
+    {
+      type: 'image',
+      id: 'img-4',
+      imageUrl: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787283870/cloud_engineer_aws_dashboard_zn63vw.webp',
+      alt: 'Operava Cloud Engineer AWS Dashboard',
+    },
+    // 4. Insight 4: Cloud Architecture & AWS DevOps
+    {
+      type: 'insight',
+      id: 'insight-4',
+      category: 'Cloud Architecture & DevOps',
+      title: 'Resilient Multi-Region Cloud Infrastructure & Auto-Healing Clusters',
+      description:
+        'Designing fault-tolerant cloud architectures with automated failover, zero-trust security postures, and cost-optimized compute workloads.',
+      scope: 'Managed AWS / Azure / GCP Cloud',
+      variant: 'dark',
+      link: '/services/it/cloud-infrastructure',
+    },
+
+    // 5. Image 5: Back Office Support Professional
+    {
+      type: 'image',
+      id: 'img-5',
+      imageUrl: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787283911/back_office_support_professional_on938n.webp',
+      alt: 'Operava Back Office Support Professional',
+    },
+    // 5. Insight 5: High-Precision Back-Office Scalability
+    {
+      type: 'insight',
+      id: 'insight-5',
+      category: 'Back-Office Operations & Compliance',
+      title: 'High-Volume Transaction Processing with Strict ISO 27001 Precision',
+      description:
+        'Scalable back-office workflows for invoice reconciliation, risk verification, and regulatory auditing with dual-layer human-in-the-loop quality checks.',
+      scope: 'Enterprise Back-Office & Data Processing',
+      variant: 'default',
+      link: '/services/bpo/back-office',
+    },
+
+    // 6. Image 6: IT Helpdesk Professional
+    {
+      type: 'image',
+      id: 'img-6',
+      imageUrl: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787283964/it_helpdesk_professional_zyp15e.webp',
+      alt: 'Operava IT Helpdesk Professional',
+    },
+    // 6. Insight 6: 24/7 Enterprise IT Helpdesk
+    {
+      type: 'insight',
+      id: 'insight-6',
+      category: '24/7 Enterprise IT Helpdesk',
+      title: 'Follow-the-Sun Technical Helpdesk with Rapid Incident Triage',
+      description:
+        'Dedicated Tier 1–3 technical support engineers equipped to handle enterprise infrastructure troubleshooting, network monitoring, and endpoint administration.',
+      scope: 'Managed IT Support & Endpoint Management',
+      variant: 'accent',
+      link: '/services/it/managed-it',
+    },
+
+    // 7. Image 7: Customer Support Banner
+    {
+      type: 'image',
+      id: 'img-7',
+      imageUrl: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787284005/customer_support_banner_hbpnus.webp',
+      alt: 'Operava Customer Support Banner',
+    },
+    // 7. Insight 7: Omnichannel Customer Experience & CSAT
+    {
+      type: 'insight',
+      id: 'insight-7',
+      category: 'Omnichannel Customer Experience',
+      title: 'Scalable Omnichannel CX Teams Delivering High-CSAT Global Retention',
+      description:
+        'Empowering enterprise brands with dedicated customer care professionals across live chat, voice, email, and social care channels with seamless CRM integration.',
+      scope: '24/7 Customer Care & Escalation Operations',
+      variant: 'purple',
+      link: '/services/bpo/customer-service',
     },
   ]
 
@@ -390,7 +324,6 @@ export default function DraggableMarquee() {
     const getResetThreshold = () => track.offsetWidth / 3
 
     function animate() {
-      // Continuous movement: NEVER paused by simple hovering, only when actively dragged
       if (!isDragging) {
         currentX += speed
         const threshold = getResetThreshold()
@@ -482,10 +415,10 @@ export default function DraggableMarquee() {
   }, [])
 
   const renderCard = (item: MarqueeCardItem, idx: number) => {
-    if (item.type === 'video') {
-      return <VideoCardComponent key={`${item.id}-${idx}`} item={item} idx={idx} />
+    if (item.type === 'image') {
+      return <PlainImageCardComponent key={`${item.id}-${idx}`} item={item} idx={idx} />
     }
-    return <StatementCardComponent key={`${item.id}-${idx}`} item={item} idx={idx} />
+    return <InsightCardComponent key={`${item.id}-${idx}`} item={item} idx={idx} />
   }
 
   return (
@@ -493,15 +426,15 @@ export default function DraggableMarquee() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="text-xs font-bold uppercase tracking-[0.18em] text-violet-700 mb-2 block">
-            {t('marquee.badge', 'Global Performance Tracks')}
+            {t('marquee.badge', 'OPERATIONAL INSIGHTS & INNOVATIONS')}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
-            {t('marquee.title', 'Proven Execution Across Critical Enterprise Stacks')}
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight leading-tight">
+            {t('marquee.title', 'Operava Operational Insights & Innovations')}
           </h2>
         </div>
         <p className="text-sm text-gray-500 max-w-sm flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>{t('marquee.dragPrompt', 'Drag sideways to inspect case tracks or explore details.')}</span>
+          <span>{t('marquee.dragPrompt', 'Drag sideways to inspect innovations or explore details.')}</span>
         </p>
       </div>
 

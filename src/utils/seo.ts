@@ -1,4 +1,27 @@
 import { getServiceBySlug } from '../data/services'
+import {
+  injectPathSchema,
+  generateBreadcrumbListSchema,
+  generateFAQPageSchema,
+  getBreadcrumbsForPath,
+  getFaqsForPath,
+  injectBreadcrumbAndFaqSchema,
+  injectJsonLd,
+  removeDynamicJsonLd,
+  buildGraphForPath,
+} from './schemaMarkup'
+
+export {
+  injectPathSchema,
+  generateBreadcrumbListSchema,
+  generateFAQPageSchema,
+  getBreadcrumbsForPath,
+  getFaqsForPath,
+  injectBreadcrumbAndFaqSchema,
+  injectJsonLd,
+  removeDynamicJsonLd,
+  buildGraphForPath,
+}
 
 export interface BreadcrumbItem {
   name: string
@@ -32,9 +55,9 @@ export interface PageMetadata {
   serviceData?: ServiceSchemaData
 }
 
-export const BASE_URL = 'https://operava.com'
+export const BASE_URL = 'https://www.operavaglobal.com'
 export const DEFAULT_OG_IMAGE = 'https://res.cloudinary.com/sdaxzncs/image/upload/v1786240859/Cover%20Photo.png'
-export const SITE_NAME = 'OPERAVA Global Solutions'
+export const SITE_NAME = 'OPERAVA GLOBAL SOLUTIONS'
 
 // Core authoritative company FAQs
 export const COMPANY_CORE_FAQS: FAQItem[] = [
@@ -66,13 +89,14 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 1. Home
   if (cleanPath === '/') {
     return {
-      title: 'OPERAVA | Workforce, IT & BPO Solutions – Philippine-Based, Operating Globally',
+      title: 'OPERAVA GLOBAL SOLUTIONS',
       description:
         'OPERAVA Global Solutions is a Philippine-based Corporation providing Workforce, Information Technology, and Business Process Outsourcing (BPO) services, operating remotely and globally.',
       keywords:
-        'OPERAVA, Workforce, Information Technology, Business Process Outsourcing, BPO, IT Services, Philippine-based, Remote Workforce, Global Operations, Cloud Infrastructure, Custom Software Development, Cybersecurity, 24/7 Support, Back-Office Operations',
+        'OPERAVA GLOBAL SOLUTIONS, OPERAVA, Workforce, Information Technology, Business Process Outsourcing, BPO, IT Services, Philippine-based, Remote Workforce, Global Operations, Cloud Infrastructure, Custom Software Development, Cybersecurity, 24/7 Support, Back-Office Operations',
       canonicalUrl: `${BASE_URL}/`,
       ogType: 'website',
+      ogTitle: 'OPERAVA GLOBAL SOLUTIONS',
       breadcrumbs: [{ name: 'Home', item: `${BASE_URL}/` }],
       faqs: COMPANY_CORE_FAQS,
     }
@@ -81,7 +105,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 2. About Us
   if (cleanPath === '/about') {
     return {
-      title: 'About Us | OPERAVA Global Solutions',
+      title: 'About Us | OPERAVA GLOBAL SOLUTIONS',
       description:
         'Learn about OPERAVA Global Solutions — a Philippine-based Corporation delivering enterprise IT engineering, modern workforce, and BPO operations remotely and globally.',
       keywords:
@@ -112,7 +136,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 3. Information Technology Services
   if (cleanPath === '/services/it') {
     return {
-      title: 'Information Technology (IT) Services | OPERAVA',
+      title: 'Information Technology (IT) Services | OPERAVA GLOBAL SOLUTIONS',
       description:
         'Enterprise IT solutions from custom software, web & mobile applications, SaaS platforms, systems integration, and database management delivered by Philippine-based engineering talent globally.',
       keywords:
@@ -144,7 +168,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 4. Business Process Outsourcing Services
   if (cleanPath === '/services/bpo') {
     return {
-      title: 'Business Process Outsourcing (BPO) Services | OPERAVA',
+      title: 'Business Process Outsourcing (BPO) Services | OPERAVA GLOBAL SOLUTIONS',
       description:
         'Scalable BPO solutions including customer support, technical help desk, back-office operations, data processing, and virtual assistance from our Philippine-based global workforce.',
       keywords:
@@ -195,9 +219,9 @@ export function getMetadataForPath(pathname: string): PageMetadata {
           ]
 
       return {
-        title: `${service.name} | ${categoryLabel} | OPERAVA`,
+        title: `${service.name} | ${categoryLabel} | OPERAVA GLOBAL SOLUTIONS`,
         description: `${service.name}: ${service.shortDescription} Delivered by skilled Philippine-based professionals operating remotely and globally.`,
-        keywords: `${service.name}, ${service.capabilities.slice(0, 5).join(', ')}, Philippine-based, Global Operations, OPERAVA`,
+        keywords: `${service.name}, ${service.capabilities.slice(0, 5).join(', ')}, Philippine-based, Global Operations, OPERAVA GLOBAL SOLUTIONS`,
         canonicalUrl: `${BASE_URL}${cleanPath}`,
         ogType: 'article',
         breadcrumbs: [
@@ -221,7 +245,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 6. Services Hub
   if (cleanPath === '/services') {
     return {
-      title: 'Services & Solutions | OPERAVA',
+      title: 'Services & Solutions | OPERAVA GLOBAL SOLUTIONS',
       description:
         "Explore OPERAVA's comprehensive IT and BPO service catalog. Philippine-based, operating remotely and globally to power your digital and operational transformation.",
       keywords:
@@ -248,7 +272,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 7. Industries
   if (cleanPath === '/industries') {
     return {
-      title: 'Industries & Sectors | OPERAVA',
+      title: 'Industries & Sectors | OPERAVA GLOBAL SOLUTIONS',
       description:
         'Specialized technology, workforce, and operational solutions for Technology & SaaS, Financial Services, Healthcare, E-Commerce, Logistics, and Professional Services globally.',
       keywords:
@@ -275,7 +299,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 8. Careers
   if (cleanPath === '/careers') {
     return {
-      title: 'Careers & Remote Opportunities | OPERAVA',
+      title: 'Careers & Remote Opportunities | OPERAVA GLOBAL SOLUTIONS',
       description:
         'Join OPERAVA Global Solutions. Explore remote career opportunities in IT engineering, software development, customer support, and BPO operations across the Philippines and worldwide.',
       keywords:
@@ -302,7 +326,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 9. Insights
   if (cleanPath === '/insights') {
     return {
-      title: 'Insights & Thought Leadership | OPERAVA',
+      title: 'Insights & Thought Leadership | OPERAVA GLOBAL SOLUTIONS',
       description:
         'Industry perspectives, technology analysis, operational best practices, and trends in global workforce management from OPERAVA Global Solutions.',
       keywords:
@@ -325,7 +349,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 10. Contact Us
   if (cleanPath === '/contact') {
     return {
-      title: 'Contact Us | OPERAVA Global Solutions',
+      title: 'Contact Us | OPERAVA GLOBAL SOLUTIONS',
       description:
         'Get in touch with OPERAVA Global Solutions. Philippine-based, operating remotely and globally to support your enterprise IT and BPO requirements.',
       keywords:
@@ -356,7 +380,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 11. Privacy Policy
   if (cleanPath === '/privacy') {
     return {
-      title: 'Privacy Policy | OPERAVA Global Solutions',
+      title: 'Privacy Policy | OPERAVA GLOBAL SOLUTIONS',
       description:
         "OPERAVA Global Solutions' commitment to data privacy, confidentiality, and regulatory compliance under Philippine and international data protection standards.",
       keywords:
@@ -379,7 +403,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   // 12. Terms of Service
   if (cleanPath === '/terms') {
     return {
-      title: 'Terms of Service | OPERAVA Global Solutions',
+      title: 'Terms of Service | OPERAVA GLOBAL SOLUTIONS',
       description:
         "Terms of Service and legal agreements governing the use of OPERAVA Global Solutions' website, IT services, and BPO operations.",
       keywords:
@@ -395,7 +419,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
 
   // 13. Fallback / 404
   return {
-    title: 'Page Not Found (404) | OPERAVA',
+    title: 'Page Not Found (404) | OPERAVA GLOBAL SOLUTIONS',
     description:
       "The requested page could not be found. Explore OPERAVA's Philippine-based IT, workforce, and BPO solutions operating remotely and globally.",
     keywords: '404, Page Not Found, OPERAVA',
@@ -470,152 +494,16 @@ export function updatePageSEO(metadata: PageMetadata): void {
   // ----------------------------------------------------
   // Dynamic JSON-LD Structured Data Injection
   // ----------------------------------------------------
-  const graphNodes: Record<string, unknown>[] = [
-    // 1. WebPage Schema
-    {
-      '@type': 'WebPage',
-      '@id': `${ogUrl}#webpage`,
-      url: ogUrl,
-      name: metadata.title,
-      description: metadata.description,
-      isPartOf: {
-        '@id': `${BASE_URL}/#website`,
-      },
-      inLanguage: 'en-US',
-    },
-    // 2. LocalBusiness / Organization Schema Node
-    {
-      '@type': ['Organization', 'LocalBusiness', 'ProfessionalService'],
-      '@id': `${BASE_URL}/#organization`,
-      name: SITE_NAME,
-      legalName: SITE_NAME,
-      alternateName: ['OPERAVA', 'Operava'],
-      url: `${BASE_URL}/`,
-      logo: 'https://res.cloudinary.com/sdaxzncs/image/upload/Favicon_512x512.svg',
-      image: DEFAULT_OG_IMAGE,
-      description:
-        'Philippine-based Corporation providing Workforce, Information Technology, and Business Process Outsourcing (BPO) services, operating remotely and globally.',
-      slogan: 'We Operate in Advance',
-      email: 'contact@operava.com',
-      priceRange: '$$',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: 'Pagudpud',
-        addressLocality: 'Pagudpud',
-        addressRegion: 'Ilocos Norte',
-        postalCode: '2919',
-        addressCountry: 'PH',
-      },
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: 18.5595,
-        longitude: 120.787,
-      },
-      openingHoursSpecification: [
-        {
-          '@type': 'OpeningHoursSpecification',
-          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-          opens: '00:00',
-          closes: '23:59',
-        },
-      ],
-      areaServed: [
-        { '@type': 'AdministrativeArea', name: 'Global / Worldwide' },
-        { '@type': 'Country', name: 'Philippines' },
-        { '@type': 'Country', name: 'United States' },
-        { '@type': 'Country', name: 'United Kingdom' },
-        { '@type': 'Country', name: 'Canada' },
-        { '@type': 'Country', name: 'Australia' },
-        { '@type': 'Country', name: 'Singapore' },
-        { '@type': 'Country', name: 'Japan' },
-      ],
-      contactPoint: [
-        {
-          '@type': 'ContactPoint',
-          contactType: 'customer support',
-          email: 'contact@operava.com',
-          availableLanguage: ['English', 'Spanish', 'French', 'German', 'Filipino', 'Arabic', 'Chinese', 'Japanese'],
-        },
-        {
-          '@type': 'ContactPoint',
-          contactType: 'sales',
-          email: 'contact@operava.com',
-          availableLanguage: ['English', 'Filipino'],
-        },
-      ],
-    },
-  ]
+  const currentPath = window.location.pathname || '/'
+  const graphSchema = buildGraphForPath({
+    pathname: currentPath,
+    title: metadata.title,
+    description: metadata.description,
+    canonicalUrl: ogUrl,
+    breadcrumbs: metadata.breadcrumbs,
+    faqs: metadata.faqs,
+    serviceInfo: metadata.serviceData,
+  })
 
-  // 3. BreadcrumbList Schema Node
-  if (metadata.breadcrumbs && metadata.breadcrumbs.length > 0) {
-    graphNodes.push({
-      '@type': 'BreadcrumbList',
-      '@id': `${ogUrl}#breadcrumb`,
-      itemListElement: metadata.breadcrumbs.map((crumb, idx) => ({
-        '@type': 'ListItem',
-        position: idx + 1,
-        name: crumb.name,
-        item: crumb.item,
-      })),
-    })
-  }
-
-  // 4. FAQPage Schema Node
-  if (metadata.faqs && metadata.faqs.length > 0) {
-    graphNodes.push({
-      '@type': 'FAQPage',
-      '@id': `${ogUrl}#faq`,
-      mainEntity: metadata.faqs.map((faq) => ({
-        '@type': 'Question',
-        name: faq.q,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: faq.a,
-        },
-      })),
-    })
-  }
-
-  // 5. Service Schema Node
-  if (metadata.serviceData) {
-    graphNodes.push({
-      '@type': 'Service',
-      '@id': `${ogUrl}#service`,
-      name: metadata.serviceData.name,
-      serviceType: metadata.serviceData.serviceType,
-      description: metadata.serviceData.description,
-      provider: {
-        '@id': `${BASE_URL}/#organization`,
-      },
-      areaServed: {
-        '@type': 'AdministrativeArea',
-        name: 'Global / Worldwide',
-      },
-      hasOfferCatalog: {
-        '@type': 'OfferCatalog',
-        name: `${metadata.serviceData.name} Capabilities`,
-        itemListElement: (metadata.serviceData.capabilities || []).map((cap) => ({
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: cap,
-          },
-        })),
-      },
-    })
-  }
-
-  const dynamicJsonLd = {
-    '@context': 'https://schema.org',
-    '@graph': graphNodes,
-  }
-
-  let scriptEl = document.getElementById('operava-dynamic-jsonld') as HTMLScriptElement | null
-  if (!scriptEl) {
-    scriptEl = document.createElement('script')
-    scriptEl.id = 'operava-dynamic-jsonld'
-    scriptEl.type = 'application/ld+json'
-    document.head.appendChild(scriptEl)
-  }
-  scriptEl.textContent = JSON.stringify(dynamicJsonLd, null, 2)
+  injectJsonLd(graphSchema, 'operava-dynamic-jsonld')
 }
