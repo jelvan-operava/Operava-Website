@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPERAVA Brand Component</title>
+    <style>
+        /* Container to easily embed anywhere */
+        .operava-brand-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            background: #ffffff; /* Change this to match your website background */
+            font-family: 'Arial Black', 'Impact', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Ultra-fat lettering with clean, flat colors */
+        .operava-text {
+            font-size: 5rem; /* Scalable size */
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+            text-align: center;
+            
+            /* Much wider color stops create a larger moving color spot */
+            background: linear-gradient(
+                90deg, 
+                #000000 0%, 
+                #000000 20%, 
+                #8a2be2 40%, 
+                #ff1493 60%, 
+                #000000 80%, 
+                #000000 100%
+            );
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            
+            /* Slowed down to 9 seconds for a smooth, gradual crawl */
+            animation: lightWave 9s ease-in-out infinite;
+        }
+
+        /* Smooth animation shifting from black -> purple -> pink -> black */
+        @keyframes lightWave {
+            0% {
+                background-position: 100% 0%;
+            }
+            100% {
+                background-position: 0% 0%;
+            }
+        }
+
+        /* Responsive scaling for mobile devices */
+        @media (max-width: 600px) {
+            .operava-text {
+                font-size: 2.8rem;
+                letter-spacing: -1px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Copy this block to embed on your website -->
+    <div class="operava-brand-container">
+        <h1 class="operava-text">OPERAVA</h1>
+    </div>
+
+</body>
+</html>

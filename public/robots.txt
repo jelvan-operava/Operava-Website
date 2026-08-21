@@ -1,6 +1,6 @@
-# Robots.txt for OPERAVA Global Solutions
+# Robots.txt for OPERAVA GLOBAL SOLUTIONS
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://operava.com/sitemap.xml
+Sitemap: https://www.operavaglobal.com/sitemap.xml

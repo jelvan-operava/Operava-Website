@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operava - Pure Edge Running Lines</title>
+    <style>
+        /* Midnight background */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #030407;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 
+           PURE LINES ONLY: No drop shadows, glows, blurs, or highlights.
+           Just a clean 1px neon-pink vector track.
+        */
+        .laser-path {
+            stroke: #ff007f !important;
+            stroke-width: 1px !important;
+            fill: none !important;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: none !important; /* Completely removed all glow filters */
+            
+            /* Segment size and continuous flow settings */
+            stroke-dasharray: 60 250;
+            stroke-dashoffset: 310;
+            animation: runAlongEdges 8.5s linear infinite;
+        }
+
+        /* Keyframes: Animates the segment loop */
+        @keyframes runAlongEdges {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container" id="logo-target">
+        <!-- The logo code parses directly into this target -->
+    </div>
+
+    <script>
+        const logoUrl = "https://res.cloudinary.com/sdaxzncs/image/upload/v1786248668/Operava_Logo_Official.svg";
+
+        async function fetchAndAnimateLogo() {
+            try {
+                const response = await fetch(logoUrl);
+                let svgText = await response.text();
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(svgText, "image/svg+xml");
+                const svgElement = doc.querySelector("svg");
+
+                if (svgElement) {
+                    const allPaths = svgElement.querySelectorAll("path, circle, rect, polygon, ellipse, line, text");
+                    
+                    allPaths.forEach((path) => {
+                        const laserClone = path.cloneNode(true);
+                        laserClone.classList.add("laser-path");
+                        
+                        path.parentNode.appendChild(laserClone);
+                    });
+
+                    document.getElementById("logo-target").appendChild(svgElement);
+                }
+            } catch (error) {
+                console.error("Vector target tracing issue:", error);
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", fetchAndAnimateLogo);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service - Highlighted Purple Interface</title>
+    <style>
+        /* The outside background is a clean white canvas */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* The main card container matches the purple theme */
+        .card-frame {
+            position: relative;
+            width: 380px;
+            background: #5e42be;
+            border-radius: 16px;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 15px 40px rgba(94, 66, 190, 0.25);
+            border: 1px solid #4a32a3;
+        }
+
+        /* 
+           UPDATED: The image block is now entirely purple (#5e42be) 
+           with a bright white radial-gradient spotlight centered directly 
+           behind the icon to act as an atmospheric backdrop highlight.
+        */
+        .image-container {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+            
+            /* Layer 1: Solid purple base matching the card perfectly */
+            background-color: #5e42be; 
+            
+            /* Layer 2: Seamless blending blend of a white glow spotlight combined with the pink dot grid */
+            background-image: 
+                radial-gradient(circle at center, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 65%), /* White core background glow */
+                radial-gradient(rgba(255, 0, 127, 0.35) 10%, transparent 11%); /* Pink dot layer optimized for contrast */
+            background-size: 100% 100%, 16px 16px;
+            background-position: center, center;
+            background-repeat: no-repeat, repeat;
+        }
+
+        /* Additional edge spotlight reinforcement */
+        .image-container::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            right: 15%;
+            bottom: 15%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            filter: blur(15px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            position: relative;
+            z-index: 2; /* Sits cleanly over the white backdrop highlight and pink dots */
+        }
+
+        /* Card Typography Content */
+        .card-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .card-description {
+            color: #e2dbff;
+            font-size: 14px;
+            line-height: 1.55;
+            margin: 0 0 24px 0;
+            text-align: center;
+        }
+
+        /* Clean action button */
+        .learn-more-btn {
+            width: 100%;
+            padding: 13px;
+            background-color: #ffffff;
+            border: 1px solid #ffffff;
+            color: #5e42be;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .learn-more-btn:hover {
+    
+            background-color: #4a32a3;
+            color: #ffffff;
+            border-color: #4a32a3;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-frame">
+        <!-- Purple image section with a bright white background glow layer underneath the graphic -->
+        <div class="image-container">
+            <img src="https://res.cloudinary.com/sdaxzncs/image/upload/v1787254956/customer_service.webp" alt="Customer Service">
+        </div>
+
+        <!-- Typography Section -->
+        <h2 class="card-title">Customer Service</h2>
+        
+        <p class="card-description">
+            Experience exceptional customer care and support tailored to your needs. Our dedicated team ensures seamless solutions, active assistance, and dependable experiences every step of the way.
+        </p>
+
+        <button class="learn-more-btn">Learn More</button>
+    </div>
+
+</body>
+</html>
