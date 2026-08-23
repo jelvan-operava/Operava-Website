@@ -256,12 +256,10 @@ video {
   margin-bottom: 20px;
   position: relative;
   background-color: #5e42be;
-  background-image: 
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 65%),
-    radial-gradient(rgba(255, 0, 127, 0.35) 10%, transparent 11%);
-  background-size: 100% 100%, 16px 16px;
-  background-position: center, center;
-  background-repeat: no-repeat, repeat;
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 26%, transparent 45%);
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -270,12 +268,12 @@ video {
 .operava-image-container::after {
   content: '';
   position: absolute;
-  top: 15%;
-  left: 15%;
-  right: 15%;
-  bottom: 15%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-  filter: blur(15px);
+  top: 25%;
+  left: 25%;
+  right: 25%;
+  bottom: 25%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+  filter: blur(8px);
   z-index: 1;
   pointer-events: none;
 }
@@ -391,3 +389,212 @@ video {
 .reveal-delay-3 { transition-delay: 0.3s; }
 .reveal-delay-4 { transition-delay: 0.4s; }
 .reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ── SLOW WAVING & FLOATING CARD ANIMATIONS ── */
+@keyframes waveMotion {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(0.35deg);
+  }
+  50% {
+    transform: translateY(-1px) rotate(-0.25deg);
+  }
+  75% {
+    transform: translateY(-6px) rotate(0.2deg);
+  }
+}
+
+@keyframes gentleBlink {
+  0%, 100% {
+    opacity: 0.95;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.04));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.08));
+  }
+}
+
+@keyframes radarPing {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+
+.animate-wave-motion {
+  animation: waveMotion 5.5s ease-in-out infinite;
+}
+
+.animate-gentle-blink {
+  animation: gentleBlink 3.8s ease-in-out infinite;
+}
+
+.animate-radar-ping {
+  animation: radarPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ── GLOSSY BLINKING & SPECULAR SHIMMER ── */
+@keyframes glossySweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  35% {
+    transform: translateX(250%) skewX(-20deg);
+    opacity: 0.8;
+  }
+  36%, 100% {
+    transform: translateX(250%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes glossyBlinkGlow {
+  0%, 100% {
+    filter: brightness(1);
+    opacity: 0.96;
+  }
+  18% {
+    filter: brightness(1.06) contrast(1.02) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.07));
+    opacity: 1;
+  }
+  36% {
+    filter: brightness(1);
+    opacity: 0.96;
+  }
+}
+
+.animate-glossy-sheen {
+  animation: glossySweep 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-glossy-card {
+  animation: glossyBlinkGlow 5.5s ease-in-out infinite, waveMotion 6s ease-in-out infinite;
+}
+
+/* ── MULTI-DIRECTIONAL MARQUEE ANIMATIONS ── */
+@keyframes marqueeLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marqueeRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee-left {
+  animation: marqueeLeft 75s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  animation: marqueeRight 75s linear infinite;
+  will-change: transform;
+}
+
+/* ── REFINED FLOATING & LEVITATION SUITE ── */
+@keyframes floatingGentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.4deg);
+  }
+}
+
+@keyframes floatingGentleReverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-0.4deg);
+  }
+}
+
+@keyframes orbLevitate {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    filter: drop-shadow(0 15px 30px rgba(94, 66, 190, 0.25));
+  }
+  50% {
+    transform: translateY(-12px) scale(1.02);
+    filter: drop-shadow(0 25px 45px rgba(94, 66, 190, 0.4));
+  }
+}
+
+@keyframes ambientAuraPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes stepSheen {
+  0% {
+    transform: translateX(-120%) skewX(-18deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  40% {
+    transform: translateX(220%) skewX(-18deg);
+    opacity: 0.6;
+  }
+  41%, 100% {
+    transform: translateX(220%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+.animate-float-gentle {
+  animation: floatingGentle 5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-gentle-rev {
+  animation: floatingGentleReverse 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-orb-levitate {
+  animation: orbLevitate 6s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+.animate-aura-pulse {
+  animation: ambientAuraPulse 4s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+.animate-step-sheen {
+  animation: stepSheen 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
+}

@@ -32,7 +32,7 @@ export default function ServiceCard({
       id={`service-card-${service.slug}`}
       className={`operava-card-frame group w-full ${className}`}
     >
-      {/* Image Container with Spotlight Glow & Pink Dot Grid Pattern */}
+      {/* Image Container with Focused Spotlight Glow */}
       <div className="operava-image-container">
         {service.image && !imgError ? (
           <img

@@ -73,6 +73,12 @@ export const AVA_COMPANY_PROFILE = {
     },
   ],
   clientTypes: ['Startups', 'Small Businesses', 'SMEs', 'Growing Companies', 'Established Organizations', 'Enterprises'],
+  departmentalEmails: [
+    { team: 'Clients Support Team', desc: 'For product, services and partnerships', email: 'hello@operavaglobal.com' },
+    { team: 'Human Resources Team', desc: 'Application, verification and employment documentation related services', email: 'hr@operavaglobal.com' },
+    { team: 'Customer Service Team', desc: 'Product and Services concerns', email: 'cs@operavaglobal.com' },
+    { team: 'Compliance Team', desc: 'Data privacy act issue and concerns or any related compliance', email: 'compliance@operavaglobal.com' },
+  ],
   talentStrategy: {
     primarySource: 'Philippines (highly skilled, English-fluent professionals)',
     globalRecruitment: 'Expanding global recruitment for specialized skills, technical domains, and language capabilities.',

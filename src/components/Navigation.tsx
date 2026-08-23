@@ -76,10 +76,18 @@ export default function Navigation() {
         <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="OPERAVA Global Solutions — Home">
           <div className="relative h-10 w-10 sm:h-11 sm:w-11 overflow-hidden bg-transparent flex items-center justify-center">
             <img
-              src="https://res.cloudinary.com/sdaxzncs/image/upload/v1786248668/Operava_Logo_Official.svg"
+              src="/operava-logo.svg"
               alt="OPERAVA Logo"
               className="h-full w-full object-contain pointer-events-none select-none transition-transform duration-200 group-hover:scale-105"
               loading="eager"
+              onError={(e) => {
+                const target = e.currentTarget
+                if (target.src.includes('/operava-logo.svg')) {
+                  target.src = 'https://res.cloudinary.com/sdaxzncs/image/upload/v1786248668/Operava_Logo_Official.svg'
+                } else if (!target.src.includes('favicon-512.svg')) {
+                  target.src = '/favicon-512.svg'
+                }
+              }}
             />
           </div>
           <div className="flex flex-col leading-none">

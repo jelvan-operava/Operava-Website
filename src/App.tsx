@@ -56,7 +56,7 @@ function RouteManager() {
     return () => clearTimeout(timer)
   }, [location.pathname])
 
-  return <RouteLoadingProgress isLoading={loading} />
+  return <RouteLoadingProgress isLoading={loading} pathname={location.pathname} />
 }
 
 // Subtle, refined page transition variants
