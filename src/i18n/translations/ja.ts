@@ -221,6 +221,8 @@ export const ja: Record<string, string> = {
   'footer.location': 'フィリピン • グローバル展開',
   'footer.privacy': 'プライバシーポリシー',
   'footer.terms': '利用規約',
+  'footer.refund': '返金ポリシー',
+  'footer.paymentPortal': 'クライアント決済ポータル',
 
   'common.exploreService': '詳細を見る',
   'common.learnMore': '詳しく知る',

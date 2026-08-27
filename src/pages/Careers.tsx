@@ -309,13 +309,10 @@ export default function Careers() {
                   className="bg-white rounded-3xl p-8 border border-gray-200/80 shadow-md hover:shadow-xl hover:border-violet-300 transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
-                    <div className="flex items-center justify-between gap-4 mb-6">
+                    <div className="mb-6">
                       <div className="w-12 h-12 rounded-2xl bg-violet-50 text-violet-700 flex items-center justify-center border border-violet-100 group-hover:scale-105 transition-transform">
                         <Icon className="w-6 h-6" />
                       </div>
-                      <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide border ${exec.badgeColor}`}>
-                        Broad Title
-                      </span>
                     </div>
 
                     <h3 className="text-xl font-bold text-gray-900 tracking-tight mb-3">
@@ -553,13 +550,10 @@ export default function Careers() {
                     <img src={role.image} alt={role.title} className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <div className="mb-1.5">
                       <h3 className="text-lg font-bold text-gray-900 group-hover:text-violet-700 transition-colors">
                         {role.title}
                       </h3>
-                      <span className="px-2.5 py-0.5 rounded-full bg-violet-50 border border-violet-200 text-violet-700 text-[11px] font-bold">
-                        {role.broadTitle}
-                      </span>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-500 max-w-2xl mb-2">{role.desc}</p>
                     <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">

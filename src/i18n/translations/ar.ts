@@ -221,6 +221,8 @@ export const ar: Record<string, string> = {
   'footer.location': 'الفلبين • عمليات عالمية',
   'footer.privacy': 'سياسة الخصوصية',
   'footer.terms': 'الشروط والأحكام',
+  'footer.refund': 'سياسة الاسترداد',
+  'footer.paymentPortal': 'بوابة دفع العملاء',
 
   // Operational Insights & Innovations Marquee
   'marquee.badge': 'رؤى وابتكارات تشغيلية',

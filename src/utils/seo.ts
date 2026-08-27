@@ -417,7 +417,66 @@ export function getMetadataForPath(pathname: string): PageMetadata {
     }
   }
 
-  // 13. Fallback / 404
+  // 13. Refund Policy
+  if (cleanPath === '/refund-policy' || cleanPath === '/refundpolicy' || cleanPath === '/refund') {
+    return {
+      title: 'Refund Policy | OPERAVA GLOBAL SOLUTIONS',
+      description:
+        'Official Refund Policy, cancellations, service credits, billing error remedies, and resolution frameworks for OPERAVA Global Solutions.',
+      keywords:
+        'Refund Policy, Service Credits, Cancellation Terms, Billing Dispute, Software Development Refund, BPO Refund, OPERAVA',
+      canonicalUrl: `${BASE_URL}/refund-policy`,
+      ogType: 'website',
+      breadcrumbs: [
+        { name: 'Home', item: `${BASE_URL}/` },
+        { name: 'Refund Policy', item: `${BASE_URL}/refund-policy` },
+      ],
+      faqs: [
+        {
+          q: 'How do I submit a refund request to OPERAVA?',
+          a: 'Clients may submit a refund request via email to cs@operavaglobal.com or through the client support portal at www.operavaglobal.com with relevant invoice and transaction details.',
+        },
+        {
+          q: 'What is the timeframe for refund reviews?',
+          a: 'OPERAVA aims to issue a review decision within thirty (30) business days of receiving all necessary details, and processed refunds are typically finalized within fifteen (15) business days thereafter.',
+        },
+      ],
+    }
+  }
+
+  // 14. Client Payment Portal
+  if (
+    cleanPath === '/payment-portal' ||
+    cleanPath === '/payment' ||
+    cleanPath === '/pay' ||
+    cleanPath === '/client-portal/payment'
+  ) {
+    return {
+      title: 'Client Payment Portal | OPERAVA GLOBAL SOLUTIONS',
+      description:
+        'Secure 256-Bit SSL client payment and invoice settlement portal for OPERAVA Global Solutions. Settle IT development milestones, BPO retainers, and cloud invoices.',
+      keywords:
+        'Payment Portal, Client Invoicing, Settle Milestone, Bank Wire SWIFT, Credit Card Payment, OPERAVA Billing, BPO Payment',
+      canonicalUrl: `${BASE_URL}/payment-portal`,
+      ogType: 'website',
+      breadcrumbs: [
+        { name: 'Home', item: `${BASE_URL}/` },
+        { name: 'Client Payment Portal', item: `${BASE_URL}/payment-portal` },
+      ],
+      faqs: [
+        {
+          q: 'What payment methods are supported on the OPERAVA Payment Portal?',
+          a: 'We support international and domestic bank wire transfers (SWIFT/ACH/BDO/BPI), major credit/debit cards (Visa, Mastercard, American Express, JCB), digital wallets (Stripe Checkout, PayPal Express, GCash, Maya), and corporate Purchase Orders (Net-30).',
+        },
+        {
+          q: 'Is my payment data secure?',
+          a: 'Yes. All transactions are protected by 256-Bit SSL/TLS 1.3 encryption and comply with PCI-DSS Level 1 security standards. Card details are processed via tokenization and are never stored on our servers.',
+        },
+      ],
+    }
+  }
+
+  // 15. Fallback / 404
   return {
     title: 'Page Not Found (404) | OPERAVA GLOBAL SOLUTIONS',
     description:

@@ -221,6 +221,8 @@ export const zh: Record<string, string> = {
   'footer.location': '菲律宾 • 全球运营',
   'footer.privacy': '隐私政策',
   'footer.terms': '使用条款',
+  'footer.refund': '退款政策',
+  'footer.paymentPortal': '客户付款门户',
 
   'common.exploreService': '查看服务详情',
   'common.learnMore': '了解更多',

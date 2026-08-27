@@ -322,6 +322,8 @@ export const en: Record<string, string> = {
   'footer.location': 'Philippines • Global Operations',
   'footer.privacy': 'Privacy Policy',
   'footer.terms': 'Terms & Conditions',
+  'footer.refund': 'Refund Policy',
+  'footer.paymentPortal': 'Client Payment Portal',
 
   // Testimonials
   'testimonials.badge': 'Verified Enterprise Outcomes',

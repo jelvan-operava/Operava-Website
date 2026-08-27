@@ -221,6 +221,8 @@ export const fil: Record<string, string> = {
   'footer.location': 'Pilipinas • Pandaigdigang Operasyon',
   'footer.privacy': 'Patakaran sa Pagkapribado',
   'footer.terms': 'Mga Tuntunin at Kundisyon',
+  'footer.refund': 'Patakaran sa Refund',
+  'footer.paymentPortal': 'Portal sa Pagbabayad ng Kliyente',
 
   'common.exploreService': 'Tuklasin ang serbisyo',
   'common.learnMore': 'Alamin ang higit pa',

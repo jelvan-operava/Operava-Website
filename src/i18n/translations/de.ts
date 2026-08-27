@@ -221,6 +221,8 @@ export const de: Record<string, string> = {
   'footer.location': 'Philippinen • Globale Operationen',
   'footer.privacy': 'Datenschutzrichtlinie',
   'footer.terms': 'Nutzungsbedingungen',
+  'footer.refund': 'Rückerstattungsrichtlinie',
+  'footer.paymentPortal': 'Kunden-Zahlungsportal',
 
   'common.exploreService': 'Dienst erkunden',
   'common.learnMore': 'Mehr erfahren',

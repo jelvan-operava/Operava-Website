@@ -19,6 +19,8 @@ import Contact from './pages/Contact'
 import Insights from './pages/Insights'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
+import RefundPolicy from './pages/RefundPolicy'
+import PaymentPortal from './pages/PaymentPortal'
 import NotFound from './pages/NotFound'
 import { getMetadataForPath, updatePageSEO } from './utils/seo'
 import { injectSchemaMarkup } from './utils/schema'
@@ -119,6 +121,13 @@ function Layout() {
               <Route path="/insights" element={<Insights />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/refundpolicy" element={<RefundPolicy />} />
+              <Route path="/refund" element={<RefundPolicy />} />
+              <Route path="/payment-portal" element={<PaymentPortal />} />
+              <Route path="/payment" element={<PaymentPortal />} />
+              <Route path="/pay" element={<PaymentPortal />} />
+              <Route path="/client-portal/payment" element={<PaymentPortal />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </motion.div>

@@ -1,32 +1,9 @@
 import { Link } from 'react-router-dom'
-import { Mail, ArrowUpRight } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
+import EmailDirectoryCarousel from './EmailDirectoryCarousel'
 
 export default function Footer() {
   const { t } = useLanguage()
-
-  const departmentalEmails = [
-    {
-      team: 'Client Support Team',
-      email: 'hello@operavaglobal.com',
-      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787462467/Client%20Team%20-%20Email.png',
-    },
-    {
-      team: 'Human Resources Team',
-      email: 'hr@operavaglobal.com',
-      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787462462/Human%20Resources%20Team%20-%20Email.png',
-    },
-    {
-      team: 'Customer Service Team',
-      email: 'cs@operavaglobal.com',
-      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787462456/Customer%20Service%20Team%20-%20Email.png',
-    },
-    {
-      team: 'Compliance Team',
-      email: 'compliance@operavaglobal.com',
-      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1787462474/Compliance%20Team%20-%20Email.png',
-    },
-  ]
 
   const footerServices = [
     { label: t('nav.services.it', 'Information Technology'), href: '/services/it' },
@@ -44,70 +21,29 @@ export default function Footer() {
     { label: t('nav.careers', 'Careers'), href: '/careers' },
     { label: t('nav.insights', 'Insights'), href: '/insights' },
     { label: t('nav.contact', 'Contact'), href: '/contact' },
+    { label: t('footer.paymentPortal', 'Client Payment Portal'), href: '/payment-portal' },
   ]
 
   const footerLegal = [
     { label: t('footer.privacy', 'Privacy Policy'), href: '/privacy' },
     { label: t('footer.terms', 'Terms & Conditions'), href: '/terms' },
+    { label: t('footer.refund', 'Refund Policy'), href: '/refund-policy' },
+    { label: t('footer.paymentPortal', 'Client Payment Portal'), href: '/payment-portal' },
   ]
 
   return (
-    <footer className="bg-gray-950 text-white border-t border-white/10">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-16 pb-8">
-        
-        {/* ── DEPARTMENTAL EMAIL CONTACTS DIRECTORY ── */}
-        <div className="mb-16 pb-14 border-b border-white/10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-            <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white">
-                <Mail className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">Direct Departmental Inquiries</h3>
-                <p className="text-sm text-gray-400">Reach the right team directly for prompt assistance</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
-            {departmentalEmails.map((dept) => (
-              <a
-                key={dept.email}
-                href={`mailto:${dept.email}`}
-                className="group relative block bg-transparent transition-all duration-300 hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-violet-500/50 rounded-2xl"
-                aria-label={`Email ${dept.team} directly at ${dept.email}`}
-              >
-                {/* Pop-out floating email badge on hover */}
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 -translate-y-1.5 group-hover:translate-y-0 transition-all duration-300 pointer-events-none z-30 whitespace-nowrap shadow-2xl">
-                  <div className="px-3.5 py-1.5 rounded-full bg-violet-950/95 border border-violet-400/80 text-white shadow-xl shadow-black/90 flex items-center gap-2 text-xs font-semibold backdrop-blur-md">
-                    <Mail className="w-3.5 h-3.5 text-violet-400 shrink-0" />
-                    <span className="font-mono text-violet-200 tracking-tight">{dept.email}</span>
-                    <ArrowUpRight className="w-3 h-3 text-violet-400 shrink-0" />
-                  </div>
-                </div>
-
-                <div className="w-full overflow-hidden bg-transparent flex items-center justify-center relative">
-                  <img
-                    src={dept.image}
-                    alt={`${dept.team} - ${dept.email}`}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-auto object-contain rounded-2xl shadow-md shadow-black/30 transition-all duration-300 group-hover:shadow-violet-900/20 group-hover:brightness-105"
-                    loading="lazy"
-                  />
-                  {/* Subtle hover overlay highlighting the mail action */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-gray-950/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3 pointer-events-none">
-                    <span className="text-[11px] font-mono text-white/90 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-full border border-white/10">
-                      Click to email ↗
-                    </span>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
+    <>
+      {/* ── DEPARTMENTAL EMAIL CONTACTS DIRECTORY (CAROUSEL) - WHITE BACKGROUND ── */}
+      <section className="bg-white border-t border-gray-200 py-12 lg:py-14">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <EmailDirectoryCarousel />
         </div>
+      </section>
 
-        {/* ── MAIN FOOTER NAVIGATION ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
+      {/* ── MAIN FOOTER NAVIGATION ── */}
+      <footer className="bg-gray-950 text-white border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-16 pb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 group mb-5 inline-flex" aria-label="OPERAVA Global Solutions — Home">
@@ -287,14 +223,33 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-500">
-            © 2026 OPERAVA Global Solutions. {t('footer.rights', 'All rights reserved.')}
-          </p>
-          <p className="text-xs text-gray-600">{t('footer.location', 'Philippines • Global Operations')}</p>
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+            <p className="text-sm text-gray-500">
+              © 2026 OPERAVA Global Solutions. {t('footer.rights', 'All rights reserved.')}
+            </p>
+            <span className="hidden sm:inline text-gray-700">•</span>
+            <p className="text-xs text-gray-600">{t('footer.location', 'Philippines • Global Operations')}</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link
+              to="/payment-portal"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-300 hover:text-white transition-all duration-200"
+            >
+              <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>{t('footer.paymentPortal', 'Client Payment Portal')}</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-950 text-violet-300 border border-violet-800/60 font-mono">
+                256-Bit SSL
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
+    </>
   )
 }
 
