@@ -5,6 +5,11 @@
   "compatibility_flags": ["nodejs_compat"],
   "pages_build_output_dir": "dist",
   "vars": {
-    "NODE_VERSION": "20"
+    "NODE_VERSION": "20",
+    "RESEND_FROM": "OPERAVA <noreply@operavaglobal.com>",
+    "CLIENT_INBOX": "hello@operavaglobal.com",
+    "SALES_INBOX": "hello@operavaglobal.com",
+    "TALENT_INBOX": "talents@operavaglobal.com",
+    "HR_INBOX": "hr@operavaglobal.com"
   }
 }
