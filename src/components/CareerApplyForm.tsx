@@ -52,9 +52,9 @@ export default function CareerApplyForm({ roleTitle, onClose, onSent }: CareerAp
       {error && <p className="text-xs text-red-600">{error}</p>}
       <button type="submit" disabled={sending} className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-violet-700 rounded-xl disabled:opacity-70">
         {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-        {sending ? 'Sending…' : 'Send to Talent Team'}
+        {sending ? 'Sending…' : 'Submit application'}
       </button>
-      <p className="text-[11px] text-gray-500">Applications go to talents@operavaglobal.com</p>
+      <p className="text-[11px] text-gray-500">You receive a ticket confirmation. Talent and HR are copied.</p>
     </form>
   )
 }
