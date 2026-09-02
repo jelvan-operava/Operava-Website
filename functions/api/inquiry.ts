@@ -3,6 +3,8 @@ interface Env {
   RESEND_FROM?: string
   CLIENT_INBOX?: string
   TALENT_INBOX?: string
+  HR_INBOX?: string
+  APPLICANT_CC?: string
 }
 
 const CAREER_KINDS = new Set(['career', 'ai-career'])
@@ -24,15 +26,96 @@ function clean(value: unknown, max = 2000): string {
 
 function escapeHtml(value: string): string {
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/&/g, '&')
+    .replace(/</g, '<')
+    .replace(/>/g, '>')
+    .replace(/"/g, '"')
 }
 
 function row(label: string, value: string): string {
   if (!value) return ''
   return `<tr><td style="padding:8px 0;color:#5b5270;width:160px;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:8px 0;color:#1c1333;">${escapeHtml(value).replace(/\n/g, '<br/>')}</td></tr>`
+}
+
+function parseList(value?: string): string[] {
+  if (!value) return []
+  return value
+    .split(/[,;]+/)
+    .map((item) => item.trim().toLowerCase())
+    .filter((item) => EMAIL_RE.test(item))
+}
+
+function uniqueEmails(list: string[], exclude: string): string[] {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const item of list) {
+    if (!item || item === exclude || seen.has(item)) continue
+    seen.add(item)
+    out.push(item)
+  }
+  return out
+}
+
+/** Same ticket shape AVA generates in chat: OPV-###### */
+function makeTicketId(): string {
+  return `OPV-${Math.floor(100000 + Math.random() * 900000)}`
+}
+
+function detailsTable(name: string, email: string, fields: Record<string, string>): string {
+  return `<table style="width:100%;border-collapse:collapse;font-size:14px;">
+          ${row('Name', name)}
+          ${row('Email', email)}
+          ${row('Company', fields.company)}
+          ${row('Phone', fields.phone)}
+          ${row('Country', fields.country)}
+          ${row('Service', fields.service)}
+          ${row('Delivery model', fields.teamModel)}
+          ${row('Timeline', fields.timeline)}
+          ${row('Role', fields.role)}
+          ${row('Details', fields.notes)}
+        </table>`
+}
+
+function clientConfirmationHtml(
+  name: string,
+  email: string,
+  ticketId: string,
+  sourceLabel: string,
+  fields: Record<string, string>,
+): string {
+  return `
+      <div style="font-family:Segoe UI,Arial,sans-serif;max-width:640px;margin:0 auto;color:#1c1333;">
+        <p style="margin:0 0 4px;color:#6d28d9;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">AVA ticket confirmation</p>
+        <h2 style="margin:0 0 8px;">Thank you, ${escapeHtml(name)}.</h2>
+        <p style="margin:0 0 16px;color:#5b5270;line-height:1.5;">
+          Your project consultation request is registered under reference <strong>#${escapeHtml(ticketId)}</strong>.
+          Our solutions team received your information (${escapeHtml(email)}) and will review your requirements to connect with you within 2 business hours.
+        </p>
+        <p style="margin:0 0 16px;color:#5b5270;font-size:13px;">${escapeHtml(sourceLabel)}</p>
+        ${detailsTable(name, email, fields)}
+        <p style="margin:24px 0 0;color:#8a8298;font-size:12px;">OPERAVA Global Solutions · We Operate in Advance</p>
+      </div>`
+}
+
+function applicantConfirmationHtml(
+  name: string,
+  email: string,
+  ticketId: string,
+  sourceLabel: string,
+  fields: Record<string, string>,
+): string {
+  return `
+      <div style="font-family:Segoe UI,Arial,sans-serif;max-width:640px;margin:0 auto;color:#1c1333;">
+        <p style="margin:0 0 4px;color:#6d28d9;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">AVA ticket confirmation</p>
+        <h2 style="margin:0 0 8px;">Thank you, ${escapeHtml(name)}.</h2>
+        <p style="margin:0 0 16px;color:#5b5270;line-height:1.5;">
+          Your career application is registered under reference <strong>#${escapeHtml(ticketId)}</strong>.
+          Talent review typically starts within 24–48 hours. Keep this ticket number for follow-up.
+        </p>
+        <p style="margin:0 0 16px;color:#5b5270;font-size:13px;">${escapeHtml(sourceLabel)} · sent to ${escapeHtml(email)}</p>
+        ${detailsTable(name, email, fields)}
+        <p style="margin:24px 0 0;color:#8a8298;font-size:12px;">OPERAVA Global Solutions · Careers</p>
+      </div>`
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
@@ -64,46 +147,68 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const isCareer = CAREER_KINDS.has(kind)
-    const to = isCareer
-      ? env.TALENT_INBOX || 'talents@operavaglobal.com'
-      : env.CLIENT_INBOX || 'client@operavaglobal.com'
+    const clientInbox = env.CLIENT_INBOX || 'client@operavaglobal.com'
+    const talentInbox = env.TALENT_INBOX || 'talents@operavaglobal.com'
+    const hrInbox = env.HR_INBOX || 'hr@operavaglobal.com'
     const from = env.RESEND_FROM || 'OPERAVA Website <noreply@operavaglobal.com>'
     const apiKey = env.RESEND_API_KEY
-    const year = new Date().getFullYear()
-    const referenceId = `OPV-${year}-${Math.floor(10000 + Math.random() * 90000)}`
+    const ticketId = makeTicketId()
     const sourceLabel = {
       contact: 'Website contact form',
       service: 'Services inquiry',
       'ai-consultation': 'AVA assistant consultation',
       career: 'Careers application',
       'ai-career': 'AVA assistant career interest',
-    }[kind]
-    const subject = isCareer
-      ? `[Career] ${fields.role || 'Application'} — ${name} (${referenceId})`
-      : `[Client] ${fields.service || 'Inquiry'} — ${name} (${referenceId})`
+    }[kind] as string
 
-    const html = `
-      <div style="font-family:Segoe UI,Arial,sans-serif;max-width:640px;margin:0 auto;color:#1c1333;">
-        <h2 style="margin:0 0 8px;">OPERAVA website inquiry</h2>
-        <p style="margin:0 0 16px;color:#5b5270;">${escapeHtml(sourceLabel || kind)} · ${escapeHtml(referenceId)}</p>
-        <table style="width:100%;border-collapse:collapse;font-size:14px;">
-          ${row('Name', name)}
-          ${row('Email', email)}
-          ${row('Company', fields.company)}
-          ${row('Phone', fields.phone)}
-          ${row('Country', fields.country)}
-          ${row('Service', fields.service)}
-          ${row('Delivery model', fields.teamModel)}
-          ${row('Timeline', fields.timeline)}
-          ${row('Role', fields.role)}
-          ${row('Details', fields.notes)}
-        </table>
-      </div>`
+    const cc = uniqueEmails(
+      isCareer
+        ? [talentInbox, hrInbox, ...parseList(env.APPLICANT_CC)]
+        : [clientInbox],
+      email,
+    )
+    const replyTo = isCareer ? talentInbox : clientInbox
+    const subject = isCareer
+      ? `Ticket #${ticketId} — career application received`
+      : `Ticket #${ticketId} — consultation request received`
+    const html = isCareer
+      ? applicantConfirmationHtml(name, email, ticketId, sourceLabel, fields)
+      : clientConfirmationHtml(name, email, ticketId, sourceLabel, fields)
+    const text = [
+      isCareer
+        ? `Thank you, ${name}. Your career application is registered under reference #${ticketId}.`
+        : `Thank you, ${name}. Your project consultation request is registered under reference #${ticketId}.`,
+      `Our team received your information (${email}).`,
+      isCareer
+        ? 'Talent review typically starts within 24-48 hours.'
+        : 'We will review your requirements and connect within 2 business hours.',
+      sourceLabel,
+      fields.company && `Company: ${fields.company}`,
+      fields.phone && `Phone: ${fields.phone}`,
+      fields.country && `Country: ${fields.country}`,
+      fields.service && `Service: ${fields.service}`,
+      fields.teamModel && `Model: ${fields.teamModel}`,
+      fields.timeline && `Timeline: ${fields.timeline}`,
+      fields.role && `Role: ${fields.role}`,
+      fields.notes && `Details:\n${fields.notes}`,
+    ]
+      .filter(Boolean)
+      .join('\n')
 
     if (!apiKey) {
       console.error('RESEND_API_KEY is not configured')
       return json({ error: 'Email delivery is not configured yet.' }, 503)
     }
+
+    const payload: Record<string, unknown> = {
+      from,
+      to: [email],
+      reply_to: replyTo,
+      subject,
+      html,
+      text,
+    }
+    if (cc.length) payload.cc = cc
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -111,29 +216,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        from,
-        to: [to],
-        reply_to: email,
-        subject,
-        html,
-        text: [
-          sourceLabel,
-          `Reference: ${referenceId}`,
-          `Name: ${name}`,
-          `Email: ${email}`,
-          fields.company && `Company: ${fields.company}`,
-          fields.phone && `Phone: ${fields.phone}`,
-          fields.country && `Country: ${fields.country}`,
-          fields.service && `Service: ${fields.service}`,
-          fields.teamModel && `Model: ${fields.teamModel}`,
-          fields.timeline && `Timeline: ${fields.timeline}`,
-          fields.role && `Role: ${fields.role}`,
-          fields.notes && `Details:\n${fields.notes}`,
-        ]
-          .filter(Boolean)
-          .join('\n'),
-      }),
+      body: JSON.stringify(payload),
     })
 
     if (!res.ok) {
@@ -142,7 +225,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       return json({ error: 'Unable to deliver this inquiry.' }, 502)
     }
 
-    return json({ ok: true, referenceId })
+    return json({ ok: true, referenceId: ticketId })
   } catch {
     return json({ error: 'Unable to process this inquiry.' }, 500)
   }
