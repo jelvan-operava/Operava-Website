@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import EmailDirectoryCarousel from './EmailDirectoryCarousel'
 
+const PAY_PORTAL_URL = 'https://pay.operavaglobal.com'
+const SEC_REGISTRATION = 'SEC Registration Number: 2026080262213-03'
+
 export default function Footer() {
   const { t } = useLanguage()
 
@@ -28,6 +31,27 @@ export default function Footer() {
     { label: t('footer.terms', 'Terms & Conditions'), href: '/terms' },
     { label: t('footer.refund', 'Refund Policy'), href: '/refund-policy' },
   ]
+
+  const renderFooterLink = (item: { label: string; href: string }) => {
+    const className = 'text-sm text-gray-400 hover:text-white transition-colors duration-200'
+    if (item.href.startsWith('http')) {
+      return (
+        <a
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={className}
+        >
+          {item.label}
+        </a>
+      )
+    }
+    return (
+      <Link to={item.href} className={className}>
+        {item.label}
+      </Link>
+    )
+  }
 
   return (
     <>
@@ -165,12 +189,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerServices.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    to={item.href}
-                    className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
-                  >
-                    {item.label}
-                  </Link>
+                  {renderFooterLink(item)}
                 </li>
               ))}
             </ul>
@@ -184,12 +203,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerCompany.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    to={item.href}
-                    className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
-                  >
-                    {item.label}
-                  </Link>
+                  {renderFooterLink(item)}
                 </li>
               ))}
             </ul>
@@ -203,12 +217,7 @@ export default function Footer() {
             <ul className="space-y-3 mb-8">
               {footerLegal.map((item) => (
                 <li key={item.href}>
-                  <Link
-                    to={item.href}
-                    className="text-sm text-gray-400 hover:text-white transition-colors duration-200"
-                  >
-                    {item.label}
-                  </Link>
+                  {renderFooterLink(item)}
                 </li>
               ))}
             </ul>
