@@ -21,11 +21,8 @@ export interface InquiryPayload {
   website?: string
 }
 
-export async function submitInquiry(payload: InquiryPayload): Promise<{
-  ok: true
-  referenceId: string
-}> {
-  const res = await fetch('/api/inquiry', {
+async function postForm(path: string, payload: InquiryPayload) {
+  const res = await fetch(path, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -37,5 +34,14 @@ export async function submitInquiry(payload: InquiryPayload): Promise<{
   if (!res.ok || !data.referenceId) {
     throw new Error(data.error || 'Unable to send your inquiry right now.')
   }
-  return { ok: true, referenceId: data.referenceId }
+  return { ok: true as const, referenceId: data.referenceId }
+}
+
+export async function submitInquiry(payload: InquiryPayload) {
+  const applicant = payload.kind === 'career' || payload.kind === 'ai-career'
+  return postForm(applicant ? '/api/apply' : '/api/inquiry', payload)
+}
+
+export async function submitApplication(payload: Omit<InquiryPayload, 'kind'> & { kind?: 'career' | 'ai-career' }) {
+  return postForm('/api/apply', { ...payload, kind: payload.kind || 'career' })
 }
