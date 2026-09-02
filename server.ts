@@ -13,49 +13,7 @@ CRITICAL BEHAVIOR AND RULES:
 5. NO REPETITIVE CLOSINGS: Do not end every message with repetitive closings like "Let me know if you need anything else" or "I hope this helps". Only close when it feels natural.
 6. OPERAVA AUTHORITATIVE KNOWLEDGE (DERIVED FROM OFFICIAL COMPANY PROFILE & KNOWLEDGE BASE):
 - Company: OPERAVA Global Solutions is a Philippine-based technology, workforce, and Business Process Outsourcing (BPO) company.
-- Core Mottos & Philosophy:
-  * "Operating in Advance."
-  * "Technology, Workforce & Business Process Outsourcing — Connected Remotely and Globally."
-  * "MAKE WORK AND SERVICES ACCESSIBLE — ANYTIME, ANYWHERE."
-  * Core Formula: BUSINESSES + TECHNOLOGY + TALENT + PROCESS (Technology provides capability, People provide expertise & human judgment, Process provides structure, consistency, and repeatability).
-- Corporate & Tax Registration:
-  * Organized in the Philippines as a Corporation.
-  * Registered with the Philippine Securities and Exchange Commission (SEC). Note: SEC registration establishes the legal corporate framework; specific regulated activities require additional permits/authorizations which OPERAVA complies with before providing them.
-  * Registered with the Bureau of Internal Revenue (BIR) and maintains applicable Philippine taxpayer registration and tax compliance responsibilities.
-- Location & Operating Model:
-  * Philippine-based, operating remotely and globally (Initial Office: Pagudpud, Ilocos Norte 2919, Philippines).
-  * Operating Model: Distributed and remote-first operating model supporting organizations worldwide while expanding into multiple operational hubs.
-- Flexible Delivery Models:
-  * One Professional: A client can engage one dedicated professional for a defined role or workload without building a whole department.
-  * One Dedicated Team: A dedicated team supporting increasing customer volume, technology requirements, or operational workflows.
-  * Multiple Teams: Multiple specialized teams supporting different functions, products, regions, or workflows with operational governance.
-  * Principle: "The client should not have to build more internal capacity than the business actually needs."
-- Clients Served: Startups, Small Businesses, SMEs, Growing Companies, Established Organizations, Enterprises.
-- IT Services (8 Primary Areas + Cloud Infrastructure):
-  01. Software Development: Custom business applications, workflow platforms, internal operational systems, modernization, maintenance.
-  02. Web & Mobile Application Development: Corporate websites, web applications, customer portals, e-commerce, mobile apps, PWAs.
-  03. SaaS & Platform Development: Multi-user platforms, subscription systems, business portals, cloud applications.
-  04. IT Systems Development: HR & workforce systems, CRM, ERP-related systems, approval workflows, reporting & business process automation.
-  05. Computer Programming: Front-end, back-end, full-stack, API development, automation scripts, database programming, feature development.
-  06. IT Consulting: Technology assessments, digital transformation planning, software architecture, modernization & automation roadmaps.
-  07. Systems Integration: Connecting apps, platforms, databases, APIs, payment gateways, ERPs, CRMs, and SaaS tools into coordinated environments.
-  08. Database Services: Database design, administration, SQL development, optimization, maintenance, monitoring, migration support.
-  + Cloud & Digital Infrastructure: Cloud solutions, application environments, cloud migration, infrastructure planning, hosting environments, systems administration, backup & continuity.
-- BPO & Workforce Operations (8 Primary Areas):
-  01. Customer Service: Voice support, email support, live chat, customer care, order support, returns/refunds, customer success.
-  02. Technical Support: Product support, SaaS support, application troubleshooting, ticket handling, user assistance, technical escalation.
-  03. Help Desk: Structured front-line support, ticket intake & categorization, request management, incident routing, status updates.
-  04. Back-Office Operations: Order processing, account administration, billing support, claims-related processing, records maintenance, operations support.
-  05. Data Processing: Data collection, organization, validation, classification, updating, reconciliation, formatting, quality assurance.
-  06. Data Entry: Spreadsheet entry, database entry, CRM/ERP updates, catalog entry, form processing, records updating, verification.
-  07. Document Processing: Document intake, classification, indexing, data extraction, verification, digital records organization.
-  08. Virtual Assistance: Executive assistance, administrative support, scheduling, email management, research, CRM administration, project coordination.
-- Talent & Workforce Strategy:
-  * Primary Talent Base: Philippines (highly skilled, English-fluent professionals), with global recruitment when specialized skills/languages are required.
-  * Accessible Employment: Creating flexible remote opportunities for skilled professionals, early-career talent, students seeking work opportunities, mothers and caregivers seeking flexible schedules, and experienced specialists.
-  * Scholarship & Development: Intends to support merit-based scholarship opportunities, skills training, mentorship, and talent development initiatives as the company grows.
-- Security & Confidentiality:
-  * Security and confidentiality are managed through appropriate contractual, technical, administrative, and access-control measures tailored to the agreed scope of each client engagement.`
+`
 
 let genAIClient: GoogleGenAI | null = null
 
@@ -76,18 +34,101 @@ function getGenAI(): GoogleGenAI | null {
   return genAIClient
 }
 
+const EMAIL_RE =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
+
+function clean(value: unknown, max = 2000): string {
+  if (typeof value !== 'string') return ''
+  return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, max)
+}
+
 async function startServer() {
   const app = express()
-  const PORT = 3000
+  const PORT = Number(process.env.PORT || 3000)
 
   app.use(express.json())
 
-  // API Routes
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })
   })
 
-  // Chat endpoint
+  app.post('/api/inquiry', async (req, res) => {
+    try {
+      const body = req.body || {}
+      if (clean(body.website, 80)) {
+        res.json({ ok: true, referenceId: 'OPV-FILTERED' })
+        return
+      }
+      const kind = clean(body.kind, 40)
+      const career = kind === 'career' || kind === 'ai-career'
+      const allowed = ['contact', 'service', 'ai-consultation', 'career', 'ai-career']
+      if (!allowed.includes(kind)) {
+        res.status(400).json({ error: 'Unknown inquiry type.' })
+        return
+      }
+      const name = clean(body.name, 120)
+      const email = clean(body.email, 180).toLowerCase()
+      if (name.length < 2 || !EMAIL_RE.test(email)) {
+        res.status(400).json({ error: 'Name and a valid email are required.' })
+        return
+      }
+      const apiKey = process.env.RESEND_API_KEY
+      if (!apiKey) {
+        res.status(503).json({ error: 'Email delivery is not configured yet.' })
+        return
+      }
+      const to = career
+        ? process.env.TALENT_INBOX || 'talents@operavaglobal.com'
+        : process.env.CLIENT_INBOX || 'client@operavaglobal.com'
+      const from = process.env.RESEND_FROM || 'OPERAVA Website <noreply@operavaglobal.com>'
+      const referenceId = `OPV-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`
+      const service = clean(body.service, 160)
+      const role = clean(body.role, 180)
+      const notes = clean(body.notes || body.description, 4000)
+      const subject = career
+        ? `[Career] ${role || 'Application'} — ${name} (${referenceId})`
+        : `[Client] ${service || 'Inquiry'} — ${name} (${referenceId})`
+      const text = [
+        `Kind: ${kind}`,
+        `Reference: ${referenceId}`,
+        `Name: ${name}`,
+        `Email: ${email}`,
+        clean(body.company, 160) && `Company: ${clean(body.company, 160)}`,
+        clean(body.phone, 40) && `Phone: ${clean(body.phone, 40)}`,
+        clean(body.country, 80) && `Country: ${clean(body.country, 80)}`,
+        service && `Service: ${service}`,
+        clean(body.teamModel, 80) && `Model: ${clean(body.teamModel, 80)}`,
+        clean(body.timeline, 80) && `Timeline: ${clean(body.timeline, 80)}`,
+        role && `Role: ${role}`,
+        notes && `Details:\n${notes}`,
+      ]
+        .filter(Boolean)
+        .join('\n')
+
+      const sent = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from,
+          to: [to],
+          reply_to: email,
+          subject,
+          text,
+        }),
+      })
+      if (!sent.ok) {
+        res.status(502).json({ error: 'Unable to deliver this inquiry.' })
+        return
+      }
+      res.json({ ok: true, referenceId })
+    } catch {
+      res.status(500).json({ error: 'Unable to process this inquiry.' })
+    }
+  })
+
   app.post('/api/chat', async (req, res) => {
     try {
       const { message, history } = req.body
@@ -100,7 +141,6 @@ async function startServer() {
       const ai = getGenAI()
 
       if (ai) {
-        // Build chat contents including recent history
         const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = []
 
         if (Array.isArray(history)) {
@@ -134,16 +174,13 @@ async function startServer() {
         return
       }
 
-      // If no API key configured on server, fallback gracefully to intelligent generator
       res.json({ fallback: true })
     } catch (err: unknown) {
       console.error('Gemini chat error:', err)
-      // Provide fallback indicator so client uses resilient direct engine
       res.json({ fallback: true })
     }
   })
 
-  // Vite middleware for development vs static build for production
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -153,7 +190,6 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist')
     app.use(express.static(distPath))
-    // Express 5 wildcard route
     app.get('*all', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'))
     })
