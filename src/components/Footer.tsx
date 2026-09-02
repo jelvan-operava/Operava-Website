@@ -21,14 +21,12 @@ export default function Footer() {
     { label: t('nav.careers', 'Careers'), href: '/careers' },
     { label: t('nav.insights', 'Insights'), href: '/insights' },
     { label: t('nav.contact', 'Contact'), href: '/contact' },
-    { label: t('footer.paymentPortal', 'Client Payment Portal'), href: '/payment-portal' },
   ]
 
   const footerLegal = [
     { label: t('footer.privacy', 'Privacy Policy'), href: '/privacy' },
     { label: t('footer.terms', 'Terms & Conditions'), href: '/terms' },
     { label: t('footer.refund', 'Refund Policy'), href: '/refund-policy' },
-    { label: t('footer.paymentPortal', 'Client Payment Portal'), href: '/payment-portal' },
   ]
 
   return (
@@ -233,18 +231,14 @@ export default function Footer() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              to="/payment-portal"
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-gray-300 hover:text-white transition-all duration-200"
+            <a
+              href="https://pay.operavaglobal.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-medium text-gray-400 hover:text-white transition-colors duration-200"
             >
-              <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              <span>{t('footer.paymentPortal', 'Client Payment Portal')}</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-violet-950 text-violet-300 border border-violet-800/60 font-mono">
-                256-Bit SSL
-              </span>
-            </Link>
+              SEC Registration Number: 2026080262213-03
+            </a>
           </div>
         </div>
       </div>
@@ -252,4 +246,3 @@ export default function Footer() {
     </>
   )
 }
-
