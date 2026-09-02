@@ -24,14 +24,12 @@ export default function Footer() {
     { label: t('nav.careers', 'Careers'), href: '/careers' },
     { label: t('nav.insights', 'Insights'), href: '/insights' },
     { label: t('nav.contact', 'Contact'), href: '/contact' },
-    { label: t('footer.paymentPortal', 'Client Payment Portal'), href: PAY_PORTAL_URL },
   ]
 
   const footerLegal = [
     { label: t('footer.privacy', 'Privacy Policy'), href: '/privacy' },
     { label: t('footer.terms', 'Terms & Conditions'), href: '/terms' },
     { label: t('footer.refund', 'Refund Policy'), href: '/refund-policy' },
-    { label: t('footer.paymentPortal', 'Client Payment Portal'), href: PAY_PORTAL_URL },
   ]
 
   const renderFooterLink = (item: { label: string; href: string }) => {
@@ -241,14 +239,16 @@ export default function Footer() {
             <p className="text-xs text-gray-600">{t('footer.location', 'Philippines • Global Operations')}</p>
           </div>
 
-          <a
-            href={PAY_PORTAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-medium text-gray-400 hover:text-white transition-colors duration-200"
-          >
-            {SEC_REGISTRATION}
-          </a>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://pay.operavaglobal.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-medium text-gray-400 hover:text-white transition-colors duration-200"
+            >
+              SEC Registration Number: 2026080262213-03
+            </a>
+          </div>
         </div>
       </div>
     </footer>
