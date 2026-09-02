@@ -33,7 +33,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     ).bind(await hashOtp(secret, code), now + 10 * 60 * 1000, now, draftId).run()
     await sendResend(env, {
       to: [row.email],
-      subject: 'Your OPERAVA verification code',
+      subject: 'Verification Code',
       html: otpEmailHtml(payload.name || 'there', purposeLabel(row.form_type), code),
       text: otpEmailText(payload.name || 'there', purposeLabel(row.form_type), code),
     })
