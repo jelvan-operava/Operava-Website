@@ -27,7 +27,6 @@ export default function ITServices() {
 
   return (
     <main>
-      {/* Hero */}
       <section className="pt-28 pb-16 lg:pt-36 lg:pb-20 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -44,7 +43,6 @@ export default function ITServices() {
         </div>
       </section>
 
-      {/* Services grid */}
       <section ref={ref} className="py-16 lg:py-24 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -64,10 +62,8 @@ export default function ITServices() {
         </div>
       </section>
 
-      {/* Marquee Tracks */}
       <DraggableMarquee />
 
-      {/* CTA */}
       <section className="py-16 lg:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -77,10 +73,10 @@ export default function ITServices() {
             {t('cta.subtitle', 'Our team can help you identify the right approach for your business.')}
           </p>
           <Link
-            to="/contact"
+            to="/quote"
             className="inline-flex items-center px-8 py-4 text-sm font-semibold text-white bg-violet-700 rounded-xl hover:bg-violet-800 active:scale-95 transition-all duration-200"
           >
-            {t('common.discussRequirements', 'Discuss Your Requirements')}
+            {t('common.discussRequirements', 'Request a Quote')}
           </Link>
         </div>
       </section>
