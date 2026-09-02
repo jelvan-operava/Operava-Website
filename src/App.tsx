@@ -15,6 +15,7 @@ import BPOServices from './pages/BPOServices'
 import ServiceDetail from './pages/ServiceDetail'
 import Industries from './pages/Industries'
 import Careers from './pages/Careers'
+import Apply from './pages/Apply'
 import Contact from './pages/Contact'
 import Insights from './pages/Insights'
 import Privacy from './pages/Privacy'
@@ -30,18 +31,15 @@ function RouteManager() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // Scroll to top on navigation instantly and reset Lenis scroll position
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
     const win = window as unknown as { lenis?: { scrollTo: (target: number, opts?: { immediate?: boolean }) => void } }
     if (win.lenis?.scrollTo) {
       win.lenis.scrollTo(0, { immediate: true })
     }
 
-    // Update document title, meta description, keywords, OpenGraph, and Twitter tags dynamically
     const metadata = getMetadataForPath(location.pathname)
     updatePageSEO(metadata)
 
-    // Dynamically inject path-specific BreadcrumbList and FAQPage Schema JSON-LD markup into document head
     injectSchemaMarkup(location.pathname, {
       title: metadata.title,
       description: metadata.description,
@@ -49,7 +47,6 @@ function RouteManager() {
       faqs: metadata.faqs,
     })
 
-    // Trigger subtle route loading progress bar
     setLoading(true)
     const timer = setTimeout(() => {
       setLoading(false)
@@ -61,7 +58,6 @@ function RouteManager() {
   return <RouteLoadingProgress isLoading={loading} pathname={location.pathname} />
 }
 
-// Subtle, refined page transition variants
 const pageTransitionVariants = {
   initial: {
     opacity: 0,
@@ -96,7 +92,7 @@ function Layout() {
       <SmoothScroll />
       <RouteManager />
       <Navigation />
-      
+
       <div className="flex-1 overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
@@ -117,6 +113,7 @@ function Layout() {
               <Route path="/services" element={<ITServices />} />
               <Route path="/industries" element={<Industries />} />
               <Route path="/careers" element={<Careers />} />
+              <Route path="/apply" element={<Apply />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/insights" element={<Insights />} />
               <Route path="/privacy" element={<Privacy />} />
