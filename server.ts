@@ -42,6 +42,25 @@ function clean(value: unknown, max = 2000): string {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, max)
 }
 
+function parseList(value?: string): string[] {
+  if (!value) return []
+  return value
+    .split(/[,;]+/)
+    .map((item) => item.trim().toLowerCase())
+    .filter((item) => EMAIL_RE.test(item))
+}
+
+function uniqueEmails(list: string[], exclude: string): string[] {
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const item of list) {
+    if (!item || item === exclude || seen.has(item)) continue
+    seen.add(item)
+    out.push(item)
+  }
+  return out
+}
+
 async function startServer() {
   const app = express()
   const PORT = Number(process.env.PORT || 3000)
@@ -60,7 +79,7 @@ async function startServer() {
         return
       }
       const kind = clean(body.kind, 40)
-      const career = kind === 'career' || kind === 'ai-career'
+      const isCareer = kind === 'career' || kind === 'ai-career'
       const allowed = ['contact', 'service', 'ai-consultation', 'career', 'ai-career']
       if (!allowed.includes(kind)) {
         res.status(400).json({ error: 'Unknown inquiry type.' })
@@ -77,22 +96,32 @@ async function startServer() {
         res.status(503).json({ error: 'Email delivery is not configured yet.' })
         return
       }
-      const to = career
-        ? process.env.TALENT_INBOX || 'talents@operavaglobal.com'
-        : process.env.CLIENT_INBOX || 'client@operavaglobal.com'
+      const clientInbox = process.env.CLIENT_INBOX || 'client@operavaglobal.com'
+      const talentInbox = process.env.TALENT_INBOX || 'talents@operavaglobal.com'
+      const hrInbox = process.env.HR_INBOX || 'hr@operavaglobal.com'
       const from = process.env.RESEND_FROM || 'OPERAVA Website <noreply@operavaglobal.com>'
-      const referenceId = `OPV-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`
+      const ticketId = `OPV-${Math.floor(100000 + Math.random() * 900000)}`
       const service = clean(body.service, 160)
       const role = clean(body.role, 180)
       const notes = clean(body.notes || body.description, 4000)
-      const subject = career
-        ? `[Career] ${role || 'Application'} — ${name} (${referenceId})`
-        : `[Client] ${service || 'Inquiry'} — ${name} (${referenceId})`
+      const cc = uniqueEmails(
+        isCareer
+          ? [talentInbox, hrInbox, ...parseList(process.env.APPLICANT_CC)]
+          : [clientInbox],
+        email,
+      )
+      const subject = isCareer
+        ? `Ticket #${ticketId} — career application received`
+        : `Ticket #${ticketId} — consultation request received`
       const text = [
+        isCareer
+          ? `Thank you, ${name}. Your career application is registered under reference #${ticketId}.`
+          : `Thank you, ${name}. Your project consultation request is registered under reference #${ticketId}.`,
+        `Our team received your information (${email}).`,
+        isCareer
+          ? 'Talent review typically starts within 24-48 hours.'
+          : 'We will review your requirements and connect within 2 business hours.',
         `Kind: ${kind}`,
-        `Reference: ${referenceId}`,
-        `Name: ${name}`,
-        `Email: ${email}`,
         clean(body.company, 160) && `Company: ${clean(body.company, 160)}`,
         clean(body.phone, 40) && `Phone: ${clean(body.phone, 40)}`,
         clean(body.country, 80) && `Country: ${clean(body.country, 80)}`,
@@ -105,25 +134,28 @@ async function startServer() {
         .filter(Boolean)
         .join('\n')
 
+      const payload: Record<string, unknown> = {
+        from,
+        to: [email],
+        reply_to: isCareer ? talentInbox : clientInbox,
+        subject,
+        text,
+      }
+      if (cc.length) payload.cc = cc
+
       const sent = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          from,
-          to: [to],
-          reply_to: email,
-          subject,
-          text,
-        }),
+        body: JSON.stringify(payload),
       })
       if (!sent.ok) {
         res.status(502).json({ error: 'Unable to deliver this inquiry.' })
         return
       }
-      res.json({ ok: true, referenceId })
+      res.json({ ok: true, referenceId: ticketId })
     } catch {
       res.status(500).json({ error: 'Unable to process this inquiry.' })
     }
