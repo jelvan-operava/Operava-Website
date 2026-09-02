@@ -16,6 +16,7 @@ import ServiceDetail from './pages/ServiceDetail'
 import Industries from './pages/Industries'
 import Careers from './pages/Careers'
 import Apply from './pages/Apply'
+import Quote from './pages/Quote'
 import Contact from './pages/Contact'
 import Insights from './pages/Insights'
 import Privacy from './pages/Privacy'
@@ -114,6 +115,8 @@ function Layout() {
               <Route path="/industries" element={<Industries />} />
               <Route path="/careers" element={<Careers />} />
               <Route path="/apply" element={<Apply />} />
+              <Route path="/quote" element={<Quote />} />
+              <Route path="/request-a-quote" element={<Quote />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/insights" element={<Insights />} />
               <Route path="/privacy" element={<Privacy />} />

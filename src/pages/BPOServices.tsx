@@ -62,10 +62,8 @@ export default function BPOServices() {
         </div>
       </section>
 
-      {/* Stacked Frameworks */}
       <StackedPlaybooks />
 
-      {/* CTA */}
       <section className="py-16 lg:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
@@ -75,10 +73,10 @@ export default function BPOServices() {
             {t('cta.subtitle', 'Connect with our team to discuss tailored operational support for your business.')}
           </p>
           <Link
-            to="/contact"
+            to="/quote"
             className="inline-flex items-center px-8 py-4 text-sm font-semibold text-white bg-violet-700 rounded-xl hover:bg-violet-800 active:scale-95 transition-all duration-200"
           >
-            {t('common.discussRequirements', 'Discuss Your Requirements')}
+            {t('common.discussRequirements', 'Request a Quote')}
           </Link>
         </div>
       </section>
