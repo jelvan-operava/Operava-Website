@@ -26,5 +26,6 @@ CREATE TABLE IF NOT EXISTS form_otps (
   consumed INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE INDEX IF NOT EXISTS idx_form_otps_email ON form_otps(email, form_type);
 CREATE INDEX IF NOT EXISTS idx_form_submissions_type ON form_submissions(form_type, created_at);
+CREATE INDEX IF NOT EXISTS idx_form_submissions_email ON form_submissions(email);
+CREATE INDEX IF NOT EXISTS idx_form_otps_email ON form_otps(email, form_type, consumed);
