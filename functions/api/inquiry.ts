@@ -1,8 +1,9 @@
 import {
   applicantConfirmationEmail,
   clientConfirmationEmail,
+  CLIENT_RESEND_FROM,
   sendResend,
-  SUPPORT_INBOX,
+  TALENT_RESEND_FROM,
   type FormEnv,
 } from '../lib/formCore'
 
@@ -89,12 +90,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }[kind] as string
 
     const cc = uniqueEmails(
-      [...(isCareer ? [talentInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox]), SUPPORT_INBOX],
+      isCareer ? [talentInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox],
       email,
     )
-    const subject = isCareer
-      ? `Ticket #${ticketId} — career application received`
-      : `Ticket #${ticketId} — consultation request received`
+    const subject = isCareer ? 'Operava Application' : kind === 'service' ? 'Services Inquiry' : 'Contact Inquiry'
 
     const rows = [
       { label: 'Name', value: name },
@@ -114,8 +113,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       : clientConfirmationEmail({ name, email, referenceId: ticketId, sourceLabel, rows })
 
     const text = isCareer
-      ? `Thank you, ${name}. Your career application is registered under #${ticketId}. Talent review typically starts within 24-48 hours.`
-      : `Thank you, ${name}. Your project consultation request is registered under #${ticketId}. Our team will connect within 2 business hours where possible.`
+      ? `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.\n\nTalent Acquisition Team,\nOperava Global Solutions`
+      : `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your inquiry. The team will get in touch with you as soon as possible.\n\nClient Support Team,\nOperava Global Solutions`
 
     if (!apiKey) {
       console.error('RESEND_API_KEY is not configured')
@@ -123,6 +122,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const payload: Record<string, unknown> = {
+      from: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
       to: [email],
       subject,
       html,

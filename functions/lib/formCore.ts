@@ -10,8 +10,10 @@ export interface FormEnv {
   TALENT_INBOX?: string
 }
 
-/** Every outbound OPERAVA email shares this sender identity and support address. */
-export const DEFAULT_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
+export const DEFAULT_RESEND_FROM = 'OPERAVA <notification-noreply@operavaglobal.com>'
+export const OTP_RESEND_FROM = 'OPERAVA <notification-noreply@operavaglobal.com>'
+export const CLIENT_RESEND_FROM = 'OPERAVA <hello@operavaglobal.com>'
+export const TALENT_RESEND_FROM = 'OPERAVA <talents@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
 
 export const EMAIL_RE =
@@ -105,12 +107,9 @@ export function brandedEmailShell(options: {
           <td style="background:linear-gradient(135deg,${BRAND.ink} 0%,#1a1030 55%,${BRAND.violetDeep} 100%);padding:22px 28px;">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
               <tr>
-                <td style="vertical-align:middle;">
-                  <img src="https://res.cloudinary.com/sdaxzncs/image/upload/v1786248668/Operava_Logo_Official.svg" alt="OPERAVA" width="40" height="40" style="display:block;border:0;" />
-                </td>
-                <td style="vertical-align:middle;text-align:right;">
-                  <div style="font-size:11px;letter-spacing:0.14em;font-weight:700;color:#C4B5FD;text-transform:uppercase;">OPERAVA</div>
-                  <div style="font-size:12px;color:#E9D5FF;margin-top:2px;">We Operate in Advance</div>
+                <td style="vertical-align:middle;text-align:left;">
+                  <div style="font-size:18px;letter-spacing:0.14em;font-weight:700;color:#FFFFFF;text-transform:uppercase;">OPERAVA</div>
+                  <div style="font-size:11px;color:#E9D5FF;margin-top:3px;">www.operavaglobal.com</div>
                 </td>
               </tr>
             </table>
@@ -183,10 +182,10 @@ export function clientConfirmationEmail(opts: {
   rows: Array<{ label: string; value: string }>
 }): string {
   return brandedEmailShell({
-    eyebrow: 'Client confirmation',
-    title: 'Thank you for your inquiry',
-    introHtml: `<p style="margin:0 0 12px;">Hi!</p>
-      <p style="margin:0 0 12px;">Thank you for submitting your Inquiry. The team will get in touch with you as soon as possible.</p>
+    eyebrow: 'Confirmation',
+    title: 'Inquiry Confirmation',
+    introHtml: `<p style="margin:0 0 12px;">Hi ${escapeHtml(opts.name)},</p>
+      <p style="margin:0 0 12px;">Thank you for submitting your inquiry. The team will get in touch with you as soon as possible.</p>
       <p style="margin:0;">Client Support Team,<br/>Operava Global Solutions</p>`,
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
@@ -205,10 +204,10 @@ export function applicantConfirmationEmail(opts: {
   rows: Array<{ label: string; value: string }>
 }): string {
   return brandedEmailShell({
-    eyebrow: 'Applicant confirmation',
-    title: 'Thank you for your application',
-    introHtml: `<p style="margin:0 0 12px;">Hi!</p>
-      <p style="margin:0 0 12px;">Thank you for submitting your application. The team will get in touch with you as soon as possible.</p>
+    eyebrow: 'Confirmation',
+    title: 'Application Confirmation',
+    introHtml: `<p style="margin:0 0 12px;">Hi ${escapeHtml(opts.name)},</p>
+      <p style="margin:0 0 12px;">Thank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.</p>
       <p style="margin:0;">Talent Acquisition Team,<br/>Operava Global Solutions</p>`,
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
@@ -227,15 +226,11 @@ export function staffNotificationEmail(opts: {
 }): string {
   const isApplicant = opts.formType === 'CAREERS'
   return brandedEmailShell({
-    eyebrow: isApplicant ? 'Applicant confirmation' : 'Client confirmation',
-    title: isApplicant ? 'Thank you for your application' : 'Thank you for your inquiry',
+    eyebrow: 'Notification',
+    title: isApplicant ? 'Application Received' : 'Inquiry Received',
     introHtml: isApplicant
-      ? `<p style="margin:0 0 12px;">Hi!</p>
-        <p style="margin:0 0 12px;">Thank you for submitting your application. The team will get in touch with you as soon as possible.</p>
-        <p style="margin:0;">Talent Acquisition Team,<br/>Operava Global Solutions</p>`
-      : `<p style="margin:0 0 12px;">Hi!</p>
-        <p style="margin:0 0 12px;">Thank you for submitting your Inquiry. The team will get in touch with you as soon as possible.</p>
-        <p style="margin:0;">Client Support Team,<br/>Operava Global Solutions</p>`,
+      ? `<p style="margin:0 0 12px;">A new application has been received.</p>`
+      : `<p style="margin:0 0 12px;">A new inquiry has been received.</p>`,
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0;font-size:13px;color:${BRAND.muted};">Verified email: <strong style="color:${BRAND.ink};">${escapeHtml(opts.email)}</strong><br/>Submitted: ${escapeHtml(opts.submittedAt)}</p>
       ${detailsTableHtml(opts.rows)}`,
@@ -295,6 +290,11 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
 export function inboxFor(type: FormType, env: FormEnv) {
   if (type === 'CAREERS') return [env.TALENT_INBOX || 'talents@operavaglobal.com']
   return [env.CLIENT_INBOX || 'hello@operavaglobal.com']
+}
+
+export function senderFor(type: FormType, env: FormEnv) {
+  if (type === 'CAREERS') return `OPERAVA <${env.TALENT_INBOX || 'talents@operavaglobal.com'}>`
+  return `OPERAVA <${env.CLIENT_INBOX || 'hello@operavaglobal.com'}>`
 }
 
 export function purposeLabel(type: FormType) {

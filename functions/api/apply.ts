@@ -1,4 +1,4 @@
-import { applicantConfirmationEmail, sendResend, SUPPORT_INBOX, type FormEnv } from '../lib/formCore'
+import { applicantConfirmationEmail, sendResend, TALENT_RESEND_FROM, type FormEnv } from '../lib/formCore'
 
 interface Env extends FormEnv {
   APPLICANT_CC?: string
@@ -57,7 +57,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const apiKey = env.RESEND_API_KEY
     if (!apiKey) return json({ error: 'Email delivery is not configured yet.' }, 503)
 
-    const cc = uniqueEmails([talentInbox, SUPPORT_INBOX, ...parseList(env.APPLICANT_CC)], email)
+    const cc = uniqueEmails([talentInbox, ...parseList(env.APPLICANT_CC)], email)
     const rows = [
       { label: 'Name', value: name },
       { label: 'Email', value: email },
@@ -77,11 +77,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     try {
       await sendResend(env, {
+        from: TALENT_RESEND_FROM,
         to: [email],
         cc,
-        subject: `Ticket #${ticketId} — career application received`,
+        subject: 'Operava Application',
         html,
-        text: `Thank you, ${name}. Application #${ticketId} received for ${role || 'a general role'}. Talent review typically starts within 24-48 hours.`,
+        text: `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.\n\nTalent Acquisition Team,\nOperava Global Solutions`,
       })
     } catch (err) {
       console.error('Resend error', err)

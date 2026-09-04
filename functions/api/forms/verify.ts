@@ -7,8 +7,8 @@ import {
   json,
   makeReference,
   sendResend,
+  senderFor,
   staffNotificationEmail,
-  SUPPORT_INBOX,
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
@@ -139,7 +139,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     const rows = payloadRows(payload)
     const staffInboxes = inboxFor(formType, env).filter((addr) => addr && addr.toLowerCase() !== email.toLowerCase())
     const ccSeen = new Set<string>()
-    const ccList = [...staffInboxes, SUPPORT_INBOX].filter((addr) => {
+    const ccList = staffInboxes.filter((addr) => {
       const key = addr.toLowerCase()
       if (key === email.toLowerCase() || ccSeen.has(key)) return false
       ccSeen.add(key)
@@ -153,21 +153,18 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
           ? 'Careers application form'
           : 'Contact form'
 
-    const subject = isCareer
-      ? `Ticket #${referenceId} — career application received`
-      : formType === 'SERVICES'
-        ? `Ticket #${referenceId} — service inquiry received`
-        : `Ticket #${referenceId} — contact message received`
+    const subject = isCareer ? 'Operava Application' : formType === 'SERVICES' ? 'Services Inquiry' : 'Contact Inquiry'
 
     const html = isCareer
       ? applicantConfirmationEmail({ name, email, referenceId, sourceLabel, rows })
       : clientConfirmationEmail({ name, email, referenceId, sourceLabel, rows })
 
     const text = isCareer
-      ? `Thank you, ${name}. Your career application is registered under #${referenceId}. Talent review typically starts within 24-48 hours.`
-      : `Thank you, ${name}. Your inquiry is registered under #${referenceId}. Our team will review and connect within 2 business hours where possible.`
+      ? `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.\n\nTalent Acquisition Team,\nOperava Global Solutions`
+      : `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your inquiry. The team will get in touch with you as soon as possible.\n\nClient Support Team,\nOperava Global Solutions`
 
     await sendResend(env, {
+      from: senderFor(formType, env),
       to: [email],
       cc: ccList.length ? ccList : undefined,
       subject,
@@ -177,6 +174,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     if (staffInboxes.length) {
       await sendResend(env, {
+        from: senderFor(formType, env),
         to: staffInboxes,
         subject: `${formType} submission ${referenceId}`,
         html: staffNotificationEmail({

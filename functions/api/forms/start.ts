@@ -10,6 +10,7 @@ import {
   otpEmailText,
   purposeLabel,
   sendResend,
+  OTP_RESEND_FROM,
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
@@ -144,8 +145,9 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
 
     await sendResend(env, {
+      from: OTP_RESEND_FROM,
       to: [email],
-      subject: 'Your OPERAVA verification code',
+      subject: 'Operava Notification',
       html: otpEmailHtml(name, purposeLabel(formType), code),
       text: otpEmailText(name, purposeLabel(formType), code),
     })
