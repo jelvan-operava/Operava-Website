@@ -1,8 +1,6 @@
-interface Env {
-  RESEND_API_KEY?: string
-  RESEND_FROM?: string
-  TALENT_INBOX?: string
-  HR_INBOX?: string
+import { applicantConfirmationEmail, type FormEnv } from '../lib/formCore'
+
+interface Env extends FormEnv {
   APPLICANT_CC?: string
 }
 
@@ -14,17 +12,12 @@ function clean(value: unknown, max = 2000): string {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, max)
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}
-
 function parseList(value?: string): string[] {
   if (!value) return []
-  return value.split(/[,;]+/).map((item) => item.trim().toLowerCase()).filter((item) => EMAIL_RE.test(item))
+  return value
+    .split(/[,;]+/)
+    .map((item) => item.trim().toLowerCase())
+    .filter((item) => EMAIL_RE.test(item))
 }
 
 function uniqueEmails(list: string[], exclude: string): string[] {
@@ -62,24 +55,26 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const ticketId = `OPV-${Math.floor(100000 + Math.random() * 900000)}`
     const talentInbox = env.TALENT_INBOX || 'talents@operavaglobal.com'
     const hrInbox = env.HR_INBOX || 'hr@operavaglobal.com'
-    const from = env.RESEND_FROM || 'OPERAVA Careers <noreply@operavaglobal.com>'
     const apiKey = env.RESEND_API_KEY
     if (!apiKey) return json({ error: 'Email delivery is not configured yet.' }, 503)
 
     const cc = uniqueEmails([talentInbox, hrInbox, ...parseList(env.APPLICANT_CC)], email)
-    const html = `
-      <div style="font-family:Segoe UI,Arial,sans-serif;max-width:640px;margin:0 auto;color:#1c1333;">
-        <p style="margin:0 0 4px;color:#6d28d9;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Applicant confirmation</p>
-        <h2 style="margin:0 0 8px;">Thank you, ${escapeHtml(name)}.</h2>
-        <p style="margin:0 0 16px;color:#5b5270;line-height:1.5;">
-          Your career application is registered under reference <strong>#${escapeHtml(ticketId)}</strong>.
-          Talent review typically starts within 24–48 hours.
-        </p>
-        <p>Role: ${escapeHtml(role || 'General application')}</p>
-        <p>Phone: ${escapeHtml(phone || '—')}</p>
-        <p>Country: ${escapeHtml(country || '—')}</p>
-        <p>Notes: ${escapeHtml(notes || '—')}</p>
-      </div>`
+    const rows = [
+      { label: 'Name', value: name },
+      { label: 'Email', value: email },
+      { label: 'Role', value: role || 'General application' },
+      { label: 'Phone', value: phone },
+      { label: 'Country', value: country },
+      { label: 'Notes', value: notes },
+    ]
+
+    const html = applicantConfirmationEmail({
+      name,
+      email,
+      referenceId: ticketId,
+      sourceLabel: 'Careers / AVA applicant path',
+      rows,
+    })
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -88,13 +83,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from,
+        from: env.RESEND_FROM || 'OPERAVA <noreply@operavaglobal.com>',
         to: [email],
         reply_to: talentInbox,
         cc,
         subject: `Ticket #${ticketId} — career application received`,
         html,
-        text: `Thank you, ${name}. Application #${ticketId} received for ${role || 'a general role'}.`,
+        text: `Thank you, ${name}. Application #${ticketId} received for ${role || 'a general role'}. Talent review typically starts within 24-48 hours.`,
       }),
     })
     if (!res.ok) return json({ error: 'Unable to deliver this application.' }, 502)
