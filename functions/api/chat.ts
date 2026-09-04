@@ -86,7 +86,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       messages.push({ role: 'user', content: message })
 
       try {
-        const result = (await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+        // Larger active Llama: 70B fp8-fast (8B and non-fast 70B variants deprecated May 2026)
+        const result = (await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
           messages,
           temperature: 0.55,
           max_tokens: 700,
