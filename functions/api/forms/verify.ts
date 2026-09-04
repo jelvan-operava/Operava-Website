@@ -1,6 +1,7 @@
 import {
   applicantConfirmationEmail,
   APPLICANT_CONFIRMATION_FROM,
+  CLIENT_RESEND_FROM,
   clientConfirmationEmail,
   ensureTables,
   hashOtp,
@@ -10,6 +11,7 @@ import {
   sendResend,
   senderFor,
   staffNotificationEmail,
+  TALENT_RESEND_FROM,
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
