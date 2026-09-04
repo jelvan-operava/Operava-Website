@@ -55,7 +55,7 @@ export default function Navigation() {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as Node
       if (dropdownRef.current && !dropdownRef.current.contains(target)) {
-        setServicesOpen(false)
+        setServicesOpen((prev) => (prev ? false : prev))
       }
       if (
         mobileRef.current &&
@@ -63,7 +63,7 @@ export default function Navigation() {
         mobileToggleRef.current &&
         !mobileToggleRef.current.contains(target)
       ) {
-        setMobileOpen(false)
+        setMobileOpen((prev) => (prev ? false : prev))
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -227,11 +227,17 @@ export default function Navigation() {
             {navLinks.map((link) =>
               link.children ? (
                 <div key={link.href}>
-                  <div className="flex items-center w-full rounded-xl hover:bg-gray-50">
+                  <div
+                    className={`flex items-center w-full rounded-xl ${
+                      isActive(link.href) ? 'text-violet-700 bg-violet-50' : 'text-gray-800 hover:bg-gray-50'
+                    }`}
+                  >
                     <Link
                       to={link.href}
                       onClick={closeMenus}
-                      className="flex-1 px-4 py-3 text-sm font-medium text-gray-800"
+                      className={`flex-1 px-4 py-3 text-sm font-medium ${
+                        isActive(link.href) ? 'text-violet-700 font-semibold' : 'text-gray-800'
+                      }`}
                     >
                       {link.label}
                     </Link>
