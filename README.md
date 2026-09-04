@@ -23,7 +23,7 @@ This codebase, including all design assets, architectural specifications, propri
 The **OPERAVA Web Platform** is an enterprise-grade digital experience presenting OPERAVA's dual capabilities:
 1. **High-Velocity Technology & Software Engineering**: Custom web and cloud applications, multi-cloud infrastructure (AWS/GCP/Azure), Kubernetes orchestration, cybersecurity SOC, and AI dataset engineering.
 2. **24/7 Global Business Operations & BPO**: Omnichannel customer experience (CX), Tier 1–3 technical support, back-office data processing, KYC/AML compliance, and dedicated engineering squads.
-3. **AVA Virtual Intelligence**: Real-time conversational AI assistant powered by Google Gemini and a resilient client-side reasoning engine for direct consultations, qualification, and candidate onboarding.
+3. **AVA Virtual Intelligence**: Real-time conversational AI assistant powered by **Cloudflare Workers AI** (with a resilient client-side reasoning engine fallback) for direct consultations, qualification, and candidate onboarding. Knowledge is grounded in `AVA-INSTRUCTIONS/`.
 4. **Multilingual Architecture**: Native 8-language localization (English, Spanish, French, German, Tagalog/Filipino, Arabic, Chinese, Japanese) with automated RTL direction support.
 
 ---
@@ -35,7 +35,7 @@ operava-website/
 ├── .github/                       # GitHub Actions workflows & CI/CD configs
 ├── functions/                     # Cloudflare Pages Functions (Edge Serverless)
 │   └── api/
-│       ├── chat.ts                # Serverless Gemini 3.7 Flash API handler
+│       ├── chat.ts                # AVA chat → Cloudflare Workers AI (+ local fallback)
 │       └── health.ts              # Edge health check endpoint
 ├── public/                        # Static assets served at root
 │   ├── _headers                   # Cloudflare security headers & caching rules
@@ -85,21 +85,22 @@ operava-website/
 │   │   ├── ServiceDetail.tsx      # Dynamic service detail drilldown view
 │   │   └── Terms.tsx              # Terms of service & SLA covenants
 │   ├── utils/                     # Helpers & Conversation Engines
-│   │   └── avaConversationEngine.ts # Autonomous conversational logic for AVA
+│   │   └── avaConversationEngine.ts # Autonomous conversational logic for AVA (fallback)
 │   ├── App.tsx                    # Route definitions, layout wrapper & router
 │   ├── index.css                  # Tailwind CSS v4 entrypoint & brand theme tokens
 │   ├── main.tsx                   # React 19 application entrypoint
 │   └── vite-env.d.ts              # Vite environment typings
+├── AVA-INSTRUCTIONS/              # Authoritative knowledge base consumed by AVA
 ├── .env.example                   # Environment variable documentation template
 ├── .gitignore                     # Git exclusion rules
 ├── .nvmrc                         # Node.js version pinning (v20)
 ├── DEPLOYMENT.md                  # Detailed Cloudflare Pages & GitHub deployment guide
 ├── metadata.json                  # Application platform manifest
 ├── package.json                   # Dependencies, scripts & engine requirements
-├── server.ts                      # Full-stack Express server with Vite middleware
+├── server.ts                      # Full-stack Express server with Vite middleware (local)
 ├── tsconfig.json                  # TypeScript compiler configuration
 ├── vite.config.ts                 # Vite bundler, React plugin & Tailwind v4 setup
-└── wrangler.jsonc                 # Cloudflare Pages / Workers project configuration
+└── wrangler.jsonc                 # Cloudflare Pages / Workers project configuration (+ AI binding)
 ```
 
 ---
@@ -156,6 +157,16 @@ operava-website/
 
 ---
 
+## 🤖 AVA & Cloudflare Workers AI
+
+Production chat (`functions/api/chat.ts`) uses the **Workers AI** binding named `AI` (configured in `wrangler.jsonc`). Model: `@cf/meta/llama-3.1-8b-instruct`.
+
+System knowledge is aligned with the markdown under **`AVA-INSTRUCTIONS/`** (company profile, services, engagement models, careers, FAQ). The client-side engine in `src/utils/avaConversationEngine.ts` remains the offline / failure fallback.
+
+No external Gemini key is required for production. Ensure the Pages project has Workers AI enabled and the binding is present after deploy.
+
+---
+
 ## 🚀 Local Development & Build
 
 ### Prerequisites
@@ -164,15 +175,15 @@ operava-website/
 
 ```bash
 # 1. Clone the private repository
-git clone https://github.com/operava/operava-website.git
-cd operava-website
+git clone https://github.com/jelvan-operava/Operava-Website.git
+cd Operava-Website
 
 # 2. Install dependencies
 npm install
 
 # 3. Configure environment variables (optional)
 cp .env.example .env
-# Edit .env and supply your GEMINI_API_KEY if testing live server-side AI
+# Production AVA uses Cloudflare AI binding. GEMINI_API_KEY is only for optional local Express testing.
 
 # 4. Start local development server (hosts on port 3000)
 npm run dev
@@ -185,6 +196,9 @@ npm run build
 
 # 7. Preview production build locally
 npm run preview
+
+# Optional: Pages + AI binding locally
+npx wrangler pages dev dist
 ```
 
 ---
@@ -194,6 +208,8 @@ npm run preview
 For complete, detailed instructions on deploying to **Cloudflare Pages**, configuring custom domains, setting edge variables, and full-stack Docker deployments, refer to:
 
 👉 **[DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+After deploy, confirm the **AI** binding is attached to the Pages project so `/api/chat` can call Workers AI.
 
 ---
 
