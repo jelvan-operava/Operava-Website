@@ -282,8 +282,8 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     },
     body: JSON.stringify({
       from: env.RESEND_FROM || DEFAULT_RESEND_FROM,
-      reply_to: SUPPORT_INBOX,
       ...payload,
+      reply_to: SUPPORT_INBOX,
     }),
   })
   if (!res.ok) {
