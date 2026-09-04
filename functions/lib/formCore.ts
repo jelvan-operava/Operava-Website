@@ -88,9 +88,8 @@ export function brandedEmailShell(options: {
   title: string
   introHtml: string
   bodyHtml: string
-  footerNote?: string
 }): string {
-  const { eyebrow, title, introHtml, bodyHtml, footerNote } = options
+  const { eyebrow, title, introHtml, bodyHtml } = options
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -192,7 +191,6 @@ export function clientConfirmationEmail(opts: {
       <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
       ${detailsTableHtml(opts.rows)}
       <p style="margin:20px 0 0;font-size:13px;color:${BRAND.muted};">Prefer to add detail now? Visit <a href="https://www.operavaglobal.com/quote" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Request a Quote</a> or <a href="https://www.operavaglobal.com/contact" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Contact</a>.</p>`,
-    footerNote: 'OPERAVA Global Solutions · Client Solutions Desk',
   })
 }
 
@@ -213,7 +211,6 @@ export function applicantConfirmationEmail(opts: {
       <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
       ${detailsTableHtml(opts.rows)}
       <p style="margin:20px 0 0;font-size:13px;color:${BRAND.muted};">Explore open roles anytime at <a href="https://www.operavaglobal.com/careers" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Careers</a> or continue at <a href="https://www.operavaglobal.com/apply" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Apply</a>.</p>`,
-    footerNote: 'OPERAVA Global Solutions · Talent Acquisition',
   })
 }
 
@@ -234,14 +231,10 @@ export function staffNotificationEmail(opts: {
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0;font-size:13px;color:${BRAND.muted};">Verified email: <strong style="color:${BRAND.ink};">${escapeHtml(opts.email)}</strong><br/>Submitted: ${escapeHtml(opts.submittedAt)}</p>
       ${detailsTableHtml(opts.rows)}`,
-    footerNote: isApplicant
-      ? 'OPERAVA Global Solutions · Talent Acquisition'
-      : 'OPERAVA Global Solutions · Client Support',
   })
 }
 
 export function otpEmailHtml(name: string, purpose: string, code: string) {
-  const first = escapeHtml(name.split(' ')[0] || name)
   return brandedEmailShell({
     eyebrow: 'Email verification',
     title: 'Your verification code',
@@ -251,14 +244,12 @@ export function otpEmailHtml(name: string, purpose: string, code: string) {
         <div style="font-size:32px;font-weight:700;letter-spacing:0.28em;color:${BRAND.ink};">${escapeHtml(code)}</div>
       </div>
       <p style="margin:16px 0 0;font-size:12px;color:${BRAND.muted};">For your security, do not share this code. If you did not request it, you can ignore this email.</p>`,
-    footerNote: 'OPERAVA Global Solutions · Secure verification',
   })
 }
 
 export function otpEmailText(_name: string, purpose: string, code: string) {
   return `Your verification code for ${purpose} is: ${code}
 
-Your verification code is: ${code}
 This code expires in 10 minutes.
 
 Do not share this code. If you did not request it, ignore this email.
