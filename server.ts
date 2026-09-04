@@ -1,7 +1,66 @@
-import express from 'express'
+import express, { type Request as ExpressRequest, type Response as ExpressResponse } from 'express'
 import path from 'path'
 import { createServer as createViteServer } from 'vite'
 import { GoogleGenAI } from '@google/genai'
+import type { FormEnv } from './functions/lib/formCore.ts'
+import { onRequestPost as formsStartHandler } from './functions/api/forms/start.ts'
+import { onRequestPost as formsVerifyHandler } from './functions/api/forms/verify.ts'
+import { onRequestPost as formsResendHandler } from './functions/api/forms/resend.ts'
+import { onRequestPost as formsUploadHandler } from './functions/api/forms/upload.ts'
+import { onRequestPost as applyHandler } from './functions/api/apply.ts'
+
+type BridgeEnv = FormEnv & { APPLICANT_CC?: string }
+
+function buildFormEnv(): BridgeEnv {
+  return {
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_FROM: process.env.RESEND_FROM,
+    OTP_SECRET: process.env.OTP_SECRET,
+    CLIENT_INBOX: process.env.CLIENT_INBOX,
+    TALENT_INBOX: process.env.TALENT_INBOX,
+    APPLICANT_CC: process.env.APPLICANT_CC,
+  }
+}
+
+/**
+ * Bridges an Express request to a Cloudflare Pages Function handler so the
+ * same `functions/api/**` logic used in production also runs under the
+ * local/preview Node server (which has no Pages Functions runtime).
+ */
+function bridgePagesFunction(
+  handler: (context: { request: globalThis.Request; env: BridgeEnv }) => Promise<globalThis.Response>,
+) {
+  return async (req: ExpressRequest, res: ExpressResponse) => {
+    try {
+      const safeHost = /^[a-zA-Z0-9.-]+(:\d+)?$/.test(req.headers.host || '') ? req.headers.host : 'localhost'
+      const url = `http://${safeHost}${req.originalUrl}`
+      const headers = new Headers()
+      const skipHeaders = new Set(['content-length', 'host', 'connection', 'transfer-encoding'])
+      for (const [key, value] of Object.entries(req.headers)) {
+        if (skipHeaders.has(key.toLowerCase())) continue
+        if (typeof value === 'string') headers.set(key, value)
+        else if (Array.isArray(value)) headers.set(key, value.join(', '))
+      }
+      const hasBody = req.method !== 'GET' && req.method !== 'HEAD'
+      const body = hasBody
+        ? Buffer.isBuffer(req.body)
+          ? req.body
+          : JSON.stringify(req.body ?? {})
+        : undefined
+      const webRequest = new globalThis.Request(url, { method: req.method, headers, body })
+      const response = await handler({ request: webRequest, env: buildFormEnv() })
+      res.status(response.status)
+      response.headers.forEach((value, key) => {
+        if (key.toLowerCase() === 'content-length') return
+        res.setHeader(key, value)
+      })
+      res.send(Buffer.from(await response.arrayBuffer()))
+    } catch (err) {
+      console.error('forms bridge error', err)
+      res.status(500).json({ error: 'Unable to process this request.' })
+    }
+  }
+}
 
 const SYSTEM_INSTRUCTION = `You are AVA, the virtual intelligence assistant for OPERAVA Global Solutions.
 
@@ -66,6 +125,16 @@ async function startServer() {
   const PORT = Number(process.env.PORT || 3000)
 
   app.use(express.json())
+
+  app.post('/api/forms/start', bridgePagesFunction(formsStartHandler))
+  app.post('/api/forms/verify', bridgePagesFunction(formsVerifyHandler))
+  app.post('/api/forms/resend', bridgePagesFunction(formsResendHandler))
+  app.post(
+    '/api/forms/upload',
+    express.raw({ type: () => true, limit: '10mb' }),
+    bridgePagesFunction(formsUploadHandler),
+  )
+  app.post('/api/apply', bridgePagesFunction(applyHandler))
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() })
