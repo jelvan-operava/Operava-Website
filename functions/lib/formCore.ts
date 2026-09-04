@@ -102,7 +102,7 @@ export function brandedEmailShell(options: {
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
               <tr>
                 <td style="vertical-align:middle;">
-                  <img src="https://www.operavaglobal.com/operava-logo.svg" alt="OPERAVA" width="40" height="40" style="display:block;border:0;" />
+                  <img src="https://res.cloudinary.com/sdaxzncs/image/upload/v1786248668/Operava_Logo_Official.svg" alt="OPERAVA" width="40" height="40" style="display:block;border:0;" />
                 </td>
                 <td style="vertical-align:middle;text-align:right;">
                   <div style="font-size:11px;letter-spacing:0.14em;font-weight:700;color:#C4B5FD;text-transform:uppercase;">OPERAVA</div>
@@ -178,13 +178,12 @@ export function clientConfirmationEmail(opts: {
   sourceLabel: string
   rows: Array<{ label: string; value: string }>
 }): string {
-  const first = escapeHtml(opts.name.split(' ')[0] || opts.name)
   return brandedEmailShell({
     eyebrow: 'Client confirmation',
-    title: `Thank you, ${opts.name.split(' ')[0] || opts.name}`,
-    introHtml: `<p style="margin:0 0 12px;">Hello ${first},</p>
-      <p style="margin:0 0 12px;">Your <strong>service / project inquiry</strong> has been received by OPERAVA Global Solutions. Our solutions team will review your requirements and connect with you within <strong>2 business hours</strong> where possible.</p>
-      <p style="margin:0;">A copy of this confirmation was also shared with our client desk so the conversation can continue seamlessly.</p>`,
+    title: 'Thank you for your inquiry',
+    introHtml: `<p style="margin:0 0 12px;">Hi!</p>
+      <p style="margin:0 0 12px;">Thank you for submitting your Inquiry. The team will get in touch with you as soon as possible.</p>
+      <p style="margin:0;">Client Support Team,<br/>Operava Global Solutions</p>`,
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
       ${detailsTableHtml(opts.rows)}
@@ -201,13 +200,12 @@ export function applicantConfirmationEmail(opts: {
   sourceLabel: string
   rows: Array<{ label: string; value: string }>
 }): string {
-  const first = escapeHtml(opts.name.split(' ')[0] || opts.name)
   return brandedEmailShell({
     eyebrow: 'Applicant confirmation',
-    title: `Thank you, ${opts.name.split(' ')[0] || opts.name}`,
-    introHtml: `<p style="margin:0 0 12px;">Hello ${first},</p>
-      <p style="margin:0 0 12px;">Your <strong>career application</strong> has been received by OPERAVA Talent. Our team typically begins review within <strong>24–48 hours</strong>. Please keep your reference number for follow-up.</p>
-      <p style="margin:0;">Talent and HR have been notified so your application can be routed to the right hiring track.</p>`,
+    title: 'Thank you for your application',
+    introHtml: `<p style="margin:0 0 12px;">Hi!</p>
+      <p style="margin:0 0 12px;">Thank you for submitting your application. The team will get in touch with you as soon as possible.</p>
+      <p style="margin:0;">Talent Acquisition Team,<br/>Operava Global Solutions</p>`,
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
       ${detailsTableHtml(opts.rows)}
@@ -223,14 +221,23 @@ export function staffNotificationEmail(opts: {
   submittedAt: string
   rows: Array<{ label: string; value: string }>
 }): string {
+  const isApplicant = opts.formType === 'CAREERS'
   return brandedEmailShell({
-    eyebrow: 'Internal routing',
-    title: `${opts.formType} · ${opts.referenceId}`,
-    introHtml: `<p style="margin:0;">A verified submission was received and confirmation was sent to the submitter.</p>`,
+    eyebrow: isApplicant ? 'Applicant confirmation' : 'Client confirmation',
+    title: isApplicant ? 'Thank you for your application' : 'Thank you for your inquiry',
+    introHtml: isApplicant
+      ? `<p style="margin:0 0 12px;">Hi!</p>
+        <p style="margin:0 0 12px;">Thank you for submitting your application. The team will get in touch with you as soon as possible.</p>
+        <p style="margin:0;">Talent Acquisition Team,<br/>Operava Global Solutions</p>`
+      : `<p style="margin:0 0 12px;">Hi!</p>
+        <p style="margin:0 0 12px;">Thank you for submitting your Inquiry. The team will get in touch with you as soon as possible.</p>
+        <p style="margin:0;">Client Support Team,<br/>Operava Global Solutions</p>`,
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0;font-size:13px;color:${BRAND.muted};">Verified email: <strong style="color:${BRAND.ink};">${escapeHtml(opts.email)}</strong><br/>Submitted: ${escapeHtml(opts.submittedAt)}</p>
       ${detailsTableHtml(opts.rows)}`,
-    footerNote: 'OPERAVA internal notification — do not forward externally',
+    footerNote: isApplicant
+      ? 'OPERAVA Global Solutions · Talent Acquisition'
+      : 'OPERAVA Global Solutions · Client Support',
   })
 }
 
