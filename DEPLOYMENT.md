@@ -48,8 +48,10 @@ Set these on the production Pages project:
 
 **Bindings**
 - `AI` — Workers AI (AVA chat → `@cf/meta/llama-3.3-70b-instruct-fp8-fast`)
-- `SUBMISSIONS_DB` — D1 (`operava-submissions`)
-- `RESUMES_BUCKET` — R2 (`operava-resumes`)
+- `SUBMISSIONS_DB` — D1 (`operava-submissions`) optional; OTP works via signed drafts without D1
+- `RESUMES_BUCKET` — R2 (`operava-resumes`) optional; applications proceed with `pending:` key if unbound
+
+**Important:** After adding or changing secrets in the Cloudflare dashboard, trigger a **new deployment** (push to `main` or Retry deployment). Secrets are injected only at deploy time.
 
 Verify `noreply@operavaglobal.com` (or the RESEND_FROM domain) in Resend before going live.
 
