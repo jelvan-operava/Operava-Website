@@ -1,4 +1,4 @@
-import { applicantConfirmationEmail, type FormEnv } from '../lib/formCore'
+import { applicantConfirmationEmail, sendResend, SUPPORT_INBOX, type FormEnv } from '../lib/formCore'
 
 interface Env extends FormEnv {
   APPLICANT_CC?: string
@@ -57,7 +57,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const apiKey = env.RESEND_API_KEY
     if (!apiKey) return json({ error: 'Email delivery is not configured yet.' }, 503)
 
-    const cc = uniqueEmails([talentInbox, ...parseList(env.APPLICANT_CC)], email)
+    const cc = uniqueEmails([talentInbox, SUPPORT_INBOX, ...parseList(env.APPLICANT_CC)], email)
     const rows = [
       { label: 'Name', value: name },
       { label: 'Email', value: email },
@@ -75,23 +75,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       rows,
     })
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: env.RESEND_FROM || 'OPERAVA <noreply@operavaglobal.com>',
+    try {
+      await sendResend(env, {
         to: [email],
-        reply_to: talentInbox,
         cc,
         subject: `Ticket #${ticketId} — career application received`,
         html,
         text: `Thank you, ${name}. Application #${ticketId} received for ${role || 'a general role'}. Talent review typically starts within 24-48 hours.`,
-      }),
-    })
-    if (!res.ok) return json({ error: 'Unable to deliver this application.' }, 502)
+      })
+    } catch (err) {
+      console.error('Resend error', err)
+      return json({ error: 'Unable to deliver this application.' }, 502)
+    }
     return json({ ok: true, referenceId: ticketId })
   } catch {
     return json({ error: 'Unable to process this application.' }, 500)

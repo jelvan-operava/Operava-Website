@@ -1,6 +1,8 @@
 import {
   applicantConfirmationEmail,
   clientConfirmationEmail,
+  sendResend,
+  SUPPORT_INBOX,
   type FormEnv,
 } from '../lib/formCore'
 
@@ -87,10 +89,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }[kind] as string
 
     const cc = uniqueEmails(
-      isCareer ? [talentInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox],
+      [...(isCareer ? [talentInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox]), SUPPORT_INBOX],
       email,
     )
-    const replyTo = isCareer ? talentInbox : clientInbox
     const subject = isCareer
       ? `Ticket #${ticketId} — career application received`
       : `Ticket #${ticketId} — consultation request received`
@@ -122,27 +123,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const payload: Record<string, unknown> = {
-      from: env.RESEND_FROM || 'OPERAVA <noreply@operavaglobal.com>',
       to: [email],
-      reply_to: replyTo,
       subject,
       html,
       text,
     }
     if (cc.length) payload.cc = cc
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (!res.ok) {
-      const errText = await res.text()
-      console.error('Resend error', res.status, errText)
+    try {
+      await sendResend(env, payload)
+    } catch (err) {
+      console.error('Resend error', err)
       return json({ error: 'Unable to deliver this inquiry.' }, 502)
     }
 

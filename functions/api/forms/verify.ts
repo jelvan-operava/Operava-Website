@@ -8,6 +8,7 @@ import {
   makeReference,
   sendResend,
   staffNotificationEmail,
+  SUPPORT_INBOX,
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
@@ -137,7 +138,13 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     const rows = payloadRows(payload)
     const staffInboxes = inboxFor(formType, env).filter((addr) => addr && addr.toLowerCase() !== email.toLowerCase())
-    const replyTo = staffInboxes[0] || env.CLIENT_INBOX || 'hello@operavaglobal.com'
+    const ccSeen = new Set<string>()
+    const ccList = [...staffInboxes, SUPPORT_INBOX].filter((addr) => {
+      const key = addr.toLowerCase()
+      if (key === email.toLowerCase() || ccSeen.has(key)) return false
+      ccSeen.add(key)
+      return true
+    })
     const isCareer = formType === 'CAREERS'
     const sourceLabel =
       formType === 'SERVICES'
@@ -162,8 +169,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     await sendResend(env, {
       to: [email],
-      cc: staffInboxes.length ? staffInboxes : undefined,
-      reply_to: replyTo,
+      cc: ccList.length ? ccList : undefined,
       subject,
       html,
       text,
