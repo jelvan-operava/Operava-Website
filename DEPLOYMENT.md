@@ -12,8 +12,8 @@ After the applicant/client verifies their email:
 
 | Form type | Sent to | Reply-To | CC / staff |
 |---|---|---|---|
-| CONTACT | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`) + `hello@operavaglobal.com` |
-| SERVICES | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`) + `hello@operavaglobal.com` |
+| CONTACT | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`, always CC'd) |
+| SERVICES | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`, always CC'd) |
 | CAREERS | submitter | `hello@operavaglobal.com` | `TALENT_INBOX` (default `talents@operavaglobal.com`) + `hello@operavaglobal.com` |
 
 Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `OPERAVA-CON-########`.
@@ -24,7 +24,7 @@ Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `O
 
 | Source | Sent to | Reply-To | CC |
 |---|---|---|---|
-| Contact, services, AVA consultation | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (hello@operavaglobal.com) |
+| Contact, services, AVA consultation | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`, always CC'd) |
 | Careers apply, AVA career interest | submitter | `hello@operavaglobal.com` | `TALENT_INBOX` (talents@operavaglobal.com) + `hello@operavaglobal.com`, optional `APPLICANT_CC` |
 
 Ticket IDs: `OPV-######`.
