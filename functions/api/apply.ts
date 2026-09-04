@@ -80,6 +80,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         from: TALENT_RESEND_FROM,
         to: [email],
         cc,
+        reply_to: TALENT_RESEND_FROM,
         subject: 'Operava Application',
         html,
         text: `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.\n\nTalent Acquisition Team,\nOperava Global Solutions`,

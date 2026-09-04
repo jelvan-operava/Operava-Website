@@ -6,30 +6,30 @@ Contact, Quote/Services, and Careers pages use `OperavaIntakeForm` → `/api/for
 
 After the applicant/client verifies their email:
 
-1. **Confirmation email** is sent **to the submitter** from `OPERAVA <notification@operavaglobal.com>`
-2. **Staff and `hello@operavaglobal.com` are CC’d** on that same confirmation, and replies route to `hello@operavaglobal.com`
+1. **Confirmation email** is sent **to the submitter** from the client or talent inbox
+2. **Staff and the relevant inbox are CC’d** on that same confirmation, and replies route to the relevant client or talent inbox
 3. A second **staff-only** notification is also sent with the full payload
 
 | Form type | Sent to | Reply-To | CC / staff |
 |---|---|---|---|
 | CONTACT | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`, always CC'd) |
 | SERVICES | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`, always CC'd) |
-| CAREERS | submitter | `hello@operavaglobal.com` | `TALENT_INBOX` (default `talents@operavaglobal.com`) + `hello@operavaglobal.com` |
+| CAREERS | submitter | `talents@operavaglobal.com` | `TALENT_INBOX` (default `talents@operavaglobal.com`) + `hello@operavaglobal.com` |
 
 Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `OPERAVA-CON-########`.
 
 ## Legacy / AVA ticket path
 
-`/api/inquiry` and `/api/apply` (used by AVA-style tickets and `submitInquiry`) send confirmation **to the submitter** from `OPERAVA <notification@operavaglobal.com>` with staff + `hello@operavaglobal.com` **CC**:
+`/api/inquiry` and `/api/apply` (used by AVA-style tickets and `submitInquiry`) send confirmation **to the submitter** from the relevant client or talent inbox with staff **CC**:
 
 | Source | Sent to | Reply-To | CC |
 |---|---|---|---|
 | Contact, services, AVA consultation | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`, always CC'd) |
-| Careers apply, AVA career interest | submitter | `hello@operavaglobal.com` | `TALENT_INBOX` (talents@operavaglobal.com) + `hello@operavaglobal.com`, optional `APPLICANT_CC` |
+| Careers apply, AVA career interest | submitter | `talents@operavaglobal.com` | `TALENT_INBOX` (talents@operavaglobal.com) + `hello@operavaglobal.com`, optional `APPLICANT_CC` |
 
 Ticket IDs: `OPV-######`.
 
-Every OPERAVA email (OTP, confirmations, and staff notifications) shares the same sender identity and always replies to `hello@operavaglobal.com` so replies land with the team.
+OTP and staff notification emails do not set a Reply-To address. Client confirmations reply to `hello@operavaglobal.com`; applicant confirmations reply to `talents@operavaglobal.com`.
 
 ## Cloudflare Pages secrets & bindings
 
