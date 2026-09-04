@@ -8,7 +8,7 @@ OPERAVA Global Solutions is an enterprise technology engineering and business pr
 - **Purpose**: To provide reliable, enterprise-grade engineering and operations talent so businesses can focus on growth, innovation, and customer satisfaction.
 
 ## Key Facts
-- **Location & Model**: Philippine-Based, operating remotely and globally with distributed delivery hubs.
+- **Location & Model**: Initially registered at Pagudpud, Ilocos Norte 2919, Philippines, operating digitally and globally with distributed delivery.
 - **Delivery Model**: Hybrid and remote-first global delivery, 24/7/365 follow-the-sun operations.
 - **Client Retention**: 99.4% long-term partnership retention rate.
 - **Uptime SLA**: 99.99% infrastructure and systems availability guarantee.

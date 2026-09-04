@@ -3,7 +3,7 @@
 ## General Questions
 
 ### Where is OPERAVA located?
-Our primary operational and delivery hubs are located in Manila and Clark in the Philippines, supporting global clients across North America, Europe, Australia, and Asia-Pacific.
+OPERAVA is initially registered at Pagudpud, Ilocos Norte 2919, Philippines. We operate digitally and globally, servicing clients across North America, Europe, Australia, and Asia-Pacific through a remote-first, distributed delivery model.
 
 ### How quickly can a dedicated team start?
 For standard engineering and BPO roles, we provide pre-vetted candidate shortlists within 48 to 72 hours. Complete onboarding and kickoff typically take 7 to 14 business days.

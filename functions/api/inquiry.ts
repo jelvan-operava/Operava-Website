@@ -76,7 +76,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const isCareer = CAREER_KINDS.has(kind)
     const clientInbox = env.CLIENT_INBOX || 'hello@operavaglobal.com'
     const talentInbox = env.TALENT_INBOX || 'talents@operavaglobal.com'
-    const hrInbox = env.HR_INBOX || 'hr@operavaglobal.com'
     const apiKey = env.RESEND_API_KEY
     const ticketId = makeTicketId()
     const sourceLabel = {
@@ -88,7 +87,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }[kind] as string
 
     const cc = uniqueEmails(
-      isCareer ? [talentInbox, hrInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox],
+      isCareer ? [talentInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox],
       email,
     )
     const replyTo = isCareer ? talentInbox : clientInbox

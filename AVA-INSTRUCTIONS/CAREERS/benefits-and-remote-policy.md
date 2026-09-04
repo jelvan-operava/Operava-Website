@@ -2,7 +2,7 @@
 
 ## Work Arrangements
 - **Remote-First Flexibility**: Most positions are 100% remote with flexible working hours based on team alignment.
-- **Hybrid Option**: Access to state-of-the-art co-working and hub offices in Manila and Clark for team sprints or collaboration.
+- **Hybrid Option**: OPERAVA is initially registered at Pagudpud, Ilocos Norte 2919, Philippines, but the team operates digitally and globally — occasional in-person or virtual meetups are arranged as needed for team sprints or collaboration.
 
 ## Comprehensive Benefits Package
 1. **Competitive Compensation**: Market-leading base pay with annual performance bonuses.

@@ -96,9 +96,8 @@ async function startServer() {
         res.status(503).json({ error: 'Email delivery is not configured yet.' })
         return
       }
-      const clientInbox = process.env.CLIENT_INBOX || 'client@operavaglobal.com'
+      const clientInbox = process.env.CLIENT_INBOX || 'hello@operavaglobal.com'
       const talentInbox = process.env.TALENT_INBOX || 'talents@operavaglobal.com'
-      const hrInbox = process.env.HR_INBOX || 'hr@operavaglobal.com'
       const from = process.env.RESEND_FROM || 'OPERAVA Website <noreply@operavaglobal.com>'
       const ticketId = `OPV-${Math.floor(100000 + Math.random() * 900000)}`
       const service = clean(body.service, 160)
@@ -106,7 +105,7 @@ async function startServer() {
       const notes = clean(body.notes || body.description, 4000)
       const cc = uniqueEmails(
         isCareer
-          ? [talentInbox, hrInbox, ...parseList(process.env.APPLICANT_CC)]
+          ? [talentInbox, ...parseList(process.env.APPLICANT_CC)]
           : [clientInbox],
         email,
       )
