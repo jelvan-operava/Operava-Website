@@ -10,11 +10,11 @@ After the applicant/client verifies their email:
 2. **Staff and `hello@operavaglobal.com` are CC’d** on that same confirmation, and replies route to `hello@operavaglobal.com`
 3. A second **staff-only** notification is also sent with the full payload
 
-| Form type | Auto-reply To | CC / staff |
-|---|---|---|
-| CONTACT | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`) + `hello@operavaglobal.com` |
-| SERVICES | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`) + `hello@operavaglobal.com` |
-| CAREERS | `hello@operavaglobal.com` | `TALENT_INBOX` (default `talents@operavaglobal.com`) + `hello@operavaglobal.com` |
+| Form type | Sent to | Reply-To | CC / staff |
+|---|---|---|---|
+| CONTACT | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`) + `hello@operavaglobal.com` |
+| SERVICES | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`) + `hello@operavaglobal.com` |
+| CAREERS | submitter | `hello@operavaglobal.com` | `TALENT_INBOX` (default `talents@operavaglobal.com`) + `hello@operavaglobal.com` |
 
 Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `OPERAVA-CON-########`.
 
@@ -22,10 +22,10 @@ Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `O
 
 `/api/inquiry` and `/api/apply` (used by AVA-style tickets and `submitInquiry`) send confirmation **to the submitter** from `OPERAVA <notification@operavaglobal.com>` with staff + `hello@operavaglobal.com` **CC**:
 
-| Source | Auto-reply To | CC |
-|---|---|---|
-| Contact, services, AVA consultation | `hello@operavaglobal.com` | `CLIENT_INBOX` (hello@operavaglobal.com) |
-| Careers apply, AVA career interest | `hello@operavaglobal.com` | `TALENT_INBOX` (talents@operavaglobal.com) + `hello@operavaglobal.com`, optional `APPLICANT_CC` |
+| Source | Sent to | Reply-To | CC |
+|---|---|---|---|
+| Contact, services, AVA consultation | submitter | `hello@operavaglobal.com` | `CLIENT_INBOX` (hello@operavaglobal.com) |
+| Careers apply, AVA career interest | submitter | `hello@operavaglobal.com` | `TALENT_INBOX` (talents@operavaglobal.com) + `hello@operavaglobal.com`, optional `APPLICANT_CC` |
 
 Ticket IDs: `OPV-######`.
 

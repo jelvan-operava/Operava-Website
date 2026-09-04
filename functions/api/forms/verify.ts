@@ -138,7 +138,9 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     const rows = payloadRows(payload)
     const staffInboxes = inboxFor(formType, env).filter((addr) => addr && addr.toLowerCase() !== email.toLowerCase())
-    const ccList = Array.from(new Set([...staffInboxes, SUPPORT_INBOX].filter((addr) => addr.toLowerCase() !== email.toLowerCase())))
+    const ccList = Array.from(
+      new Set(email.toLowerCase() === SUPPORT_INBOX.toLowerCase() ? staffInboxes : [...staffInboxes, SUPPORT_INBOX]),
+    )
     const isCareer = formType === 'CAREERS'
     const sourceLabel =
       formType === 'SERVICES'
