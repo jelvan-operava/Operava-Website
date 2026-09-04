@@ -149,7 +149,7 @@ operava-website/
 | Asset Description | Direct Cloudinary HTTPS URL |
 | :--- | :--- |
 | **Technology & Cloud Video** | `https://res.cloudinary.com/mgyosgsm/video/upload/Video_otwv5l.mp4` |
-| **Global Workforce Video** | `https://res.cloudinary.com/mgyosgsm/video/upload/Video_pmorrn.mp4` |
+| **Global Workforce Video** | `https://res.cloudinary.com/mgyosgsm/video/upload/Video_nmdtfe.mp4` |
 | **Business Processes Video** | `https://res.cloudinary.com/mgyosgsm/video/upload/Video_pmorrn.mp4` |
 | **OPERAVA Motion Logo Video**| `https://res.cloudinary.com/mgyosgsm/video/upload/Video_ffvnwd.mp4` |
 | **AVA Assistant Video Avatar**| `https://res.cloudinary.com/mgyosgsm/video/upload/Video_vpaaxl.mp4` |
