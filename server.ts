@@ -34,8 +34,9 @@ function bridgePagesFunction(
     try {
       const url = `http://${req.headers.host || 'localhost'}${req.originalUrl}`
       const headers = new Headers()
+      const skipHeaders = new Set(['content-length', 'host', 'connection', 'transfer-encoding'])
       for (const [key, value] of Object.entries(req.headers)) {
-        if (key.toLowerCase() === 'content-length') continue
+        if (skipHeaders.has(key.toLowerCase())) continue
         if (typeof value === 'string') headers.set(key, value)
         else if (Array.isArray(value)) headers.set(key, value.join(', '))
       }
