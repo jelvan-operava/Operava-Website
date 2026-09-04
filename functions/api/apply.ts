@@ -1,4 +1,11 @@
-import { applicantConfirmationEmail, sendResend, TALENT_RESEND_FROM, type FormEnv } from '../lib/formCore'
+import {
+  applicantConfirmationEmail,
+  APPLICANT_CONFIRMATION_FROM,
+  sendResend,
+  staffNotificationEmail,
+  TALENT_RESEND_FROM,
+  type FormEnv,
+} from '../lib/formCore'
 
 interface Env extends FormEnv {
   APPLICANT_CC?: string
@@ -57,7 +64,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const apiKey = env.RESEND_API_KEY
     if (!apiKey) return json({ error: 'Email delivery is not configured yet.' }, 503)
 
-    const cc = uniqueEmails([talentInbox, ...parseList(env.APPLICANT_CC)], email)
+    const staffRecipients = uniqueEmails([talentInbox, ...parseList(env.APPLICANT_CC)], email)
     const rows = [
       { label: 'Name', value: name },
       { label: 'Email', value: email },
@@ -77,14 +84,28 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
     try {
       await sendResend(env, {
-        from: TALENT_RESEND_FROM,
+        from: APPLICANT_CONFIRMATION_FROM,
         to: [email],
-        cc,
         reply_to: TALENT_RESEND_FROM,
-        subject: 'Operava Application',
+        subject: 'WE RECEIVED YOUR APPLICATION',
         html,
         text: `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.\n\nTalent Acquisition Team,\nOperava Global Solutions`,
       })
+      if (staffRecipients.length) {
+        await sendResend(env, {
+          from: TALENT_RESEND_FROM,
+          to: staffRecipients,
+          subject: 'New Application Received',
+          html: staffNotificationEmail({
+            formType: 'CAREERS',
+            referenceId: ticketId,
+            email,
+            submittedAt: new Date().toISOString(),
+            rows,
+          }),
+          text: `A new application has been received. Reference: ${ticketId}`,
+        })
+      }
     } catch (err) {
       console.error('Resend error', err)
       return json({ error: 'Unable to deliver this application.' }, 502)

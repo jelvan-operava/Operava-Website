@@ -14,6 +14,7 @@ export const DEFAULT_RESEND_FROM = 'OPERAVA <notification-noreply@operavaglobal.
 export const OTP_RESEND_FROM = 'OPERAVA <notification-noreply@operavaglobal.com>'
 export const CLIENT_RESEND_FROM = 'OPERAVA <hello@operavaglobal.com>'
 export const TALENT_RESEND_FROM = 'OPERAVA <talents@operavaglobal.com>'
+export const APPLICANT_CONFIRMATION_FROM = 'OPERAVA - Talent Acquisition Team <hello@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
 
 export const EMAIL_RE =
@@ -174,6 +175,30 @@ export function referenceBadgeHtml(referenceId: string): string {
   </div>`
 }
 
+function submissionValue(rows: Array<{ label: string; value: string }>, ...labels: string[]) {
+  const wanted = labels.map((label) => label.toLowerCase())
+  return rows.find((row) => wanted.includes(row.label.toLowerCase()))?.value || ''
+}
+
+function submissionListHtml(
+  name: string,
+  rows: Array<{ label: string; value: string }>,
+  fields: Array<{ label: string; keys: string[] }>,
+  referenceId: string,
+) {
+  const values: Array<[string, string]> = [
+    ['Name', name],
+    ...fields.map(({ label, keys }) => [label, submissionValue(rows, ...keys)]),
+    ['Reference Number', referenceId],
+  ]
+  return `<ul>${values
+    .map(
+      ([label, value]) =>
+        `<li><b>${label}:</b> ${escapeHtml(value)}<br></li>`,
+    )
+    .join('')}</ul>`
+}
+
 /** Client / services / contact confirmation */
 export function clientConfirmationEmail(opts: {
   name: string
@@ -183,14 +208,23 @@ export function clientConfirmationEmail(opts: {
   rows: Array<{ label: string; value: string }>
 }): string {
   return brandedEmailShell({
-    eyebrow: 'Confirmation',
-    title: 'Thank you for your inquiry',
-    introHtml: `<p style="margin:0 0 12px;">Thank you for submitting your inquiry. The team will get in touch with you as soon as possible.</p>
-      <p style="margin:0;">Client Support Team,<br/>Operava Global Solutions</p>`,
-    bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
-      <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
-      ${detailsTableHtml(opts.rows)}
-      <p style="margin:20px 0 0;font-size:13px;color:${BRAND.muted};">Prefer to add detail now? Visit <a href="https://www.operavaglobal.com/quote" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Request a Quote</a> or <a href="https://www.operavaglobal.com/contact" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Contact</a>.</p>`,
+    eyebrow: 'WE RECEIVED YOUR INQUIRY',
+    title: 'WE RECEIVED YOUR INQUIRY',
+    introHtml: `<p>Hi ${escapeHtml(opts.name)},<br></p>
+      <p>Thank you for contacting OPERAVA and for your interest in our services and business solutions.<br></p>
+      <p>We confirm that we have received your service inquiry. Your submitted information has been recorded as follows:<br></p>`,
+    bodyHtml: `${submissionListHtml(opts.name, opts.rows, [
+      { label: 'Email', keys: ['Email'] },
+      { label: 'Phone', keys: ['Phone'] },
+      { label: 'Country/Location', keys: ['Country / Location', 'Country'] },
+      { label: 'Company/Organization', keys: ['Company'] },
+      { label: 'Service Interested In', keys: ['Service'] },
+      { label: 'Inquiry/Project Category', keys: ['Category'] },
+      { label: 'Preferred Contact Method', keys: ['Preferred contact', 'Preferred Contact Method'] },
+    ], opts.referenceId)}
+      <p>Your service inquiry will be reviewed by the appropriate OPERAVA team. A member of our Business Development, Client Support, or relevant service team may contact you to discuss your requirements and determine the most suitable solutions for your business or organization.<br></p>
+      <p>Please note that the submission of a service inquiry does not constitute a service agreement, contract, quotation, or guarantee of service availability. Any proposed services, scope of work, pricing, and terms will be discussed and confirmed separately with the appropriate OPERAVA representative.<br></p>
+      <p>Thank you for considering OPERAVA as your business solutions partner. We appreciate your interest and look forward to learning more about your requirements.<br></p>`,
   })
 }
 
@@ -203,14 +237,22 @@ export function applicantConfirmationEmail(opts: {
   rows: Array<{ label: string; value: string }>
 }): string {
   return brandedEmailShell({
-    eyebrow: 'Confirmation',
-    title: 'Thank you for your application',
-    introHtml: `<p style="margin:0 0 12px;">Thank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.</p>
-      <p style="margin:0;">Talent Acquisition Team,<br/>Operava Global Solutions</p>`,
-    bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
-      <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
-      ${detailsTableHtml(opts.rows)}
-      <p style="margin:20px 0 0;font-size:13px;color:${BRAND.muted};">Explore open roles anytime at <a href="https://www.operavaglobal.com/careers" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Careers</a> or continue at <a href="https://www.operavaglobal.com/apply" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Apply</a>.</p>`,
+    eyebrow: 'WE RECEIVED YOUR APPLICATION',
+    title: 'WE RECEIVED YOUR APPLICATION',
+    introHtml: `<p>Hi ${escapeHtml(opts.name)},<br></p>
+      <p>Thank you for contacting OPERAVA and for your interest in our opportunities.<br></p>
+      <p>We confirm that we have received your application. Your submitted information has been recorded as follows:<br></p>`,
+    bodyHtml: `${submissionListHtml(opts.name, opts.rows, [
+      { label: 'Email', keys: ['Email'] },
+      { label: 'Phone', keys: ['Phone'] },
+      { label: 'Country/Location', keys: ['Country / Location', 'Country'] },
+      { label: 'Category', keys: ['Category'] },
+      { label: 'Position', keys: ['Position', 'Role'] },
+      { label: 'Preferred Contact Method', keys: ['Preferred contact', 'Preferred Contact Method'] },
+    ], opts.referenceId)}
+      <p>Your application will be reviewed by the appropriate team. If your qualifications match an available position or another suitable opportunity, a member of our Talent Acquisition Team may contact you through your preferred contact method.<br></p>
+      <p>Please note that submitting an application does not guarantee employment or an interview. Your information may, however, be considered for current and future opportunities within OPERAVA.<br></p>
+      <p>Thank you for your interest in becoming part of OPERAVA.<br></p>`,
   })
 }
 
