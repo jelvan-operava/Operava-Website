@@ -7,6 +7,12 @@
   "ai": {
     "binding": "AI"
   },
+  "r2_buckets": [
+    {
+      "binding": "RESUMES_BUCKET",
+      "bucket_name": "operava-resumes"
+    }
+  ],
   "vars": {
     "NODE_VERSION": "20",
     "RESEND_FROM": "OPERAVA <noreply@operavaglobal.com>",
