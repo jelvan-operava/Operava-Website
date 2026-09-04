@@ -55,6 +55,26 @@ Set these on the production Pages project:
 
 Verify `noreply@operavaglobal.com` (or the RESEND_FROM domain) in Resend before going live.
 
+### Troubleshooting: `R2 bucket 'operava-resumes' not found`
+
+If a deployment fails during Function publish with:
+
+```
+Error: Failed to publish your Function. Got error: R2 bucket 'operava-resumes' not found.
+Verify the bucket exists in your account and that the bucket_name in your configuration is correct.
+```
+
+This is a **Cloudflare account/dashboard configuration issue, not a code issue** — `wrangler.jsonc` in this repo does not declare an `r2_buckets` binding, so `RESUMES_BUCKET` is bound entirely from the Pages project's dashboard settings.
+
+To fix:
+
+1. In the Cloudflare dashboard, go to **R2** and confirm a bucket named exactly `operava-resumes` (case-sensitive) exists in the **same account** the Pages project deploys to.
+2. If it doesn't exist, create it, or if it exists under a different name, either rename it to match or update the binding.
+3. Go to the Pages project → **Settings → Functions → R2 bucket bindings** and confirm `RESUMES_BUCKET` points at the correct bucket.
+4. Retry the deployment (or push a new commit) after correcting the binding.
+
+Since the application already treats `RESUMES_BUCKET` as optional at runtime (falling back to a `pending:` resume key, see `functions/lib/formCore.ts`), the binding can also be **removed** from the Pages project's Functions settings if resume storage isn't needed yet — deployments will then succeed without it.
+
 ## AVA chat
 
 Production `/api/chat` uses the Workers AI binding. No Gemini key is required. Client-side `avaConversationEngine` is the offline fallback.
