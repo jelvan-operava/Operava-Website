@@ -1,5 +1,4 @@
 import {
-  ensureTables,
   generateOtp,
   hashOtp,
   json,
@@ -11,33 +10,124 @@ import {
   type FormType,
 } from '../../lib/formCore'
 
+function b64url(bytes: ArrayBuffer | Uint8Array | string): string {
+  let bin: string
+  if (typeof bytes === 'string') bin = bytes
+  else {
+    const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
+    bin = String.fromCharCode(...arr)
+  }
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+}
+
+function fromB64url(s: string): string {
+  const pad = s.length % 4 === 0 ? '' : '='.repeat(4 - (s.length % 4))
+  const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad
+  return atob(b64)
+}
+
+async function hmacSign(secret: string, payload: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload))
+  return b64url(sig)
+}
+
+async function readSignedDraft(secret: string, draftId: string) {
+  if (!draftId.startsWith('s1.')) return null
+  const parts = draftId.split('.')
+  if (parts.length !== 3) return null
+  const [, payload, sig] = parts
+  const expected = await hmacSign(secret, payload)
+  if (sig !== expected) return null
+  try {
+    return JSON.parse(fromB64url(payload)) as {
+      email: string
+      formType: FormType
+      payload: string
+      codeHash: string
+      expiresAt: number
+      attempts: number
+      resends: number
+      lastSentAt: number
+    }
+  } catch {
+    return null
+  }
+}
+
+async function issueSignedDraft(
+  secret: string,
+  data: {
+    email: string
+    formType: FormType
+    payload: string
+    codeHash: string
+    expiresAt: number
+    attempts?: number
+    resends?: number
+    lastSentAt?: number
+  },
+): Promise<string> {
+  const body = JSON.stringify({
+    email: data.email,
+    formType: data.formType,
+    payload: data.payload,
+    codeHash: data.codeHash,
+    expiresAt: data.expiresAt,
+    attempts: data.attempts || 0,
+    resends: data.resends || 0,
+    lastSentAt: data.lastSentAt || Date.now(),
+  })
+  const payload = b64url(body)
+  const sig = await hmacSign(secret, payload)
+  return `s1.${payload}.${sig}`
+}
+
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.SUBMISSIONS_DB) return json({ error: 'Submissions database is not bound.' }, 503)
+    if (!env.RESEND_API_KEY) return json({ error: 'Email delivery is not configured.' }, 503)
     const secret = env.OTP_SECRET || env.RESEND_API_KEY || ''
     const body = (await request.json()) as { draftId?: string }
     const draftId = String(body.draftId || '')
     if (!draftId) return json({ error: 'Missing draft.' }, 400)
-    await ensureTables(env.SUBMISSIONS_DB)
-    const row = await env.SUBMISSIONS_DB.prepare(
-      'SELECT email, form_type, payload, last_sent_at, resends, consumed FROM form_otps WHERE draft_id = ?'
-    ).bind(draftId).first<{ email: string; form_type: FormType; payload: string; last_sent_at: number; resends: number; consumed: number }>()
-    if (!row || row.consumed) return json({ error: 'Start the form again.' }, 400)
+
+    const signed = await readSignedDraft(secret, draftId)
+    if (!signed) return json({ error: 'Start the form again.' }, 400)
     const now = Date.now()
-    if (now - Number(row.last_sent_at) < 45000) return json({ error: 'Please wait before resending.', retryAfterSec: 45 }, 429)
-    if (Number(row.resends) >= 5) return json({ error: 'Resend limit reached.' }, 429)
-    const payload = JSON.parse(row.payload || '{}') as { name?: string }
+    if (now - Number(signed.lastSentAt) < 45000) {
+      return json({ error: 'Please wait before resending.', retryAfterSec: 45 }, 429)
+    }
+    if (Number(signed.resends) >= 5) return json({ error: 'Resend limit reached.' }, 429)
+
+    const payloadObj = JSON.parse(signed.payload || '{}') as { name?: string }
     const code = generateOtp()
-    await env.SUBMISSIONS_DB.prepare(
-      'UPDATE form_otps SET code_hash = ?, expires_at = ?, attempts = 0, resends = resends + 1, last_sent_at = ? WHERE draft_id = ?'
-    ).bind(await hashOtp(secret, code), now + 10 * 60 * 1000, now, draftId).run()
-    await sendResend(env, {
-      to: [row.email],
-      subject: 'Verification Code',
-      html: otpEmailHtml(payload.name || 'there', purposeLabel(row.form_type), code),
-      text: otpEmailText(payload.name || 'there', purposeLabel(row.form_type), code),
+    const codeHash = await hashOtp(secret, code)
+    const expiresAt = now + 10 * 60 * 1000
+    const newDraftId = await issueSignedDraft(secret, {
+      email: signed.email,
+      formType: signed.formType,
+      payload: signed.payload,
+      codeHash,
+      expiresAt,
+      attempts: 0,
+      resends: Number(signed.resends) + 1,
+      lastSentAt: now,
     })
-    return json({ ok: true })
+
+    await sendResend(env, {
+      to: [signed.email],
+      subject: 'Your OPERAVA verification code',
+      html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
+      text: otpEmailText(payloadObj.name || 'there', purposeLabel(signed.formType), code),
+    })
+
+    return json({ ok: true, draftId: newDraftId })
   } catch {
     return json({ error: 'Unable to resend the code.' }, 500)
   }
