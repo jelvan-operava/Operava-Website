@@ -8,7 +8,6 @@ import {
   makeReference,
   sendResend,
   senderFor,
-  staffNotificationEmail,
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
@@ -171,22 +170,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       html,
       text,
     })
-
-    if (staffInboxes.length) {
-      await sendResend(env, {
-        from: senderFor(formType, env),
-        to: staffInboxes,
-        subject: `${formType} submission ${referenceId}`,
-        html: staffNotificationEmail({
-          formType,
-          referenceId,
-          email,
-          submittedAt: nowIso,
-          rows,
-        }),
-        text: `${formType} ${referenceId} from ${email}`,
-      })
-    }
 
     return json({ ok: true, referenceId, formType, name })
   } catch (err) {
