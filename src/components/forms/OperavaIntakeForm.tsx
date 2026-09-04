@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import OtpVerify from './OtpVerify'
 import FormSuccess from './FormSuccess'
@@ -24,6 +24,7 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const [resumeKey, setResumeKey] = useState('')
+  const [resumeName, setResumeName] = useState('')
   const [form, setForm] = useState({
     name: '',
     company: '',
@@ -49,6 +50,10 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
     website: '',
   })
 
+  useEffect(() => {
+    if (defaultPosition) setForm((prev) => ({ ...prev, position: defaultPosition }))
+  }, [defaultPosition])
+
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -61,6 +66,7 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
     const json = await res.json()
     if (!res.ok) throw new Error(json.error || 'Resume upload failed.')
     setResumeKey(json.resumeKey)
+    setResumeName(file.name)
   }
 
   const submit = async (event: FormEvent) => {
@@ -68,7 +74,9 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
     setError('')
     setSending(true)
     try {
-      if (kind === 'CAREERS' && !resumeKey) throw new Error('Upload a resume before continuing.')
+      if (kind === 'CAREERS' && !resumeKey && !form.portfolio.trim()) {
+        throw new Error('Upload a resume (PDF/Word) or add a portfolio / LinkedIn URL before continuing.')
+      }
       const res = await fetch('/api/forms/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,6 +125,7 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
       <OtpVerify
         maskedEmail={maskedEmail}
         draftId={draftId}
+        onDraftIdChange={setDraftId}
         onVerified={(value) => {
           setResult(value)
           setStep('done')
@@ -128,6 +137,7 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
   }
 
   const field = 'w-full px-4 py-3 text-sm border border-gray-200 rounded-xl'
+  const positionOptions = Array.from(new Set([...(defaultPosition ? [defaultPosition] : []), ...POSITIONS]))
 
   return (
     <form onSubmit={submit} className="space-y-4 max-w-2xl">
@@ -162,18 +172,27 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
       {kind === 'CAREERS' && (
         <>
           <select required value={form.position} onChange={set('position')} className={field}>
-            {POSITIONS.map((item) => <option key={item}>{item}</option>)}
+            {positionOptions.map((item) => <option key={item}>{item}</option>)}
           </select>
           <input required value={form.availability} onChange={set('availability')} placeholder="Availability" className={field} />
           <textarea required value={form.experience} onChange={set('experience')} rows={3} placeholder="Relevant Work Experience" className={field} />
           <input required value={form.education} onChange={set('education')} placeholder="Education Level" className={field} />
           <input required value={form.skills} onChange={set('skills')} placeholder="Skills / Specialization" className={field} />
-          <input type="file" required accept=".pdf,.doc,.docx,application/pdf" onChange={(e) => {
-            const file = e.target.files?.[0]
-            if (file) uploadResume(file).catch((err) => setError(err.message))
-          }} className="text-sm" />
-          {resumeKey && <p className="text-xs text-emerald-700">Resume uploaded.</p>}
-          <input value={form.portfolio} onChange={set('portfolio')} placeholder="Portfolio / LinkedIn / Professional Profile (Optional)" className={field} />
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">Resume (PDF or Word) — recommended</label>
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx,application/pdf"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) uploadResume(file).catch((err) => setError(err.message))
+              }}
+              className="text-sm"
+            />
+            {resumeKey && <p className="text-xs text-emerald-700 mt-1">Resume ready{resumeName ? `: ${resumeName}` : ''}.</p>}
+            <p className="text-xs text-gray-500 mt-1">If upload is unavailable, add a portfolio or LinkedIn URL below.</p>
+          </div>
+          <input value={form.portfolio} onChange={set('portfolio')} placeholder="Portfolio / LinkedIn / Professional Profile" className={field} />
           <textarea value={form.additional} onChange={set('additional')} rows={3} placeholder="Additional Information (Optional)" className={field} />
         </>
       )}
