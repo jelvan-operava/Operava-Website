@@ -172,6 +172,18 @@ export function plainConfirmationEmail(options: {
        Best regards,<br />
        <strong>OPERAVA Global Solutions</strong>
      </p>
+     <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:16px;">
+       <tbody>
+         <tr>
+           <td>
+             <img src="https://res.cloudinary.com/sdaxzncs/image/upload/v1787451792/operava-signature.jpg" alt="OPERAVA Global Solutions" style="max-width:100%;height:auto;border:0;" />
+           </td>
+         </tr>
+       </tbody>
+     </table>
+     <p style="margin:12px 0 0;font-size:12px;line-height:1.6;color:${BRAND.muted};">
+       SEC and BIR Registered, website: <a href="https://www.operavaglobal.com" style="color:${BRAND.violet};">www.operavaglobal.com</a><br />
+     </p>
    </div>
  </body>
 </html>`
