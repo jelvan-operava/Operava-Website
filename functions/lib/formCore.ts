@@ -7,9 +7,7 @@ export interface FormEnv {
   RESEND_FROM?: string
   OTP_SECRET?: string
   CLIENT_INBOX?: string
-  SALES_INBOX?: string
   TALENT_INBOX?: string
-  HR_INBOX?: string
 }
 
 export const EMAIL_RE =
@@ -283,8 +281,7 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
 }
 
 export function inboxFor(type: FormType, env: FormEnv) {
-  if (type === 'CAREERS') return [env.TALENT_INBOX || 'talents@operavaglobal.com', env.HR_INBOX || 'hr@operavaglobal.com']
-  if (type === 'SERVICES') return [env.SALES_INBOX || env.CLIENT_INBOX || 'hello@operavaglobal.com']
+  if (type === 'CAREERS') return [env.TALENT_INBOX || 'talents@operavaglobal.com']
   return [env.CLIENT_INBOX || 'hello@operavaglobal.com']
 }
 

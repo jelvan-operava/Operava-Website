@@ -13,8 +13,8 @@ After the applicant/client verifies their email:
 | Form type | Auto-reply To | CC / staff |
 |---|---|---|
 | CONTACT | submitter | `CLIENT_INBOX` (default `hello@operavaglobal.com`) |
-| SERVICES | submitter | `SALES_INBOX` or `CLIENT_INBOX` |
-| CAREERS | submitter | `TALENT_INBOX` + `HR_INBOX` |
+| SERVICES | submitter | `CLIENT_INBOX` (default `hello@operavaglobal.com`) |
+| CAREERS | submitter | `TALENT_INBOX` (default `talents@operavaglobal.com`) |
 
 Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `OPERAVA-CON-########`.
 
@@ -24,8 +24,8 @@ Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `O
 
 | Source | Auto-reply To | CC |
 |---|---|---|
-| Contact, services, AVA consultation | submitter | `CLIENT_INBOX` |
-| Careers apply, AVA career interest | submitter | `TALENT_INBOX`, `HR_INBOX`, optional `APPLICANT_CC` |
+| Contact, services, AVA consultation | submitter | `CLIENT_INBOX` (hello@operavaglobal.com only) |
+| Careers apply, AVA career interest | submitter | `TALENT_INBOX` (talents@operavaglobal.com only), optional `APPLICANT_CC` |
 
 Ticket IDs: `OPV-######`.
 
@@ -39,9 +39,7 @@ Set these on the production Pages project:
 - `RESEND_API_KEY` (required for all email)
 - `RESEND_FROM` = `OPERAVA <noreply@operavaglobal.com>`
 - `CLIENT_INBOX` = `hello@operavaglobal.com`
-- `SALES_INBOX` = `hello@operavaglobal.com`
 - `TALENT_INBOX` = `talents@operavaglobal.com`
-- `HR_INBOX` = `hr@operavaglobal.com`
 - `APPLICANT_CC` (optional, comma-separated extra CCs for career tickets)
 - `OTP_SECRET` (preferred for OTP hashing; falls back to RESEND_API_KEY)
 - `NODE_VERSION` = `20`

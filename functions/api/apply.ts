@@ -54,11 +54,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const notes = clean(body.notes || body.description, 4000)
     const ticketId = `OPV-${Math.floor(100000 + Math.random() * 900000)}`
     const talentInbox = env.TALENT_INBOX || 'talents@operavaglobal.com'
-    const hrInbox = env.HR_INBOX || 'hr@operavaglobal.com'
     const apiKey = env.RESEND_API_KEY
     if (!apiKey) return json({ error: 'Email delivery is not configured yet.' }, 503)
 
-    const cc = uniqueEmails([talentInbox, hrInbox, ...parseList(env.APPLICANT_CC)], email)
+    const cc = uniqueEmails([talentInbox, ...parseList(env.APPLICANT_CC)], email)
     const rows = [
       { label: 'Name', value: name },
       { label: 'Email', value: email },

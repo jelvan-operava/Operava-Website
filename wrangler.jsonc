@@ -11,10 +11,6 @@
     "NODE_VERSION": "20",
     "RESEND_FROM": "OPERAVA <noreply@operavaglobal.com>",
     "CLIENT_INBOX": "hello@operavaglobal.com",
-    "SALES_INBOX": "hello@operavaglobal.com",
-    "CS_INBOX": "cs@operavaglobal.com",
-    "COMPLIANCE_INBOX": "compliance@operavaglobal.com",
-    "TALENT_INBOX": "talents@operavaglobal.com",
-    "HR_INBOX": "hr@operavaglobal.com"
+    "TALENT_INBOX": "talents@operavaglobal.com"
   }
 }
