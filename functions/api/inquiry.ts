@@ -1,6 +1,8 @@
 import {
   applicantConfirmationEmail,
   clientConfirmationEmail,
+  DEFAULT_RESEND_FROM,
+  SUPPORT_INBOX,
   type FormEnv,
 } from '../lib/formCore'
 
@@ -87,10 +89,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }[kind] as string
 
     const cc = uniqueEmails(
-      isCareer ? [talentInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox],
+      [...(isCareer ? [talentInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox]), SUPPORT_INBOX],
       email,
     )
-    const replyTo = isCareer ? talentInbox : clientInbox
+    const replyTo = SUPPORT_INBOX
     const subject = isCareer
       ? `Ticket #${ticketId} — career application received`
       : `Ticket #${ticketId} — consultation request received`
@@ -122,7 +124,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const payload: Record<string, unknown> = {
-      from: env.RESEND_FROM || 'OPERAVA <noreply@operavaglobal.com>',
+      from: env.RESEND_FROM || DEFAULT_RESEND_FROM,
       to: [email],
       reply_to: replyTo,
       subject,

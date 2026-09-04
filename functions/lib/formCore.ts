@@ -10,6 +10,10 @@ export interface FormEnv {
   TALENT_INBOX?: string
 }
 
+/** Every outbound OPERAVA email shares this sender identity and support address. */
+export const DEFAULT_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
+export const SUPPORT_INBOX = 'hello@operavaglobal.com'
+
 export const EMAIL_RE =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
 
@@ -277,7 +281,8 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: env.RESEND_FROM || 'OPERAVA <noreply@operavaglobal.com>',
+      from: env.RESEND_FROM || DEFAULT_RESEND_FROM,
+      reply_to: SUPPORT_INBOX,
       ...payload,
     }),
   })

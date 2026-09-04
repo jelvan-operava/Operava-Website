@@ -1,4 +1,4 @@
-import { applicantConfirmationEmail, type FormEnv } from '../lib/formCore'
+import { applicantConfirmationEmail, DEFAULT_RESEND_FROM, SUPPORT_INBOX, type FormEnv } from '../lib/formCore'
 
 interface Env extends FormEnv {
   APPLICANT_CC?: string
@@ -57,7 +57,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const apiKey = env.RESEND_API_KEY
     if (!apiKey) return json({ error: 'Email delivery is not configured yet.' }, 503)
 
-    const cc = uniqueEmails([talentInbox, ...parseList(env.APPLICANT_CC)], email)
+    const cc = uniqueEmails([talentInbox, SUPPORT_INBOX, ...parseList(env.APPLICANT_CC)], email)
     const rows = [
       { label: 'Name', value: name },
       { label: 'Email', value: email },
@@ -82,9 +82,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: env.RESEND_FROM || 'OPERAVA <noreply@operavaglobal.com>',
+        from: env.RESEND_FROM || DEFAULT_RESEND_FROM,
         to: [email],
-        reply_to: talentInbox,
+        reply_to: SUPPORT_INBOX,
         cc,
         subject: `Ticket #${ticketId} — career application received`,
         html,

@@ -6,30 +6,30 @@ Contact, Quote/Services, and Careers pages use `OperavaIntakeForm` → `/api/for
 
 After the applicant/client verifies their email:
 
-1. **Confirmation email** is sent **to the submitter**
-2. **Staff are CC’d** on that same confirmation
+1. **Confirmation email** is sent **to the submitter** from `OPERAVA <notification@operavaglobal.com>`
+2. **Staff and `hello@operavaglobal.com` are CC’d** on that same confirmation, and replies route to `hello@operavaglobal.com`
 3. A second **staff-only** notification is also sent with the full payload
 
 | Form type | Auto-reply To | CC / staff |
 |---|---|---|
-| CONTACT | submitter | `CLIENT_INBOX` (default `hello@operavaglobal.com`) |
-| SERVICES | submitter | `CLIENT_INBOX` (default `hello@operavaglobal.com`) |
-| CAREERS | submitter | `TALENT_INBOX` (default `talents@operavaglobal.com`) |
+| CONTACT | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`) + `hello@operavaglobal.com` |
+| SERVICES | `hello@operavaglobal.com` | `CLIENT_INBOX` (default `hello@operavaglobal.com`) + `hello@operavaglobal.com` |
+| CAREERS | `hello@operavaglobal.com` | `TALENT_INBOX` (default `talents@operavaglobal.com`) + `hello@operavaglobal.com` |
 
 Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `OPERAVA-CON-########`.
 
 ## Legacy / AVA ticket path
 
-`/api/inquiry` and `/api/apply` (used by AVA-style tickets and `submitInquiry`) send confirmation **to the submitter** with staff **CC**:
+`/api/inquiry` and `/api/apply` (used by AVA-style tickets and `submitInquiry`) send confirmation **to the submitter** from `OPERAVA <notification@operavaglobal.com>` with staff + `hello@operavaglobal.com` **CC**:
 
 | Source | Auto-reply To | CC |
 |---|---|---|
-| Contact, services, AVA consultation | submitter | `CLIENT_INBOX` (hello@operavaglobal.com only) |
-| Careers apply, AVA career interest | submitter | `TALENT_INBOX` (talents@operavaglobal.com only), optional `APPLICANT_CC` |
+| Contact, services, AVA consultation | `hello@operavaglobal.com` | `CLIENT_INBOX` (hello@operavaglobal.com) |
+| Careers apply, AVA career interest | `hello@operavaglobal.com` | `TALENT_INBOX` (talents@operavaglobal.com) + `hello@operavaglobal.com`, optional `APPLICANT_CC` |
 
 Ticket IDs: `OPV-######`.
 
-Reply-To is the staff inbox so replies land with the team.
+Every OPERAVA email (OTP, confirmations, and staff notifications) shares the same sender identity and always replies to `hello@operavaglobal.com` so replies land with the team.
 
 ## Cloudflare Pages secrets & bindings
 
@@ -37,7 +37,7 @@ Set these on the production Pages project:
 
 **Secrets / vars**
 - `RESEND_API_KEY` (required for all email)
-- `RESEND_FROM` = `OPERAVA <noreply@operavaglobal.com>`
+- `RESEND_FROM` = `OPERAVA <notification@operavaglobal.com>`
 - `CLIENT_INBOX` = `hello@operavaglobal.com`
 - `TALENT_INBOX` = `talents@operavaglobal.com`
 - `APPLICANT_CC` (optional, comma-separated extra CCs for career tickets)
@@ -51,7 +51,7 @@ Set these on the production Pages project:
 
 **Important:** After adding or changing secrets in the Cloudflare dashboard, trigger a **new deployment** (push to `main` or Retry deployment). Secrets are injected only at deploy time.
 
-Verify `noreply@operavaglobal.com` (or the RESEND_FROM domain) in Resend before going live.
+Verify `notification@operavaglobal.com` (or the RESEND_FROM domain) in Resend before going live.
 
 ### Troubleshooting: `R2 bucket 'operava-resumes' not found`
 
