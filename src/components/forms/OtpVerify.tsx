@@ -6,14 +6,20 @@ interface Props {
   onVerified: (result: { referenceId: string; name: string; formType: string }) => void
   onChangeEmail: () => void
   onBack: () => void
+  onDraftIdChange?: (draftId: string) => void
 }
 
-export default function OtpVerify({ maskedEmail, draftId, onVerified, onChangeEmail, onBack }: Props) {
+export default function OtpVerify({ maskedEmail, draftId: initialDraftId, onVerified, onChangeEmail, onBack, onDraftIdChange }: Props) {
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [seconds, setSeconds] = useState(45)
+  const [draftId, setDraftId] = useState(initialDraftId)
   const refs = useRef<Array<HTMLInputElement | null>>([])
+
+  useEffect(() => {
+    setDraftId(initialDraftId)
+  }, [initialDraftId])
 
   useEffect(() => {
     refs.current[0]?.focus()
@@ -70,6 +76,10 @@ export default function OtpVerify({ maskedEmail, draftId, onVerified, onChangeEm
     if (!res.ok) {
       setError(data.error || 'Unable to resend.')
       return
+    }
+    if (data.draftId) {
+      setDraftId(data.draftId)
+      onDraftIdChange?.(data.draftId)
     }
     setSeconds(45)
     setError('')
