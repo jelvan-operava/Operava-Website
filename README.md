@@ -23,7 +23,7 @@ This codebase, including all design assets, architectural specifications, propri
 The **OPERAVA Web Platform** is an enterprise-grade digital experience presenting OPERAVA's dual capabilities:
 1. **High-Velocity Technology & Software Engineering**: Custom web and cloud applications, multi-cloud infrastructure (AWS/GCP/Azure), Kubernetes orchestration, cybersecurity SOC, and AI dataset engineering.
 2. **24/7 Global Business Operations & BPO**: Omnichannel customer experience (CX), Tier 1–3 technical support, back-office data processing, KYC/AML compliance, and dedicated engineering squads.
-3. **AVA Virtual Intelligence**: Real-time conversational AI assistant powered by **Cloudflare Workers AI** (with a resilient client-side reasoning engine fallback) for direct consultations, qualification, and candidate onboarding. Knowledge is grounded in `AVA-INSTRUCTIONS/`.
+3. **AVA Virtual Intelligence**: Real-time conversational AI assistant powered by **Cloudflare Workers AI** (Llama 3.3 70B) with a resilient client-side reasoning engine fallback for direct consultations, qualification, and candidate onboarding. Knowledge is grounded in `AVA-INSTRUCTIONS/`.
 4. **Multilingual Architecture**: Native 8-language localization (English, Spanish, French, German, Tagalog/Filipino, Arabic, Chinese, Japanese) with automated RTL direction support.
 
 ---
@@ -149,7 +149,7 @@ operava-website/
 | Asset Description | Direct Cloudinary HTTPS URL |
 | :--- | :--- |
 | **Technology & Cloud Video** | `https://res.cloudinary.com/mgyosgsm/video/upload/Video_otwv5l.mp4` |
-| **Global Workforce Video** | `https://res.cloudinary.com/mgyosgsm/video/upload/Video_nmdtfe.mp4` |
+| **Global Workforce Video** | `https://res.cloudinary.com/mgyosgsm/video/upload/Video_pmorrn.mp4` |
 | **Business Processes Video** | `https://res.cloudinary.com/mgyosgsm/video/upload/Video_pmorrn.mp4` |
 | **OPERAVA Motion Logo Video**| `https://res.cloudinary.com/mgyosgsm/video/upload/Video_ffvnwd.mp4` |
 | **AVA Assistant Video Avatar**| `https://res.cloudinary.com/mgyosgsm/video/upload/Video_vpaaxl.mp4` |
@@ -159,7 +159,9 @@ operava-website/
 
 ## 🤖 AVA & Cloudflare Workers AI
 
-Production chat (`functions/api/chat.ts`) uses the **Workers AI** binding named `AI` (configured in `wrangler.jsonc`). Model: `@cf/meta/llama-3.1-8b-instruct`.
+Production chat (`functions/api/chat.ts`) uses the **Workers AI** binding named `AI` (configured in `wrangler.jsonc`).
+
+**Model:** `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (Llama 3.3 70B, fp8-fast — larger active variant; older 8B / non-fast 70B IDs were deprecated).
 
 System knowledge is aligned with the markdown under **`AVA-INSTRUCTIONS/`** (company profile, services, engagement models, careers, FAQ). The client-side engine in `src/utils/avaConversationEngine.ts` remains the offline / failure fallback.
 
