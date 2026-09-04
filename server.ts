@@ -32,7 +32,8 @@ function bridgePagesFunction(
 ) {
   return async (req: ExpressRequest, res: ExpressResponse) => {
     try {
-      const url = `http://${req.headers.host || 'localhost'}${req.originalUrl}`
+      const safeHost = /^[a-zA-Z0-9.-]+(:\d+)?$/.test(req.headers.host || '') ? req.headers.host : 'localhost'
+      const url = `http://${safeHost}${req.originalUrl}`
       const headers = new Headers()
       const skipHeaders = new Set(['content-length', 'host', 'connection', 'transfer-encoding'])
       for (const [key, value] of Object.entries(req.headers)) {
