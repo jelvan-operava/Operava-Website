@@ -3,6 +3,7 @@ import {
   clientConfirmationEmail,
   CLIENT_RESEND_FROM,
   sendResend,
+  staffNotificationEmail,
   TALENT_RESEND_FROM,
   type FormEnv,
 } from '../lib/formCore'
@@ -73,6 +74,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       teamModel: clean(body.teamModel, 80),
       timeline: clean(body.timeline, 80),
       role: clean(body.role, 180),
+      category: clean(body.category, 160),
+      contactMethod: clean(body.contactMethod, 80),
       notes: clean(body.notes || body.description, 4000),
     }
 
@@ -93,7 +96,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       isCareer ? [talentInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox],
       email,
     )
-    const subject = isCareer ? 'Operava Application' : kind === 'service' ? 'Services Inquiry' : 'Contact Inquiry'
+    const subject = isCareer ? 'WE RECEIVED YOUR APPLICATION' : 'WE RECEIVED YOUR INQUIRY'
 
     const rows = [
       { label: 'Name', value: name },
@@ -105,6 +108,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       { label: 'Delivery model', value: fields.teamModel },
       { label: 'Timeline', value: fields.timeline },
       { label: 'Role', value: fields.role },
+      { label: 'Category', value: fields.category },
+      { label: 'Preferred contact', value: fields.contactMethod },
       { label: 'Details', value: fields.notes },
     ]
 
@@ -122,17 +127,30 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const payload: Record<string, unknown> = {
-      from: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
+      from: isCareer ? 'OPERAVA - Talent Acquisition Team <hello@operavaglobal.com>' : CLIENT_RESEND_FROM,
       to: [email],
       reply_to: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
       subject,
       html,
       text,
     }
-    if (cc.length) payload.cc = cc
-
     try {
       await sendResend(env, payload)
+      if (cc.length) {
+        await sendResend(env, {
+          from: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
+          to: cc,
+          subject: isCareer ? 'New Application Received' : 'New Inquiry Received',
+          html: staffNotificationEmail({
+            formType: isCareer ? 'CAREERS' : 'SERVICES',
+            referenceId: ticketId,
+            email,
+            submittedAt: new Date().toISOString(),
+            rows,
+          }),
+          text: `A new ${isCareer ? 'application' : 'inquiry'} has been received. Reference: ${ticketId}`,
+        })
+      }
     } catch (err) {
       console.error('Resend error', err)
       return json({ error: 'Unable to deliver this inquiry.' }, 502)

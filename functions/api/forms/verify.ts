@@ -1,5 +1,6 @@
 import {
   applicantConfirmationEmail,
+  APPLICANT_CONFIRMATION_FROM,
   clientConfirmationEmail,
   ensureTables,
   hashOtp,
@@ -8,6 +9,7 @@ import {
   makeReference,
   sendResend,
   senderFor,
+  staffNotificationEmail,
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
@@ -152,7 +154,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
           ? 'Careers application form'
           : 'Contact form'
 
-    const subject = isCareer ? 'Operava Application' : formType === 'SERVICES' ? 'Services Inquiry' : 'Contact Inquiry'
+    const subject = isCareer ? 'WE RECEIVED YOUR APPLICATION' : 'WE RECEIVED YOUR INQUIRY'
 
     const html = isCareer
       ? applicantConfirmationEmail({ name, email, referenceId, sourceLabel, rows })
@@ -163,14 +165,28 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       : `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your inquiry. The team will get in touch with you as soon as possible.\n\nClient Support Team,\nOperava Global Solutions`
 
     await sendResend(env, {
-      from: senderFor(formType, env),
+      from: isCareer ? APPLICANT_CONFIRMATION_FROM : senderFor(formType, env),
       to: [email],
-      cc: ccList.length ? ccList : undefined,
       reply_to: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
-      subject,
+      subject: isCareer ? 'WE RECEIVED YOUR APPLICATION' : 'WE RECEIVED YOUR INQUIRY',
       html,
       text,
     })
+    if (ccList.length) {
+      await sendResend(env, {
+        from: senderFor(formType, env),
+        to: ccList,
+        subject: isCareer ? 'New Application Received' : 'New Inquiry Received',
+        html: staffNotificationEmail({
+          formType,
+          referenceId,
+          email,
+          submittedAt: nowIso,
+          rows,
+        }),
+        text,
+      })
+    }
 
     return json({ ok: true, referenceId, formType, name })
   } catch (err) {
