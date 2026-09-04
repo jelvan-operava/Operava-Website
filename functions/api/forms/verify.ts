@@ -1,5 +1,6 @@
 import {
   applicantConfirmationEmail,
+  APPLICANT_CONFIRMATION_FROM,
   clientConfirmationEmail,
   ensureTables,
   hashOtp,
@@ -153,7 +154,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
           ? 'Careers application form'
           : 'Contact form'
 
-    const subject = isCareer ? 'Operava Application' : formType === 'SERVICES' ? 'Services Inquiry' : 'Contact Inquiry'
+    const subject = isCareer ? 'WE RECEIVED YOUR APPLICATION' : 'WE RECEIVED YOUR INQUIRY'
 
     const html = isCareer
       ? applicantConfirmationEmail({ name, email, referenceId, sourceLabel, rows })
@@ -164,7 +165,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       : `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your inquiry. The team will get in touch with you as soon as possible.\n\nClient Support Team,\nOperava Global Solutions`
 
     await sendResend(env, {
-      from: isCareer ? 'OPERAVA - Talent Acquisition Team <hello@operavaglobal.com>' : senderFor(formType, env),
+      from: isCareer ? APPLICANT_CONFIRMATION_FROM : senderFor(formType, env),
       to: [email],
       reply_to: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
       subject: isCareer ? 'WE RECEIVED YOUR APPLICATION' : 'WE RECEIVED YOUR INQUIRY',

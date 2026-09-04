@@ -74,6 +74,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       teamModel: clean(body.teamModel, 80),
       timeline: clean(body.timeline, 80),
       role: clean(body.role, 180),
+      category: clean(body.category, 160),
+      contactMethod: clean(body.contactMethod, 80),
       notes: clean(body.notes || body.description, 4000),
     }
 
@@ -106,6 +108,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       { label: 'Delivery model', value: fields.teamModel },
       { label: 'Timeline', value: fields.timeline },
       { label: 'Role', value: fields.role },
+      { label: 'Category', value: fields.category },
+      { label: 'Preferred contact', value: fields.contactMethod },
       { label: 'Details', value: fields.notes },
     ]
 
