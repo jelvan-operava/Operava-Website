@@ -62,18 +62,194 @@ export async function hashOtp(secret: string, code: string) {
   return [...new Uint8Array(data)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+/** Brand tokens aligned with www.operavaglobal.com */
+const BRAND = {
+  violet: '#6D28D9',
+  violetDeep: '#5B21B6',
+  violetSoft: '#F5F3FF',
+  ink: '#0B0F19',
+  body: '#1F2937',
+  muted: '#4B5563',
+  line: '#E5E7EB',
+  canvas: '#F8F7FC',
+  white: '#FFFFFF',
+  success: '#10B981',
+}
+
+/**
+ * Shared professional email shell — same visual language as the public website.
+ */
+export function brandedEmailShell(options: {
+  eyebrow: string
+  title: string
+  introHtml: string
+  bodyHtml: string
+  footerNote?: string
+}): string {
+  const { eyebrow, title, introHtml, bodyHtml, footerNote } = options
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(title)}</title>
+</head>
+<body style="margin:0;padding:0;background:${BRAND.canvas};font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;color:${BRAND.body};">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${BRAND.canvas};padding:28px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:${BRAND.white};border-radius:20px;overflow:hidden;border:1px solid ${BRAND.line};box-shadow:0 12px 40px rgba(13,10,25,0.06);">
+        <!-- Header bar -->
+        <tr>
+          <td style="background:linear-gradient(135deg,${BRAND.ink} 0%,#1a1030 55%,${BRAND.violetDeep} 100%);padding:22px 28px;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+              <tr>
+                <td style="vertical-align:middle;">
+                  <img src="https://www.operavaglobal.com/operava-logo.svg" alt="OPERAVA" width="40" height="40" style="display:block;border:0;" />
+                </td>
+                <td style="vertical-align:middle;text-align:right;">
+                  <div style="font-size:11px;letter-spacing:0.14em;font-weight:700;color:#C4B5FD;text-transform:uppercase;">OPERAVA</div>
+                  <div style="font-size:12px;color:#E9D5FF;margin-top:2px;">We Operate in Advance</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <!-- Accent line -->
+        <tr><td style="height:4px;background:linear-gradient(90deg,${BRAND.violet},${BRAND.violetDeep},#A855F7);font-size:0;line-height:0;">&nbsp;</td></tr>
+        <!-- Body -->
+        <tr>
+          <td style="padding:28px 28px 8px;">
+            <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${BRAND.violet};">${escapeHtml(eyebrow)}</p>
+            <h1 style="margin:0 0 14px;font-size:22px;line-height:1.3;font-weight:700;color:${BRAND.ink};">${escapeHtml(title)}</h1>
+            <div style="font-size:14px;line-height:1.65;color:${BRAND.muted};">${introHtml}</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 28px 28px;">${bodyHtml}</td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+          <td style="padding:18px 28px 24px;background:${BRAND.violetSoft};border-top:1px solid #EDE9FE;">
+            <p style="margin:0 0 6px;font-size:12px;color:${BRAND.muted};">${footerNote || 'OPERAVA Global Solutions · Philippine-based · Remote & global delivery'}</p>
+            <p style="margin:0;font-size:12px;">
+              <a href="https://www.operavaglobal.com" style="color:${BRAND.violet};text-decoration:none;font-weight:600;">www.operavaglobal.com</a>
+              <span style="color:#C4B5FD;"> · </span>
+              <a href="https://www.operavaglobal.com/contact" style="color:${BRAND.violet};text-decoration:none;">Contact</a>
+              <span style="color:#C4B5FD;"> · </span>
+              <a href="https://www.operavaglobal.com/privacy" style="color:${BRAND.violet};text-decoration:none;">Privacy</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:16px 0 0;font-size:11px;color:#9CA3AF;text-align:center;">© OPERAVA Global Solutions. All rights reserved.</p>
+    </td></tr>
+  </table>
+</body>
+</html>`
+}
+
+export function detailsTableHtml(rows: Array<{ label: string; value: string }>): string {
+  const cells = rows
+    .filter((r) => r.value)
+    .map(
+      (r) =>
+        `<tr>
+          <td style="padding:10px 0;border-bottom:1px solid ${BRAND.line};width:150px;vertical-align:top;font-size:12px;font-weight:600;color:${BRAND.muted};text-transform:capitalize;">${escapeHtml(r.label)}</td>
+          <td style="padding:10px 0;border-bottom:1px solid ${BRAND.line};font-size:13px;color:${BRAND.body};line-height:1.5;">${escapeHtml(r.value).replace(/\n/g, '<br/>')}</td>
+        </tr>`,
+    )
+    .join('')
+  if (!cells) return ''
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:8px;border:1px solid ${BRAND.line};border-radius:12px;overflow:hidden;">
+    <tr><td style="padding:4px 16px;background:${BRAND.white};"><table role="presentation" width="100%" cellspacing="0" cellpadding="0">${cells}</table></td></tr>
+  </table>`
+}
+
+export function referenceBadgeHtml(referenceId: string): string {
+  return `<div style="display:inline-block;margin:12px 0 4px;padding:10px 14px;border-radius:12px;background:${BRAND.violetSoft};border:1px solid #DDD6FE;">
+    <span style="display:block;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.violet};">Reference</span>
+    <span style="display:block;margin-top:2px;font-size:16px;font-weight:700;color:${BRAND.ink};letter-spacing:0.02em;">#${escapeHtml(referenceId)}</span>
+  </div>`
+}
+
+/** Client / services / contact confirmation */
+export function clientConfirmationEmail(opts: {
+  name: string
+  email: string
+  referenceId: string
+  sourceLabel: string
+  rows: Array<{ label: string; value: string }>
+}): string {
+  const first = escapeHtml(opts.name.split(' ')[0] || opts.name)
+  return brandedEmailShell({
+    eyebrow: 'Client confirmation',
+    title: `Thank you, ${opts.name.split(' ')[0] || opts.name}`,
+    introHtml: `<p style="margin:0 0 12px;">Hello ${first},</p>
+      <p style="margin:0 0 12px;">Your <strong>service / project inquiry</strong> has been received by OPERAVA Global Solutions. Our solutions team will review your requirements and connect with you within <strong>2 business hours</strong> where possible.</p>
+      <p style="margin:0;">A copy of this confirmation was also shared with our client desk so the conversation can continue seamlessly.</p>`,
+    bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
+      <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
+      ${detailsTableHtml(opts.rows)}
+      <p style="margin:20px 0 0;font-size:13px;color:${BRAND.muted};">Prefer to add detail now? Visit <a href="https://www.operavaglobal.com/quote" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Request a Quote</a> or <a href="https://www.operavaglobal.com/contact" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Contact</a>.</p>`,
+    footerNote: 'OPERAVA Global Solutions · Client Solutions Desk',
+  })
+}
+
+/** Applicant / careers confirmation */
+export function applicantConfirmationEmail(opts: {
+  name: string
+  email: string
+  referenceId: string
+  sourceLabel: string
+  rows: Array<{ label: string; value: string }>
+}): string {
+  const first = escapeHtml(opts.name.split(' ')[0] || opts.name)
+  return brandedEmailShell({
+    eyebrow: 'Applicant confirmation',
+    title: `Thank you, ${opts.name.split(' ')[0] || opts.name}`,
+    introHtml: `<p style="margin:0 0 12px;">Hello ${first},</p>
+      <p style="margin:0 0 12px;">Your <strong>career application</strong> has been received by OPERAVA Talent. Our team typically begins review within <strong>24–48 hours</strong>. Please keep your reference number for follow-up.</p>
+      <p style="margin:0;">Talent and HR have been notified so your application can be routed to the right hiring track.</p>`,
+    bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
+      <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
+      ${detailsTableHtml(opts.rows)}
+      <p style="margin:20px 0 0;font-size:13px;color:${BRAND.muted};">Explore open roles anytime at <a href="https://www.operavaglobal.com/careers" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Careers</a> or continue at <a href="https://www.operavaglobal.com/apply" style="color:${BRAND.violet};font-weight:600;text-decoration:none;">Apply</a>.</p>`,
+    footerNote: 'OPERAVA Global Solutions · Talent Acquisition',
+  })
+}
+
+export function staffNotificationEmail(opts: {
+  formType: string
+  referenceId: string
+  email: string
+  submittedAt: string
+  rows: Array<{ label: string; value: string }>
+}): string {
+  return brandedEmailShell({
+    eyebrow: 'Internal routing',
+    title: `${opts.formType} · ${opts.referenceId}`,
+    introHtml: `<p style="margin:0;">A verified submission was received and confirmation was sent to the submitter.</p>`,
+    bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
+      <p style="margin:12px 0;font-size:13px;color:${BRAND.muted};">Verified email: <strong style="color:${BRAND.ink};">${escapeHtml(opts.email)}</strong><br/>Submitted: ${escapeHtml(opts.submittedAt)}</p>
+      ${detailsTableHtml(opts.rows)}`,
+    footerNote: 'OPERAVA internal notification — do not forward externally',
+  })
+}
+
 export function otpEmailHtml(name: string, purpose: string, code: string) {
   const first = escapeHtml(name.split(' ')[0] || name)
-  return `<!DOCTYPE html><html><body style="margin:0;background:#f7f6fb;padding:24px;font-family:Arial,Helvetica,sans-serif;color:#1c1333">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center">
-  <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden">
-    <tr><td style="padding:28px 32px 8px;text-align:center"><img src="https://www.operavaglobal.com/operava-logo.svg" alt="OPERAVA" width="48" height="48" style="display:inline-block"/></td></tr>
-    <tr><td style="padding:8px 32px 0;text-align:center;font-size:12px;letter-spacing:.16em;font-weight:700;color:#6d28d9">OPERAVA</td></tr>
-    <tr><td style="padding:16px 32px 0;text-align:center;font-size:22px;font-weight:700">Verify your email</td></tr>
-    <tr><td style="padding:16px 32px;font-size:14px;line-height:1.6;color:#4b445c">Hello ${first},<br/><br/>We received a request to verify your email address for your:<br/><strong>${escapeHtml(purpose)}</strong></td></tr>
-    <tr><td style="padding:8px 32px 20px;text-align:center"><div style="display:inline-block;letter-spacing:10px;font-size:32px;font-weight:700;color:#1c1333">${escapeHtml(code)}</div><div style="margin-top:8px;font-size:12px;color:#6b6478">This code expires in 10 minutes.</div></td></tr>
-    <tr><td style="padding:0 32px 28px;font-size:12px;line-height:1.6;color:#6b6478">For your security, do not share this code with anyone. If you did not make this request, you may safely ignore this email.<br/><br/>Need assistance? Contact OPERAVA Support.<br/>© OPERAVA. All rights reserved.</td></tr>
-  </table></td></tr></table></body></html>`
+  return brandedEmailShell({
+    eyebrow: 'Email verification',
+    title: 'Verify your email',
+    introHtml: `<p style="margin:0 0 12px;">Hello ${first},</p>
+      <p style="margin:0;">Use this one-time code to verify your email for your <strong>${escapeHtml(purpose)}</strong>. The code expires in <strong>10 minutes</strong>.</p>`,
+    bodyHtml: `<div style="margin:8px 0 4px;padding:18px;border-radius:14px;background:${BRAND.violetSoft};border:1px solid #DDD6FE;text-align:center;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${BRAND.violet};margin-bottom:8px;">Verification code</div>
+        <div style="font-size:32px;font-weight:700;letter-spacing:0.28em;color:${BRAND.ink};">${escapeHtml(code)}</div>
+      </div>
+      <p style="margin:16px 0 0;font-size:12px;color:${BRAND.muted};">For your security, do not share this code. If you did not request it, you can ignore this email.</p>`,
+    footerNote: 'OPERAVA Global Solutions · Secure verification',
+  })
 }
 
 export function otpEmailText(name: string, purpose: string, code: string) {
@@ -84,7 +260,7 @@ Your verification code is: ${code}
 This code expires in 10 minutes.
 
 Do not share this code. If you did not request it, ignore this email.
-OPERAVA`
+OPERAVA · www.operavaglobal.com`
 }
 
 export async function sendResend(env: FormEnv, payload: Record<string, unknown>) {
