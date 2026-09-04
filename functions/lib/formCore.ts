@@ -1,3 +1,7 @@
+import otpEmailTemplate from '../../Email Notification - OTP Format/otp-email.html'
+import servicesConfirmationTemplate from '../../Email Notification - OTP Format/services-confirmation-email.html'
+import applicationConfirmationTemplate from '../../Email Notification - OTP Format/application-confirmation-email.html'
+
 export type FormType = 'SERVICES' | 'CAREERS' | 'CONTACT'
 
 export interface FormEnv {
@@ -151,6 +155,18 @@ export function brandedEmailShell(options: {
 </html>`
 }
 
+/**
+ * Renders an editable HTML email template (see `Email Notification - OTP Format/`)
+ * by replacing `{{TOKEN}}` placeholders with the given values. Editing the
+ * template files is applied automatically the next time an email is sent.
+ */
+export function renderEmailTemplate(template: string, replacements: Record<string, string>): string {
+  return Object.entries(replacements).reduce(
+    (html, [key, value]) => html.split(`{{${key}}}`).join(value),
+    template,
+  )
+}
+
 export function plainConfirmationEmail(options: {
  title: string
  introHtml: string
@@ -245,12 +261,9 @@ export function clientConfirmationEmail(opts: {
   sourceLabel: string
   rows: Array<{ label: string; value: string }>
 }): string {
-  return plainConfirmationEmail({
-    title: 'WE RECEIVED YOUR INQUIRY',
-    introHtml: `<p>Hi ${escapeHtml(opts.name)},<br></p>
-      <p>Thank you for contacting OPERAVA and for your interest in our services and business solutions.<br></p>
-      <p>We confirm that we have received your service inquiry. Your submitted information has been recorded as follows:<br></p>`,
-    bodyHtml: `${submissionListHtml(opts.name, opts.rows, [
+  return renderEmailTemplate(servicesConfirmationTemplate, {
+    NAME: escapeHtml(opts.name),
+    DETAILS_LIST: submissionListHtml(opts.name, opts.rows, [
       { label: 'Email', keys: ['Email'] },
       { label: 'Phone', keys: ['Phone'] },
       { label: 'Country/Location', keys: ['Country / Location', 'Country'] },
@@ -258,10 +271,8 @@ export function clientConfirmationEmail(opts: {
       { label: 'Service Interested In', keys: ['Service'] },
       { label: 'Inquiry/Project Category', keys: ['Category'] },
       { label: 'Preferred Contact Method', keys: ['Preferred contact', 'Preferred Contact Method'] },
-    ], opts.referenceId)}
-      <p>Your service inquiry will be reviewed by the appropriate OPERAVA team. A member of our Business Development, Client Support, or relevant service team may contact you to discuss your requirements and determine the most suitable solutions for your business or organization.<br></p>
-      <p>Please note that the submission of a service inquiry does not constitute a service agreement, contract, quotation, or guarantee of service availability. Any proposed services, scope of work, pricing, and terms will be discussed and confirmed separately with the appropriate OPERAVA representative.<br></p>
-      <p>Thank you for considering OPERAVA as your business solutions partner. We appreciate your interest and look forward to learning more about your requirements.<br></p>`,
+    ], opts.referenceId),
+    REFERENCE_ID: escapeHtml(opts.referenceId),
   })
 }
 
