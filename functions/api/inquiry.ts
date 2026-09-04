@@ -1,7 +1,7 @@
 import {
   applicantConfirmationEmail,
   clientConfirmationEmail,
-  DEFAULT_RESEND_FROM,
+  sendResend,
   SUPPORT_INBOX,
   type FormEnv,
 } from '../lib/formCore'
@@ -123,27 +123,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const payload: Record<string, unknown> = {
-      from: env.RESEND_FROM || DEFAULT_RESEND_FROM,
       to: [email],
-      reply_to: SUPPORT_INBOX,
       subject,
       html,
       text,
     }
     if (cc.length) payload.cc = cc
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (!res.ok) {
-      const errText = await res.text()
-      console.error('Resend error', res.status, errText)
+    try {
+      await sendResend(env, payload)
+    } catch (err) {
+      console.error('Resend error', err)
       return json({ error: 'Unable to deliver this inquiry.' }, 502)
     }
 
