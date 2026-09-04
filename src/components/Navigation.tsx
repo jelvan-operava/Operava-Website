@@ -12,6 +12,7 @@ export default function Navigation() {
   const location = useLocation()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const mobileRef = useRef<HTMLDivElement>(null)
+  const mobileToggleRef = useRef<HTMLButtonElement>(null)
 
   const navLinks = [
     { label: t('nav.home', 'Home'), href: '/' },
@@ -52,8 +53,17 @@ export default function Navigation() {
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setServicesOpen(false)
+      }
+      if (
+        mobileRef.current &&
+        !mobileRef.current.contains(target) &&
+        mobileToggleRef.current &&
+        !mobileToggleRef.current.contains(target)
+      ) {
+        setMobileOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -63,6 +73,11 @@ export default function Navigation() {
   const isActive = (href: string) => {
     if (href === '/') return location.pathname === '/'
     return location.pathname.startsWith(href)
+  }
+
+  const closeMenus = () => {
+    setMobileOpen(false)
+    setServicesOpen(false)
   }
 
   return (
@@ -101,20 +116,34 @@ export default function Navigation() {
         <div className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) =>
             link.children ? (
-              <div key={link.href} className="relative" ref={dropdownRef}>
+              <div key={link.href} className="relative flex items-center" ref={dropdownRef}>
+                <Link
+                  to={link.href}
+                  onClick={closeMenus}
+                  className={`flex items-center gap-1 pl-3 pr-1 py-2 text-sm font-medium rounded-l-xl transition-all duration-200 ${
+                    isActive(link.href)
+                      ? 'text-violet-700 bg-violet-50'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  {link.label}
+                </Link>
                 <button
                   onClick={() => setServicesOpen((o) => !o)}
                   onKeyDown={(e) => e.key === 'Escape' && setServicesOpen(false)}
                   type="button"
-                  className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
+                  className={`flex items-center pr-3 pl-1 py-2 text-sm font-medium rounded-r-xl transition-all duration-200 ${
                     isActive(link.href)
                       ? 'text-violet-700 bg-violet-50'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                   aria-expanded={servicesOpen}
                   aria-haspopup="true"
+                  aria-label={`Toggle ${link.label} submenu`}
                 >
-                  {link.label}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${servicesOpen ? 'rotate-180' : ''}`}
+                  />
                 </button>
                 {servicesOpen && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 animate-fade-in z-50">
@@ -122,6 +151,7 @@ export default function Navigation() {
                       <Link
                         key={child.href}
                         to={child.href}
+                        onClick={closeMenus}
                         className="flex flex-col gap-0.5 px-4 py-3 rounded-xl hover:bg-violet-50 transition-colors duration-150 group"
                       >
                         <span className="text-sm font-semibold text-gray-900 group-hover:text-violet-700 transition-colors">
@@ -137,6 +167,7 @@ export default function Navigation() {
               <Link
                 key={link.href}
                 to={link.href}
+                onClick={closeMenus}
                 className={`px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive(link.href)
                     ? 'text-violet-700 bg-violet-50'
@@ -155,12 +186,14 @@ export default function Navigation() {
 
           <Link
             to="/services/it"
+            onClick={closeMenus}
             className="text-sm font-medium text-gray-700 hover:text-violet-700 transition-colors duration-200"
           >
             {t('nav.exploreServices', 'Explore Services')}
           </Link>
           <Link
             to="/contact"
+            onClick={closeMenus}
             className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-violet-700 rounded-xl hover:bg-violet-800 active:scale-95 transition-all duration-200 shadow-sm"
           >
             <span>{t('nav.talkToUs', 'Talk to Us')}</span>
@@ -172,6 +205,7 @@ export default function Navigation() {
         <div className="flex items-center gap-2 lg:hidden">
           <LanguageSwitcher variant="desktop" />
           <button
+            ref={mobileToggleRef}
             onClick={() => setMobileOpen((o) => !o)}
             type="button"
             className="p-2 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors"
@@ -193,22 +227,33 @@ export default function Navigation() {
             {navLinks.map((link) =>
               link.children ? (
                 <div key={link.href}>
-                  <button
-                    onClick={() => setServicesOpen((o) => !o)}
-                    type="button"
-                    className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-gray-800 rounded-xl hover:bg-gray-50"
-                  >
-                    <span>{link.label}</span>
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-200 ${servicesOpen ? 'rotate-180 text-violet-700' : ''}`}
-                    />
-                  </button>
+                  <div className="flex items-center w-full rounded-xl hover:bg-gray-50">
+                    <Link
+                      to={link.href}
+                      onClick={closeMenus}
+                      className="flex-1 px-4 py-3 text-sm font-medium text-gray-800"
+                    >
+                      {link.label}
+                    </Link>
+                    <button
+                      onClick={() => setServicesOpen((o) => !o)}
+                      type="button"
+                      className="px-4 py-3"
+                      aria-expanded={servicesOpen}
+                      aria-label={`Toggle ${link.label} submenu`}
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform duration-200 ${servicesOpen ? 'rotate-180 text-violet-700' : ''}`}
+                      />
+                    </button>
+                  </div>
                   {servicesOpen && (
                     <div className="pl-4 flex flex-col gap-1 mt-1">
                       {link.children.map((child) => (
                         <Link
                           key={child.href}
                           to={child.href}
+                          onClick={closeMenus}
                           className="px-4 py-2.5 text-sm text-gray-700 rounded-xl hover:bg-violet-50 hover:text-violet-700 transition-colors"
                         >
                           {child.label}
@@ -221,6 +266,7 @@ export default function Navigation() {
                 <Link
                   key={link.href}
                   to={link.href}
+                  onClick={closeMenus}
                   className={`px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
                     isActive(link.href) ? 'text-violet-700 bg-violet-50 font-semibold' : 'text-gray-800 hover:bg-gray-50'
                   }`}
@@ -238,6 +284,7 @@ export default function Navigation() {
             <div className="pt-2 flex flex-col gap-3">
               <Link
                 to="/contact"
+                onClick={closeMenus}
                 className="flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-violet-700 rounded-xl hover:bg-violet-800 transition-colors shadow-sm"
               >
                 <span>{t('nav.talkToUs', 'Talk to Us')}</span>
