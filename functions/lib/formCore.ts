@@ -131,11 +131,13 @@ export function brandedEmailShell(options: {
         <!-- Footer -->
         <tr>
           <td style="padding:18px 28px 24px;background:${BRAND.violetSoft};border-top:1px solid #EDE9FE;">
-            <p style="margin:0 0 6px;font-size:12px;color:${BRAND.muted};">${footerNote || 'OPERAVA Global Solutions · Philippine-based · Remote & global delivery'}</p>
+            <p style="margin:0 0 10px;font-size:12px;line-height:1.5;color:${BRAND.muted};">You received this email because you submitted an inquiry or application on our website. If you did not submit an inquiry or application, please reply to this email.</p>
             <p style="margin:0;font-size:12px;">
-              <a href="https://www.operavaglobal.com" style="color:${BRAND.violet};text-decoration:none;font-weight:600;">www.operavaglobal.com</a>
+              <span style="color:${BRAND.muted};font-weight:600;">OPERAVA Global Solutions</span>
               <span style="color:#C4B5FD;"> · </span>
-              <a href="https://www.operavaglobal.com/contact" style="color:${BRAND.violet};text-decoration:none;">Contact</a>
+              <a href="https://www.operavaglobal.com/terms" style="color:${BRAND.violet};text-decoration:none;">Terms</a>
+              <span style="color:#C4B5FD;"> · </span>
+              <a href="https://www.operavaglobal.com" style="color:${BRAND.violet};text-decoration:none;">www.operavaglobal.com</a>
               <span style="color:#C4B5FD;"> · </span>
               <a href="https://www.operavaglobal.com/privacy" style="color:${BRAND.violet};text-decoration:none;">Privacy</a>
             </p>
@@ -183,9 +185,8 @@ export function clientConfirmationEmail(opts: {
 }): string {
   return brandedEmailShell({
     eyebrow: 'Confirmation',
-    title: 'Inquiry Confirmation',
-    introHtml: `<p style="margin:0 0 12px;">Hi ${escapeHtml(opts.name)},</p>
-      <p style="margin:0 0 12px;">Thank you for submitting your inquiry. The team will get in touch with you as soon as possible.</p>
+    title: 'Thank you for your inquiry',
+    introHtml: `<p style="margin:0 0 12px;">Thank you for submitting your inquiry. The team will get in touch with you as soon as possible.</p>
       <p style="margin:0;">Client Support Team,<br/>Operava Global Solutions</p>`,
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
@@ -205,9 +206,8 @@ export function applicantConfirmationEmail(opts: {
 }): string {
   return brandedEmailShell({
     eyebrow: 'Confirmation',
-    title: 'Application Confirmation',
-    introHtml: `<p style="margin:0 0 12px;">Hi ${escapeHtml(opts.name)},</p>
-      <p style="margin:0 0 12px;">Thank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.</p>
+    title: 'Thank you for your application',
+    introHtml: `<p style="margin:0 0 12px;">Thank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.</p>
       <p style="margin:0;">Talent Acquisition Team,<br/>Operava Global Solutions</p>`,
     bodyHtml: `${referenceBadgeHtml(opts.referenceId)}
       <p style="margin:12px 0 0;font-size:13px;color:${BRAND.muted};">Source: ${escapeHtml(opts.sourceLabel)} · Confirmed for ${escapeHtml(opts.email)}</p>
@@ -244,9 +244,8 @@ export function otpEmailHtml(name: string, purpose: string, code: string) {
   const first = escapeHtml(name.split(' ')[0] || name)
   return brandedEmailShell({
     eyebrow: 'Email verification',
-    title: 'Verify your email',
-    introHtml: `<p style="margin:0 0 12px;">Hello ${first},</p>
-      <p style="margin:0;">Use this one-time code to verify your email for your <strong>${escapeHtml(purpose)}</strong>. The code expires in <strong>10 minutes</strong>.</p>`,
+    title: 'Your verification code',
+    introHtml: `<p style="margin:0;">Use this one-time code to verify your email for your <strong>${escapeHtml(purpose)}</strong>. The code expires in <strong>10 minutes</strong>.</p>`,
     bodyHtml: `<div style="margin:8px 0 4px;padding:18px;border-radius:14px;background:${BRAND.violetSoft};border:1px solid #DDD6FE;text-align:center;">
         <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${BRAND.violet};margin-bottom:8px;">Verification code</div>
         <div style="font-size:32px;font-weight:700;letter-spacing:0.28em;color:${BRAND.ink};">${escapeHtml(code)}</div>
@@ -256,10 +255,9 @@ export function otpEmailHtml(name: string, purpose: string, code: string) {
   })
 }
 
-export function otpEmailText(name: string, purpose: string, code: string) {
-  return `Hello ${name.split(' ')[0] || name},
+export function otpEmailText(_name: string, purpose: string, code: string) {
+  return `Your verification code for ${purpose} is: ${code}
 
-Verify your email for: ${purpose}
 Your verification code is: ${code}
 This code expires in 10 minutes.
 
@@ -278,7 +276,6 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     body: JSON.stringify({
       from: env.RESEND_FROM || DEFAULT_RESEND_FROM,
       ...payload,
-      reply_to: SUPPORT_INBOX,
     }),
   })
   if (!res.ok) {

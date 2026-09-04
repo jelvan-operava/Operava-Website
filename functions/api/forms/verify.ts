@@ -166,6 +166,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       from: senderFor(formType, env),
       to: [email],
       cc: ccList.length ? ccList : undefined,
+      reply_to: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
       subject,
       html,
       text,

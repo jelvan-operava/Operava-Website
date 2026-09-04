@@ -124,6 +124,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     const payload: Record<string, unknown> = {
       from: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
       to: [email],
+      reply_to: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
       subject,
       html,
       text,
