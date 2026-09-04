@@ -1,27 +1,58 @@
 # OPERAVA form email routing
 
-Website inquiries send an AVA-style ticket auto-reply to the person who submitted the form. Staff inboxes are CC'd so the same confirmation already sits in our mailbox.
+## Primary website forms (OTP path)
 
-Ticket IDs match AVA chat generation: `OPV-######`.
+Contact, Quote/Services, and Careers pages use `OperavaIntakeForm` → `/api/forms/start` (OTP) → `/api/forms/verify`.
+
+After the applicant/client verifies their email:
+
+1. **Confirmation email** is sent **to the submitter**
+2. **Staff are CC’d** on that same confirmation
+3. A second **staff-only** notification is also sent with the full payload
+
+| Form type | Auto-reply To | CC / staff |
+|---|---|---|
+| CONTACT | submitter | `CLIENT_INBOX` (default `hello@operavaglobal.com`) |
+| SERVICES | submitter | `SALES_INBOX` or `CLIENT_INBOX` |
+| CAREERS | submitter | `TALENT_INBOX` + `HR_INBOX` |
+
+Ticket / reference IDs use `OPERAVA-SER-########`, `OPERAVA-CAR-########`, or `OPERAVA-CON-########`.
+
+## Legacy / AVA ticket path
+
+`/api/inquiry` and `/api/apply` (used by AVA-style tickets and `submitInquiry`) send confirmation **to the submitter** with staff **CC**:
 
 | Source | Auto-reply To | CC |
 |---|---|---|
-| Contact form, services inquiry, AVA consultation | submitter | `client@operavaglobal.com` |
-| Careers apply form, AVA career interest | submitter | `talents@operavaglobal.com`, `hr@operavaglobal.com` |
+| Contact, services, AVA consultation | submitter | `CLIENT_INBOX` |
+| Careers apply, AVA career interest | submitter | `TALENT_INBOX`, `HR_INBOX`, optional `APPLICANT_CC` |
 
-Client and applicant confirmation copy is different. Reply-To is the staff inbox so answers land with the team.
+Ticket IDs: `OPV-######`.
 
-## Cloudflare Pages secrets
+Reply-To is the staff inbox so replies land with the team.
+
+## Cloudflare Pages secrets & bindings
 
 Set these on the production Pages project:
 
-- `RESEND_API_KEY`
-- `RESEND_FROM` = `OPERAVA Website <noreply@operavaglobal.com>`
-- `CLIENT_INBOX` = `client@operavaglobal.com`
+**Secrets / vars**
+- `RESEND_API_KEY` (required for all email)
+- `RESEND_FROM` = `OPERAVA <noreply@operavaglobal.com>`
+- `CLIENT_INBOX` = `hello@operavaglobal.com`
+- `SALES_INBOX` = `hello@operavaglobal.com`
 - `TALENT_INBOX` = `talents@operavaglobal.com`
 - `HR_INBOX` = `hr@operavaglobal.com`
 - `APPLICANT_CC` (optional, comma-separated extra CCs for career tickets)
-- `GEMINI_API_KEY` (optional, AVA)
+- `OTP_SECRET` (preferred for OTP hashing; falls back to RESEND_API_KEY)
 - `NODE_VERSION` = `20`
 
+**Bindings**
+- `AI` — Workers AI (AVA chat → `@cf/meta/llama-3.3-70b-instruct-fp8-fast`)
+- `SUBMISSIONS_DB` — D1 (`operava-submissions`)
+- `RESUMES_BUCKET` — R2 (`operava-resumes`)
+
 Verify `noreply@operavaglobal.com` (or the RESEND_FROM domain) in Resend before going live.
+
+## AVA chat
+
+Production `/api/chat` uses the Workers AI binding. No Gemini key is required. Client-side `avaConversationEngine` is the offline fallback.

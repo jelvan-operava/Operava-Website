@@ -26,10 +26,10 @@ function clean(value: unknown, max = 2000): string {
 
 function escapeHtml(value: string): string {
   return value
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 }
 
 function row(label: string, value: string): string {
@@ -147,7 +147,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     const isCareer = CAREER_KINDS.has(kind)
-    const clientInbox = env.CLIENT_INBOX || 'client@operavaglobal.com'
+    const clientInbox = env.CLIENT_INBOX || 'hello@operavaglobal.com'
     const talentInbox = env.TALENT_INBOX || 'talents@operavaglobal.com'
     const hrInbox = env.HR_INBOX || 'hr@operavaglobal.com'
     const from = env.RESEND_FROM || 'OPERAVA Website <noreply@operavaglobal.com>'
@@ -162,9 +162,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     }[kind] as string
 
     const cc = uniqueEmails(
-      isCareer
-        ? [talentInbox, hrInbox, ...parseList(env.APPLICANT_CC)]
-        : [clientInbox],
+      isCareer ? [talentInbox, hrInbox, ...parseList(env.APPLICANT_CC)] : [clientInbox],
       email,
     )
     const replyTo = isCareer ? talentInbox : clientInbox
