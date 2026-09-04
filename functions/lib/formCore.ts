@@ -151,6 +151,32 @@ export function brandedEmailShell(options: {
 </html>`
 }
 
+export function plainConfirmationEmail(options: {
+ title: string
+ introHtml: string
+ bodyHtml: string
+}): string {
+ return `<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <title>${escapeHtml(options.title)}</title>
+ </head>
+ <body style="margin:0;padding:0;background:${BRAND.canvas};font-family:Arial,Helvetica,sans-serif;color:${BRAND.body};">
+   <div style="max-width:600px;margin:0 auto;padding:32px 20px;background:${BRAND.white};border:1px solid ${BRAND.line};border-radius:16px;">
+     <h1 style="margin:0 0 16px;font-size:24px;line-height:1.3;color:${BRAND.ink};">${escapeHtml(options.title)}</h1>
+     <div style="font-size:14px;line-height:1.7;color:${BRAND.body};">${options.introHtml}</div>
+     <div style="font-size:14px;line-height:1.7;color:${BRAND.body};">${options.bodyHtml}</div>
+     <p style="margin:24px 0 0;font-size:14px;line-height:1.7;color:${BRAND.body};">
+       Best regards,<br />
+       <strong>OPERAVA Global Solutions</strong>
+     </p>
+   </div>
+ </body>
+</html>`
+}
+
 export function detailsTableHtml(rows: Array<{ label: string; value: string }>): string {
   const cells = rows
     .filter((r) => r.value)
@@ -207,8 +233,7 @@ export function clientConfirmationEmail(opts: {
   sourceLabel: string
   rows: Array<{ label: string; value: string }>
 }): string {
-  return brandedEmailShell({
-    eyebrow: 'WE RECEIVED YOUR INQUIRY',
+  return plainConfirmationEmail({
     title: 'WE RECEIVED YOUR INQUIRY',
     introHtml: `<p>Hi ${escapeHtml(opts.name)},<br></p>
       <p>Thank you for contacting OPERAVA and for your interest in our services and business solutions.<br></p>
@@ -236,8 +261,7 @@ export function applicantConfirmationEmail(opts: {
   sourceLabel: string
   rows: Array<{ label: string; value: string }>
 }): string {
-  return brandedEmailShell({
-    eyebrow: 'WE RECEIVED YOUR APPLICATION',
+  return plainConfirmationEmail({
     title: 'WE RECEIVED YOUR APPLICATION',
     introHtml: `<p>Hi ${escapeHtml(opts.name)},<br></p>
       <p>Thank you for contacting OPERAVA and for your interest in our opportunities.<br></p>
