@@ -146,13 +146,6 @@ export default function CareerCard({
     )
   }
 
-  /*
-   * Physical card flip (portrait):
-   * - Outer .operava-flip-scene keeps exact X/Y footprint (no translate)
-   * - .operava-flip-inner only rotates rotateY around center
-   * - Front + back are absolute inset-0, identical size
-   * - backface-visibility hides the reverse face
-   */
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
@@ -176,7 +169,6 @@ export default function CareerCard({
           }
         }}
       >
-        {/* FRONT — original career card design + smaller Apply + circle */}
         <div
           className="operava-flip-face operava-flip-face-front operava-card-frame group flex flex-col items-center justify-between"
           aria-hidden={flipped}
@@ -205,27 +197,10 @@ export default function CareerCard({
             ) : null}
           </div>
 
-          <div className="relative z-10 w-full flex flex-col items-center flex-1">
-            <h3 className="operava-card-title line-clamp-2 min-h-[3.25rem] flex items-center justify-center text-center">
+          <div className="relative z-10 w-full flex flex-col items-center flex-1 justify-center">
+            <h3 className="operava-card-title line-clamp-2 min-h-[3.25rem] flex items-center justify-center text-center mb-0">
               {career.title}
             </h3>
-
-            <p className="operava-card-description line-clamp-3 min-h-[3.75rem] text-center">
-              {career.summary || career.desc}
-            </p>
-
-            {career.assignments && career.assignments.length > 0 && (
-              <ul className="flex flex-wrap justify-center gap-1.5 mb-5 w-full">
-                {career.assignments.slice(0, 3).map((cap, i) => (
-                  <li
-                    key={i}
-                    className="px-2.5 py-1 text-xs font-medium bg-white/10 text-white/90 rounded-lg border border-white/15 backdrop-blur-xs transition-colors"
-                  >
-                    {cap}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
 
           <div className="relative z-10 mt-auto w-full flex items-center gap-2">
@@ -258,7 +233,6 @@ export default function CareerCard({
           </div>
         </div>
 
-        {/* BACK — same footprint; meaning / assignments */}
         <div
           className="operava-flip-face operava-flip-face-back operava-card-frame flex flex-col items-stretch justify-between overflow-hidden"
           aria-hidden={!flipped}
@@ -289,7 +263,7 @@ export default function CareerCard({
               </button>
             </div>
 
-            <p className="text-xs text-[#e2dbff] leading-relaxed mb-3 shrink-0 line-clamp-4">
+            <p className="text-xs text-[#e2dbff] leading-relaxed mb-3 shrink-0">
               {career.summary || career.desc}
             </p>
 
@@ -310,6 +284,17 @@ export default function CareerCard({
                 </ul>
               </div>
             )}
+
+            <p className="text-[10px] text-violet-200/80 leading-snug mt-3 shrink-0">
+              Candidates may be assigned to related tasks based on skills, client needs, assessments, and specialization track.{' '}
+              <Link
+                to="/terms#section-5"
+                onClick={(e) => e.stopPropagation()}
+                className="underline font-semibold text-violet-100 hover:text-white"
+              >
+                Terms Section 5
+              </Link>
+            </p>
 
             <button
               type="button"
