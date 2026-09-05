@@ -3,14 +3,23 @@ import { useEffect, useRef, useState } from 'react'
 interface Props {
   maskedEmail: string
   draftId: string
+  devCode?: string
   onVerified: (result: { referenceId: string; name: string; formType: string }) => void
   onChangeEmail: () => void
   onBack: () => void
   onDraftIdChange?: (draftId: string) => void
 }
 
-export default function OtpVerify({ maskedEmail, draftId: initialDraftId, onVerified, onChangeEmail, onBack, onDraftIdChange }: Props) {
-  const [digits, setDigits] = useState(['', '', '', '', '', ''])
+export default function OtpVerify({
+  maskedEmail,
+  draftId: initialDraftId,
+  devCode,
+  onVerified,
+  onChangeEmail,
+  onBack,
+  onDraftIdChange,
+}: Props) {
+  const [digits, setDigits] = useState(devCode && devCode.length === 6 ? devCode.split('') : ['', '', '', '', '', ''])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [seconds, setSeconds] = useState(45)

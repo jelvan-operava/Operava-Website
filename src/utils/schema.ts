@@ -317,7 +317,7 @@ export function getFaqItemsForPath(pathname: string): FAQItem[] {
       },
       {
         q: 'What positions does OPERAVA actively recruit for?',
-        a: 'We hire Software Developers, Full-Stack Engineers, Customer Service Executives, Technical Support Representatives, Business Operations Specialists, and QA Engineers.',
+        a: 'We recruit across three executive positions: OPERAVA Technology Executive, OPERAVA Business Operations Executive, and OPERAVA Customer Experience Executive.',
       },
     ]
   }

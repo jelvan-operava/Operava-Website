@@ -20,12 +20,18 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 import OperavaIntakeForm from '../components/forms/OperavaIntakeForm'
+import {
+  CAREER_OPENINGS,
+  type CareerPosition,
+} from '../data/careersData'
 
 export default function Careers() {
   const { t } = useLanguage()
   const [searchParams] = useSearchParams()
   const [selectedTrack, setSelectedTrack] = useState<string>('all')
-  const [selectedRole, setSelectedRole] = useState<string>(searchParams.get('role') || 'General application')
+  const [selectedRole, setSelectedRole] = useState<string>(
+    searchParams.get('role') || 'OPERAVA Technology Executive'
+  )
 
   useEffect(() => {
     const role = searchParams.get('role')
@@ -45,40 +51,63 @@ export default function Careers() {
 
   const executiveTracks = [
     {
-      id: 'tech-exec', code: 'tech', title: 'OPERAVA Technology Executive', shortTitle: 'Technology Executive', icon: Cpu,
-      summary: 'Assigned to IT, cloud, web, software, application, systems, database, programming, or other related technology functions.',
-      assignments: ['Cloud & DevOps (AWS, Azure, GCP, Kubernetes)', 'Full-Stack Web & Mobile Software Development', 'Application Systems & API Architecture', 'Database Management & Programming', 'IT Infrastructure, Systems Administration & Cybersecurity'],
+      id: 'tech-exec',
+      code: 'tech',
+      title: 'OPERAVA Technology Executive' as CareerPosition,
+      shortTitle: 'Technology Executive',
+      icon: Cpu,
+      summary: 'May be assigned to specific related tasks on available posts or based on your skills in software engineering, web/mobile development, cloud systems, or technical infrastructure.',
+      assignments: [
+        'Full-Stack Web & Mobile Software Development',
+        'Cloud Infrastructure, DevOps & Architecture (AWS, GCP, Azure)',
+        'Backend Microservices & API Engineering',
+        'Database Architecture & Administration',
+        'QA Engineering, Testing & Systems Security',
+      ],
     },
     {
-      id: 'cx-exec', code: 'cx', title: 'OPERAVA Customer Service Executive', shortTitle: 'Customer Service Executive', icon: Headphones,
-      summary: 'Assigned to voice, chat, email, customer support, account support, technical help desk, or other related customer-service functions.',
-      assignments: ['24/7 Inbound & Outbound Voice Communications', 'Live Chat & Real-Time Digital Resolution', 'Omnichannel Email & Ticket Desk Support', 'Enterprise Client Account Support & Retention', 'Tier 1 & Tier 2 Technical Help Desk Triage'],
+      id: 'ops-exec',
+      code: 'ops',
+      title: 'OPERAVA Business Operations Executive' as CareerPosition,
+      shortTitle: 'Business Operations Executive',
+      icon: FileSpreadsheet,
+      summary: 'May be assigned to specific related tasks on available posts or based on your skills in HR, accounting and finance, recruitment, training and development, or business operations.',
+      assignments: [
+        'Human Resources (HR) Operations & People Care',
+        'Accounting, Bookkeeping & Financial Reporting',
+        'Talent Acquisition, Recruitment & Sourcing',
+        'Training, Upskilling & Professional Development',
+        'Audited Data Processing, Records & Workflow Administration',
+      ],
     },
     {
-      id: 'ops-exec', code: 'ops', title: 'OPERAVA Business Operations Executive', shortTitle: 'Business Operations Executive', icon: FileSpreadsheet,
-      summary: 'Assigned to HR operations, accounting support, finance operations, data processing, administrative operations, or other related functions.',
-      assignments: ['HR Operations, Talent Acquisition & People Care', 'Accounting Support, Bookkeeping & Invoicing', 'FinTech & Finance Operations (KYC / AML Screening)', 'Audited Data Processing, Entry & Verification', 'Executive & Administrative Business Workflows'],
+      id: 'cx-exec',
+      code: 'cx',
+      title: 'OPERAVA Customer Experience Executive' as CareerPosition,
+      shortTitle: 'Customer Experience Executive',
+      icon: Headphones,
+      summary: 'May be assigned to specific related tasks on available posts or based on your skills in customer care, technical help desk, omnichannel communication, or client account management.',
+      assignments: [
+        'Omnichannel Support (Live Chat, Email & Ticket Resolution)',
+        'High-Touch Inbound & Outbound Voice Communications',
+        'Technical Help Desk & Incident Triage (Tier 1 & Tier 2)',
+        'Customer Success, Onboarding & Client Retention',
+        'Escalation Management, CSAT Monitoring & Quality Assurance',
+      ],
     },
   ]
 
   const hiringStages = [
-    { step: '01', title: 'Initial / AI-Assisted Interview', desc: 'Rapid interactive evaluation assessing candidate background, technical literacy, and communication profile.' },
-    { step: '02', title: 'Skills or Role Assessment', desc: 'Hands-on practical tests tailored to software, customer support scenarios, or operational accuracy benchmarks.' },
+    { step: '01', title: 'Initial / AI-Assisted Evaluation', desc: 'Rapid interactive evaluation assessing candidate background, technical literacy, and communication profile.' },
+    { step: '02', title: 'Skills & Specialization Assessment', desc: 'Hands-on practical tests tailored to software, customer support scenarios, or operational accuracy benchmarks.' },
     { step: '03', title: 'Talent Acquisition Interview', desc: 'In-depth discussion with OPERAVA talent specialists to align career goals and workforce competency tracks.' },
     { step: '04', title: 'Client Alignment Interview', desc: 'Direct match and interview with partner client leadership for dedicated project onboarding.' },
     { step: '05', title: 'Engagement Documentation', desc: 'Final selection, structured onboarding documentation, hardware provisioning, and project commencement.' },
   ]
 
-  const roles = [
-    { id: 'r1', title: 'OPERAVA Technology Executive — Cloud & DevOps', track: 'tech', location: 'Remote / Hybrid (PH)', level: 'Senior', type: 'Full-time', desc: 'Assigned to cloud application environments, AWS/GCP infrastructure, Kubernetes orchestration, and continuous deployment systems.', image: 'https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?auto=format&fit=crop&w=400&q=80' },
-    { id: 'r2', title: 'OPERAVA Technology Executive — Software & Full-Stack Development', track: 'tech', location: 'Remote', level: 'Mid–Senior', type: 'Full-time', desc: 'Assigned to web and mobile software development, API microservices architecture, and enterprise digital platform engineering.', image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80' },
-    { id: 'r3', title: 'OPERAVA Customer Service Executive — Omnichannel & Voice Support', track: 'cx', location: 'Remote / Philippines', level: 'Entry–Mid', type: 'Full-time (24/7 Shifts)', desc: 'Assigned to high-touch voice communications, live chat resolution, and tier-1 customer assistance for global commercial clients.', image: 'https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?auto=format&fit=crop&w=400&q=80' },
-    { id: 'r4', title: 'OPERAVA Customer Service Executive — Technical Help Desk & Account Support', track: 'cx', location: 'Remote / Philippines', level: 'Mid', type: 'Full-time', desc: 'Assigned to tier-2 incident triage, software customer support tickets, client account care, and multi-channel help desk workflows.', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80' },
-    { id: 'r5', title: 'OPERAVA Business Operations Executive — FinTech, KYC & Compliance Support', track: 'ops', location: 'Philippines / Remote', level: 'Entry–Mid', type: 'Full-time', desc: 'Assigned to finance operations, identity verification, accounting support, and auditable data validation for international platforms.', image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80' },
-    { id: 'r6', title: 'OPERAVA Business Operations Executive — HR & Talent Operations', track: 'ops', location: 'Philippines', level: 'Mid–Senior', type: 'Full-time', desc: 'Assigned to HR operations, administrative workflows, talent acquisition, and workforce management across global engagements.', image: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&w=400&q=80' },
-  ]
+  const roles = CAREER_OPENINGS
 
-  const filteredRoles = selectedTrack === 'all' ? roles : roles.filter((role) => role.track === selectedTrack)
+  const filteredRoles = selectedTrack === 'all' ? roles : roles.filter((role) => role.code === selectedTrack)
 
   const perks = [
     { title: t('careers.perk1.title', 'Flexible Remote Work'), desc: t('careers.perk1.desc', 'Work from home or access our modern collaboration hubs across the Philippines.'), icon: Users },
@@ -124,9 +153,11 @@ export default function Careers() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-bold uppercase tracking-wider mb-3">
               <Layers className="w-3.5 h-3.5" /><span>Workforce Architecture</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight mb-4">Generalist and Specialist Workforce Model</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight mb-4">
+              3 Available Executive Careers
+            </h2>
             <p className="text-base text-gray-600 leading-relaxed font-normal">
-              OPERAVA utilizes broad professional executive titles designed to balance agile multi-domain capabilities with high-precision specialization. Actual assignments are dynamically matched to client specifications, candidate experience, demonstrated competencies, and structured training tracks.
+              OPERAVA offers career positions across three core executive tracks. Candidates may be assigned to specific related tasks on available posts or based on your skills, demonstrated competencies, and chosen specialization.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -139,7 +170,7 @@ export default function Careers() {
                     <h3 className="text-xl font-bold text-gray-900 tracking-tight mb-3">{exec.title}</h3>
                     <p className="text-sm text-gray-600 leading-relaxed mb-6 font-normal">{exec.summary}</p>
                     <div className="border-t border-gray-100 pt-5 mb-6">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Potential Functions & Assignments:</h4>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Potential Tasks &amp; Focus Areas:</h4>
                       <ul className="space-y-2">
                         {exec.assignments.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-xs text-gray-700"><CheckCircle2 className="w-3.5 h-3.5 text-violet-600 shrink-0 mt-0.5" /><span>{item}</span></li>
@@ -148,7 +179,7 @@ export default function Careers() {
                     </div>
                   </div>
                   <button onClick={() => { setSelectedTrack(exec.code); document.getElementById('openings')?.scrollIntoView({ behavior: 'smooth' }) }} className="w-full py-3 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-800 text-xs font-bold transition-colors inline-flex items-center justify-center gap-2">
-                    <span>View {exec.shortTitle} Roles</span><ArrowRight className="w-3.5 h-3.5" />
+                    <span>View {exec.shortTitle} Role</span><ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               )
@@ -158,8 +189,8 @@ export default function Careers() {
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0"><Scale className="w-5 h-5" /></div>
               <div className="text-sm text-gray-600 space-y-3 leading-relaxed">
-                <h4 className="text-base font-bold text-gray-900">Assignment Terms & Position Governance</h4>
-                <p>These titles are intentionally broad. Employees will not necessarily perform every function associated with a position. Actual assignments depend on client requirements, education, experience, demonstrated competency, assessments, training, and project requirements.</p>
+                <h4 className="text-base font-bold text-gray-900">Task Assignments &amp; Position Governance</h4>
+                <p>Candidates and employees may be assigned to specific related tasks on available posts or based on their skills, qualifications, client specifications, assessments, and chosen specialization track.</p>
                 <div className="pt-2"><Link to="/terms#section-5" className="inline-flex items-center gap-1 text-xs font-bold text-violet-700 hover:text-violet-900 underline"><span>Read full Terms Section 5</span><ArrowRight className="w-3 h-3" /></Link></div>
               </div>
             </div>
@@ -191,7 +222,7 @@ export default function Careers() {
       <section className="py-20 bg-gray-50/70 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-bold uppercase tracking-wider mb-2"><ClipboardCheck className="w-3.5 h-3.5" /><span>Assessment & Selection</span></div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-bold uppercase tracking-wider mb-2"><ClipboardCheck className="w-3.5 h-3.5" /><span>Assessment &amp; Selection</span></div>
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">Transparent 5-Stage Hiring Journey</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
@@ -214,35 +245,54 @@ export default function Careers() {
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-violet-700 block mb-2">Join Our Talent Roster</span>
               <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">{t('careers.openingsTitle', 'Current Openings')}</h2>
             </div>
-            <div className="text-sm text-gray-500"><span className="font-bold text-violet-700">{filteredRoles.length} Active Positions</span> · Global & Philippines Applicants Welcome</div>
+            <div className="text-sm text-gray-500"><span className="font-bold text-violet-700">{filteredRoles.length} Active Positions</span> · Global &amp; Philippines Applicants Welcome</div>
           </div>
           <div className="flex flex-wrap items-center gap-2 mb-8">
-            {(['all', 'tech', 'cx', 'ops'] as const).map((track) => (
-              <button key={track} onClick={() => setSelectedTrack(track)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === track ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-                {track === 'all' ? `All Roles (${roles.length})` : track === 'tech' ? `Technology (${roles.filter((r) => r.track === 'tech').length})` : track === 'cx' ? `Customer Service (${roles.filter((r) => r.track === 'cx').length})` : `Business Ops (${roles.filter((r) => r.track === 'ops').length})`}
-              </button>
-            ))}
+            <button
+              onClick={() => setSelectedTrack('all')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === 'all' ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              All Available Positions ({roles.length})
+            </button>
+            <button
+              onClick={() => setSelectedTrack('tech')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === 'tech' ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              Technology Executive ({roles.filter((r) => r.code === 'tech').length})
+            </button>
+            <button
+              onClick={() => setSelectedTrack('ops')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === 'ops' ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              Business Operations Executive ({roles.filter((r) => r.code === 'ops').length})
+            </button>
+            <button
+              onClick={() => setSelectedTrack('cx')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === 'cx' ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              Customer Experience Executive ({roles.filter((r) => r.code === 'cx').length})
+            </button>
           </div>
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {filteredRoles.map((role) => (
-              <div key={role.id} className="p-6 rounded-3xl bg-white border border-gray-200 hover:border-violet-300 hover:shadow-lg transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 group">
+              <div key={role.id} className="p-6 sm:p-8 rounded-3xl bg-white border border-gray-200 hover:border-violet-300 hover:shadow-lg transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 group">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 border border-gray-100 hidden sm:block"><img src={role.image} alt={role.title} className="w-full h-full object-cover" /></div>
+                  <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-gray-100 hidden sm:block"><img src={role.image} alt={role.title} className="w-full h-full object-cover" /></div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-violet-700 transition-colors">{role.title}</h3>
-                    <p className="text-xs sm:text-sm text-gray-500 max-w-2xl mb-2">{role.desc}</p>
+                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-violet-700 transition-colors">{role.title}</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 max-w-2xl my-2 leading-relaxed">{role.desc}</p>
                     <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
-                      <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{role.location}</span><span>•</span>
-                      <span className="flex items-center gap-1"><Briefcase className="w-3.5 h-3.5" />{role.type}</span><span>•</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{role.level}</span>
+                      <span className="flex items-center gap-1 font-medium text-gray-500"><MapPin className="w-3.5 h-3.5 text-violet-600" />{role.location}</span><span>•</span>
+                      <span className="flex items-center gap-1 font-medium text-gray-500"><Briefcase className="w-3.5 h-3.5 text-violet-600" />{role.type}</span><span>•</span>
+                      <span className="flex items-center gap-1 font-medium text-gray-500"><Clock className="w-3.5 h-3.5 text-violet-600" />{role.level}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <button onClick={() => handleApply(role.title)} className="inline-flex items-center gap-2 px-6 py-3 text-xs font-bold text-white bg-violet-700 rounded-xl hover:bg-violet-800 active:scale-95 transition-all shadow-sm">
-                    <Send className="w-3.5 h-3.5" /><span>Quick Apply</span>
+                  <button onClick={() => handleApply(role.title)} className="inline-flex items-center gap-2 px-6 py-3.5 text-xs font-bold text-white bg-violet-700 rounded-xl hover:bg-violet-800 active:scale-95 transition-all shadow-sm">
+                    <Send className="w-3.5 h-3.5" /><span>Apply for this Role</span>
                   </button>
-                  <Link to={`/apply?role=${encodeURIComponent(role.title)}`} className="inline-flex items-center px-4 py-3 text-xs font-semibold text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">Full form</Link>
+                  <Link to={`/apply?role=${encodeURIComponent(role.title)}`} className="inline-flex items-center px-4 py-3.5 text-xs font-semibold text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">Direct Link</Link>
                 </div>
               </div>
             ))}
@@ -273,10 +323,10 @@ export default function Careers() {
 
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4 tracking-tight">{t('cta.title', "Don't see a role that fits?")}</h2>
-          <p className="text-base text-gray-500 mb-8 max-w-xl mx-auto">We are constantly scouting for exceptional talent across our broad executive tracks. Submit a general application below.</p>
-          <button type="button" onClick={() => handleApply('General application')} className="inline-flex items-center gap-2 px-8 py-4 text-sm font-bold text-white bg-violet-700 rounded-2xl hover:bg-violet-800 active:scale-95 transition-all shadow-lg shadow-violet-700/25">
-            <span>Send General Application</span><ArrowRight className="w-4 h-4" />
+          <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4 tracking-tight">Ready to Submit Your Application?</h2>
+          <p className="text-base text-gray-500 mb-8 max-w-xl mx-auto">Select from our 3 available executive titles and specify your skills specialization in the application form below.</p>
+          <button type="button" onClick={() => handleApply('OPERAVA Technology Executive')} className="inline-flex items-center gap-2 px-8 py-4 text-sm font-bold text-white bg-violet-700 rounded-2xl hover:bg-violet-800 active:scale-95 transition-all shadow-lg shadow-violet-700/25">
+            <span>Start Application</span><ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </section>
@@ -288,7 +338,7 @@ export default function Careers() {
             <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Submit your application</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
               Email verification is required. After you verify, Talent and HR receive your application and you get a branded confirmation with a reference number.
-              {selectedRole && selectedRole !== 'General application' ? (
+              {selectedRole ? (
                 <span className="block mt-2 font-semibold text-violet-800">Applying for: {selectedRole}</span>
               ) : null}
             </p>
@@ -304,3 +354,4 @@ export default function Careers() {
     </main>
   )
 }
+

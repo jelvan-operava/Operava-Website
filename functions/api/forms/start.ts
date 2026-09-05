@@ -10,6 +10,7 @@ import {
   otpEmailText,
   purposeLabel,
   sendResend,
+  resolveSecret,
   OTP_RESEND_FROM,
   type FormEnv,
   type FormType,
@@ -75,8 +76,10 @@ async function issueSignedDraft(
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY) return json({ error: 'Email delivery is not configured.' }, 503)
-    const secret = env.OTP_SECRET || env.RESEND_API_KEY
+    if (!env.RESEND_API_KEY && process.env.NODE_ENV === 'production') {
+      return json({ error: 'Email delivery is not configured.' }, 503)
+    }
+    const secret = resolveSecret(env)
     const body = (await request.json()) as Record<string, unknown>
     if (clean(body.website, 80)) return json({ ok: true, draftId: 'filtered', maskedEmail: 'hidden' })
 
@@ -144,15 +147,25 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       }
     }
 
-    await sendResend(env, {
-      from: OTP_RESEND_FROM,
-      to: [email],
-      subject: 'Operava Notification',
-      html: otpEmailHtml(name, purposeLabel(formType), code),
-      text: otpEmailText(name, purposeLabel(formType), code),
-    })
+    if (env.RESEND_API_KEY) {
+      await sendResend(env, {
+        from: 'Operava Notification <notification-noreply@operavaglobal.com>',
+        to: [email],
+        subject: 'Operava Notification',
+        html: otpEmailHtml(name, purposeLabel(formType), code),
+        text: otpEmailText(name, purposeLabel(formType), code),
+      })
+    } else {
+      console.warn(`[DEV MODE] RESEND_API_KEY not configured. Verification code for ${email}: ${code}`)
+    }
 
-    return json({ ok: true, draftId, maskedEmail: maskEmail(email), expiresInSec: 600 })
+    return json({
+      ok: true,
+      draftId,
+      maskedEmail: maskEmail(email),
+      expiresInSec: 600,
+      ...(process.env.NODE_ENV !== 'production' && !env.RESEND_API_KEY ? { devCode: code } : {}),
+    })
   } catch (err) {
     console.error('form start failed', err)
     return json({ error: 'Unable to start verification.' }, 500)

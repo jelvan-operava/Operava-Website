@@ -344,3 +344,48 @@ export const AVA_INDUSTRIES = [
   'Small and Medium Enterprises (SMEs)',
   'Enterprise Organizations',
 ]
+
+export const AVA_CAREER_POSITIONS = [
+  {
+    title: 'OPERAVA Technology Executive',
+    description: 'May assign to specific related tasks on available posts or based on your skills in software engineering, cloud infrastructure, web and mobile platforms, and technical architecture.',
+    specializations: [
+      'Full-Stack Software Engineering',
+      'Front-End Web & Mobile Development',
+      'Back-End & API Engineering',
+      'Cloud Architecture & DevOps',
+      'Database Administration & Data Engineering',
+      'Systems Integration & Automation',
+      'Quality Assurance & Automated Testing',
+      'UI/UX Technical Design & Prototyping',
+    ],
+  },
+  {
+    title: 'OPERAVA Business Operations Executive',
+    description: 'May assign to specific related tasks on available posts or based on your skills in HR operations, accounting and finance, recruitment, training, and operational workflows.',
+    specializations: [
+      'Human Resources (HR) & People Operations',
+      'Accounting & Financial Operations',
+      'Talent Acquisition & Recruitment',
+      'Training & Organizational Development',
+      'Data Processing & Records Administration',
+      'Executive Virtual Assistance & Project Coordination',
+      'Workflow Automation & Business Systems Management',
+      'Compliance & Regulatory Documentation',
+    ],
+  },
+  {
+    title: 'OPERAVA Customer Experience Executive',
+    description: 'May assign to specific related tasks on available posts or based on your skills in customer care, technical troubleshooting, omnichannel communication, and client account support.',
+    specializations: [
+      'Omnichannel Customer Care (Voice, Email, Live Chat)',
+      'Tier 1 & Tier 2 Technical Support',
+      'Customer Success & Client Account Management',
+      'Help Desk & Incident Resolution',
+      'E-Commerce Customer Support & Order Management',
+      'Client Onboarding & Product Guidance',
+      'Billing, Invoicing & Subscription Inquiries',
+      'Quality Assurance & Customer Feedback Monitoring',
+    ],
+  },
+]

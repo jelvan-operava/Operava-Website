@@ -82,30 +82,17 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       rows,
     })
 
+    const bccList = [talentInbox].filter((addr) => addr && addr.toLowerCase() !== email)
+
     try {
       await sendResend(env, {
-        from: APPLICANT_CONFIRMATION_FROM,
+        from: 'Operava Notification <notification-noreply@operavaglobal.com>',
         to: [email],
-        reply_to: TALENT_RESEND_FROM,
+        bcc: bccList.length ? bccList : undefined,
         subject: 'WE RECEIVED YOUR APPLICATION',
         html,
-        text: `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.\n\nTalent Acquisition Team,\nOperava Global Solutions`,
+        text: `CONFIRMATION\n\nHi ${name},\n\nThank you for contacting OPERAVA and for your interest in our opportunities.\n\nWe confirm that we have received your application. Reference: ${ticketId}.\n\nYour application will be reviewed by the appropriate team. If your qualifications match an available position or another suitable opportunity, a member of our Talent Acquisition Team may contact you through your preferred contact method.\n\nRegards,\nTalent Acquisition Team\nOPERAVA Global Solutions\n\nPlease do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.\nwww.operavaglobal.com`,
       })
-      if (staffRecipients.length) {
-        await sendResend(env, {
-          from: TALENT_RESEND_FROM,
-          to: staffRecipients,
-          subject: 'New Application Received',
-          html: staffNotificationEmail({
-            formType: 'CAREERS',
-            referenceId: ticketId,
-            email,
-            submittedAt: new Date().toISOString(),
-            rows,
-          }),
-          text: `A new application has been received. Reference: ${ticketId}`,
-        })
-      }
     } catch (err) {
       console.error('Resend error', err)
       return json({ error: 'Unable to deliver this application.' }, 502)

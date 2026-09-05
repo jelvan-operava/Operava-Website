@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
   X,
   Send,
@@ -16,15 +16,20 @@ import {
   Building2,
   ArrowRight,
   Calendar,
+  FileText,
+  Compass,
 } from 'lucide-react'
 import AvaVideoAvatar from './AvaVideoAvatar'
 import { generateAvaHumanResponse } from '../utils/avaConversationEngine'
+import { detectTopicRoute, type RouteAction } from '../utils/avaRouting'
 
 export interface ChatMessage {
   id: string
   sender: 'ava' | 'user'
   text: string
   timestamp: string
+  routeAction?: RouteAction
+  isRoutingNotice?: boolean
 }
 
 interface QuickTopic {
@@ -38,7 +43,7 @@ const QUICK_TOPICS: QuickTopic[] = [
   { label: 'BPO Operations', query: 'Tell me about OPERAVA BPO and customer operations.', icon: Users },
   { label: 'Company', query: 'Who is OPERAVA and where do you operate from?', icon: Building2 },
   { label: 'Engagement', query: 'How do OPERAVA delivery models work?', icon: Calendar },
-  { label: 'Careers', query: 'What career tracks and benefits does OPERAVA offer?', icon: Briefcase },
+  { label: 'Careers', query: 'What executive positions and skills specializations are available at OPERAVA?', icon: Briefcase },
   { label: 'Hiring steps', query: 'What is the OPERAVA hiring process?', icon: ShieldCheck },
 ]
 
@@ -135,12 +140,15 @@ const WELCOME =
   "Hello. I'm AVA, OPERAVA's business assistant.\n\nI can discuss our IT, software, BPO, and workforce services, how engagements work, and open career tracks. I do not share internal processes, staff records, pricing formulas, or private client information.\n\nIf you want a quotation, use Request a Quote. If you want to apply, use Careers. For anything else, use Contact."
 
 export default function AvaAssistant() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
   const [hasUnread, setHasUnread] = useState(true)
   const [showWelcomeBubble, setShowWelcomeBubble] = useState(true)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [inputText, setInputText] = useState('')
   const [isThinking, setIsThinking] = useState(false)
+  const [isRouting, setIsRouting] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -169,6 +177,14 @@ export default function AvaAssistant() {
     }
     return [initialMessage]
   })
+
+  // Automatically close and hide Ava if the user is already on or navigates to an intake form page
+  useEffect(() => {
+    if (['/quote', '/apply', '/contact'].includes(location.pathname)) {
+      setIsOpen(false)
+      setShowWelcomeBubble(false)
+    }
+  }, [location.pathname, location.search])
 
   useEffect(() => {
     try {
@@ -214,6 +230,46 @@ export default function AvaAssistant() {
     setTimeout(() => inputRef.current?.focus(), 300)
   }
 
+  const autoRouteTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (autoRouteTimerRef.current) {
+        clearTimeout(autoRouteTimerRef.current)
+        autoRouteTimerRef.current = null
+      }
+    }
+  }, [])
+
+  const cancelAutoRoute = () => {
+    if (autoRouteTimerRef.current) {
+      clearTimeout(autoRouteTimerRef.current)
+      autoRouteTimerRef.current = null
+    }
+    setIsRouting(false)
+  }
+
+  /**
+   * Routes the inquirer directly to the target form and automatically closes & hides Ava chat
+   */
+  const handleRoute = (to: string) => {
+    if (autoRouteTimerRef.current) {
+      clearTimeout(autoRouteTimerRef.current)
+      autoRouteTimerRef.current = null
+    }
+    setIsRouting(false)
+    setIsOpen(false)
+    setShowWelcomeBubble(false)
+    navigate(to)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setTimeout(() => {
+      const formEl = document.querySelector('form')
+      if (formEl) {
+        formEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 180)
+  }
+
   const playNotificationSound = () => {
     if (!soundEnabled) return
     try {
@@ -236,7 +292,7 @@ export default function AvaAssistant() {
 
   const handleSendMessage = async (textToSend?: string) => {
     const query = (textToSend || inputText).trim()
-    if (!query || isThinking) return
+    if (!query || isThinking || isRouting) return
 
     const userMsg: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -250,6 +306,41 @@ export default function AvaAssistant() {
     setIsThinking(true)
     playNotificationSound()
 
+    // 1. Detect if query expresses immediate intent to apply, request a quote, contact, or hire
+    const directRoute = detectTopicRoute(query)
+
+    if (directRoute && directRoute.isDirectIntent) {
+      setIsThinking(false)
+      setIsRouting(true)
+      const routingMsg =
+        directRoute.routingMessage ||
+        (directRoute.kind === 'CAREERS'
+          ? `Routing you directly to our verified **Job Application Form** (${directRoute.position || 'Open positions'}) now. Please prepare your details and resume.`
+          : directRoute.kind === 'CONTACT'
+          ? "Routing you directly to our verified **Contact Form** now. Our team will assist you promptly."
+          : `Routing you directly to our verified **Request a Quote Form** (${directRoute.category || 'Services'}) now. Our team will review your project requirements promptly.`)
+
+      const routingAvaMsg: ChatMessage = {
+        id: `ava-${Date.now()}`,
+        sender: 'ava',
+        text: routingMsg,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        routeAction: directRoute,
+        isRoutingNotice: true,
+      }
+
+      setMessages([...updatedMessages, routingAvaMsg])
+      playNotificationSound()
+
+      // Automatically route inquirer and close/hide Ava
+      if (autoRouteTimerRef.current) clearTimeout(autoRouteTimerRef.current)
+      autoRouteTimerRef.current = setTimeout(() => {
+        handleRoute(directRoute.to)
+      }, 1000)
+      return
+    }
+
+    // 2. Informational conversation inquiry
     const historyPayload = updatedMessages.slice(-8).map((m) => ({
       role: m.sender === 'user' ? ('user' as const) : ('model' as const),
       text: m.text,
@@ -270,6 +361,9 @@ export default function AvaAssistant() {
       // local knowledge fallback already set
     }
 
+    // Detect topic route based on query and reply content
+    const topicRoute = directRoute || detectTopicRoute(query, reply)
+
     setMessages((prev) => [
       ...prev,
       {
@@ -277,10 +371,20 @@ export default function AvaAssistant() {
         sender: 'ava',
         text: reply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        routeAction: topicRoute || undefined,
       },
     ])
     setIsThinking(false)
     playNotificationSound()
+
+    // When an inquirer asks about a topic that has a matching form, automatically route them and close/hide Ava
+    if (topicRoute) {
+      setIsRouting(true)
+      if (autoRouteTimerRef.current) clearTimeout(autoRouteTimerRef.current)
+      autoRouteTimerRef.current = setTimeout(() => {
+        handleRoute(topicRoute.to)
+      }, 2500)
+    }
   }
 
   return (
@@ -309,7 +413,14 @@ export default function AvaAssistant() {
 
       <div className="fixed bottom-6 right-6 z-50">
         <button
-          onClick={() => (isOpen ? setIsOpen(false) : handleOpen())}
+          onClick={() => {
+            if (isOpen) {
+              cancelAutoRoute()
+              setIsOpen(false)
+            } else {
+              handleOpen()
+            }
+          }}
           className="group relative block p-0 bg-transparent border-0 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110 active:scale-95"
           aria-label={isOpen ? 'Close AVA Assistant' : 'Open AVA Assistant'}
         >
@@ -356,11 +467,29 @@ export default function AvaAssistant() {
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
-              <button onClick={() => setIsOpen(false)} className="p-1.5 hover:text-white hover:bg-white/10 rounded-lg" aria-label="Close">
+              <button
+                onClick={() => {
+                  cancelAutoRoute()
+                  setIsOpen(false)
+                }}
+                className="p-1.5 hover:text-white hover:bg-white/10 rounded-lg"
+                aria-label="Close"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
+
+          {/* Routing indicator bar */}
+          {isRouting && (
+            <div className="px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-xs font-medium flex items-center justify-between shrink-0 shadow-sm animate-fade-in">
+              <span className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                Opening verified form…
+              </span>
+              <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">Closing Ava chat</span>
+            </div>
+          )}
 
           <div ref={messagesContainerRef} className="flex-1 p-4 overflow-y-auto overscroll-y-contain space-y-4 bg-gray-50/60">
             {messages.map((msg) => (
@@ -372,6 +501,58 @@ export default function AvaAssistant() {
                   }`}
                 >
                   {renderMessageText(msg.text, msg.sender === 'user')}
+
+                  {/* Interactive Topic Route Card */}
+                  {msg.routeAction && (
+                    <div className="mt-3 p-3.5 rounded-2xl bg-gradient-to-br from-violet-50/90 via-purple-50/60 to-indigo-50/60 border border-violet-200/90 shadow-xs">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-violet-600 shrink-0" />
+                            <p className="text-xs font-bold text-gray-950 truncate">{msg.routeAction.title}</p>
+                          </div>
+                          <p className="text-[11px] text-gray-600 mt-0.5 leading-snug">{msg.routeAction.subtitle}</p>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-100 text-violet-800 shrink-0">
+                          {msg.routeAction.kind === 'CAREERS'
+                            ? 'Careers Form'
+                            : msg.routeAction.kind === 'CONTACT'
+                            ? 'Contact Form'
+                            : 'Quote Form'}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRoute(msg.routeAction!.to)}
+                        className="w-full mt-1 px-3.5 py-2 rounded-xl bg-violet-700 hover:bg-violet-800 active:bg-violet-900 text-white text-xs font-semibold shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer group"
+                        aria-label={msg.routeAction.buttonText}
+                      >
+                        <span>{msg.routeAction.buttonText}</span>
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                      </button>
+                      {msg.isRoutingNotice ? (
+                        <div className="mt-2.5 flex items-center justify-center gap-1.5 text-[10px] text-violet-700 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-violet-600 animate-ping" />
+                          <span>Routing to form &amp; closing Ava chat...</span>
+                        </div>
+                      ) : isRouting ? (
+                        <div className="mt-2 flex items-center justify-between text-[10px] text-gray-500 pt-1 border-t border-violet-100/80">
+                          <span className="text-violet-700 font-medium flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
+                            Auto-routing &amp; closing chat in 2s
+                          </span>
+                          <button
+                            type="button"
+                            onClick={cancelAutoRoute}
+                            className="text-gray-500 hover:text-gray-800 underline cursor-pointer"
+                          >
+                            Stay in chat
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+
                   <div className={`flex items-center justify-between text-[10px] pt-1 ${msg.sender === 'user' ? 'text-violet-200' : 'text-gray-400'}`}>
                     <span>{msg.timestamp}</span>
                     {msg.sender === 'ava' && (
@@ -402,8 +583,8 @@ export default function AvaAssistant() {
                 <button
                   key={topic.label}
                   onClick={() => handleSendMessage(topic.query)}
-                  disabled={isThinking}
-                  className="px-2.5 py-1 rounded-full bg-gray-100 hover:bg-violet-100 hover:text-violet-800 text-gray-700 text-[11px] font-medium whitespace-nowrap flex items-center gap-1 disabled:opacity-50"
+                  disabled={isThinking || isRouting}
+                  className="px-2.5 py-1 rounded-full bg-gray-100 hover:bg-violet-100 hover:text-violet-800 text-gray-700 text-[11px] font-medium whitespace-nowrap flex items-center gap-1 disabled:opacity-50 cursor-pointer"
                 >
                   <IconComp className="w-3 h-3 text-violet-600" />
                   <span>{topic.label}</span>
@@ -412,16 +593,34 @@ export default function AvaAssistant() {
             })}
           </div>
 
-          <div className="px-3 pt-2 bg-white flex items-center justify-between text-[10px] text-violet-800">
-            <Link to="/quote" onClick={() => setIsOpen(false)} className="font-semibold hover:underline">
-              Request a Quote
-            </Link>
-            <Link to="/apply" onClick={() => setIsOpen(false)} className="font-semibold hover:underline">
-              Apply
-            </Link>
-            <Link to="/contact" onClick={() => setIsOpen(false)} className="font-semibold hover:underline">
-              Contact
-            </Link>
+          {/* Direct intake form quick routes */}
+          <div className="px-4 py-2 bg-gray-50/90 border-t border-gray-100 flex items-center justify-between text-[11px] shrink-0">
+            <button
+              type="button"
+              onClick={() => handleRoute('/quote')}
+              className="font-semibold text-violet-700 hover:text-violet-900 flex items-center gap-1 cursor-pointer"
+            >
+              <FileText className="w-3 h-3" />
+              <span>Request a Quote</span>
+            </button>
+            <span className="text-gray-300">|</span>
+            <button
+              type="button"
+              onClick={() => handleRoute('/apply')}
+              className="font-semibold text-violet-700 hover:text-violet-900 flex items-center gap-1 cursor-pointer"
+            >
+              <Briefcase className="w-3 h-3" />
+              <span>Apply</span>
+            </button>
+            <span className="text-gray-300">|</span>
+            <button
+              type="button"
+              onClick={() => handleRoute('/contact')}
+              className="font-semibold text-violet-700 hover:text-violet-900 flex items-center gap-1 cursor-pointer"
+            >
+              <Compass className="w-3 h-3" />
+              <span>Contact</span>
+            </button>
           </div>
 
           <div className="p-3 bg-white border-t border-gray-200/80 shrink-0">
@@ -438,13 +637,13 @@ export default function AvaAssistant() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="Ask AVA about OPERAVA…"
-                disabled={isThinking}
+                disabled={isThinking || isRouting}
                 className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-2xl text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-600/20 focus:border-violet-600 disabled:opacity-60"
               />
               <button
                 type="submit"
-                disabled={!inputText.trim() || isThinking}
-                className="w-10 h-10 rounded-2xl bg-violet-700 hover:bg-violet-800 disabled:opacity-40 text-white flex items-center justify-center"
+                disabled={!inputText.trim() || isThinking || isRouting}
+                className="w-10 h-10 rounded-2xl bg-violet-700 hover:bg-violet-800 disabled:opacity-40 text-white flex items-center justify-center cursor-pointer"
                 aria-label="Send message"
               >
                 <Send className="w-4 h-4" />

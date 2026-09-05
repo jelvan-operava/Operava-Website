@@ -14,10 +14,10 @@ type BridgeEnv = FormEnv & { APPLICANT_CC?: string }
 function buildFormEnv(): BridgeEnv {
   return {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
-    RESEND_FROM: process.env.RESEND_FROM,
+    RESEND_FROM: process.env.RESEND_FROM || 'Operava Notification <notification-noreply@operavaglobal.com>',
     OTP_SECRET: process.env.OTP_SECRET,
-    CLIENT_INBOX: process.env.CLIENT_INBOX,
-    TALENT_INBOX: process.env.TALENT_INBOX,
+    CLIENT_INBOX: process.env.CLIENT_INBOX || 'hello@operavaglobal.com',
+    TALENT_INBOX: process.env.TALENT_INBOX || 'talents@operavaglobal.com',
     APPLICANT_CC: process.env.APPLICANT_CC,
   }
 }
@@ -167,14 +167,14 @@ async function startServer() {
       }
       const clientInbox = process.env.CLIENT_INBOX || 'hello@operavaglobal.com'
       const talentInbox = process.env.TALENT_INBOX || 'talents@operavaglobal.com'
-      const from = process.env.RESEND_FROM || 'OPERAVA Website <noreply@operavaglobal.com>'
+      const from = process.env.RESEND_FROM || 'Operava Notification <notification-noreply@operavaglobal.com>'
       const ticketId = `OPV-${Math.floor(100000 + Math.random() * 900000)}`
       const service = clean(body.service, 160)
       const role = clean(body.role, 180)
       const notes = clean(body.notes || body.description, 4000)
-      const cc = uniqueEmails(
+      const bccList = uniqueEmails(
         isCareer
-          ? [talentInbox, ...parseList(process.env.APPLICANT_CC)]
+          ? [talentInbox]
           : [clientInbox],
         email,
       )
@@ -198,6 +198,7 @@ async function startServer() {
         clean(body.timeline, 80) && `Timeline: ${clean(body.timeline, 80)}`,
         role && `Role: ${role}`,
         notes && `Details:\n${notes}`,
+        '\nPlease do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.\nwww.operavaglobal.com',
       ]
         .filter(Boolean)
         .join('\n')
@@ -205,11 +206,10 @@ async function startServer() {
       const payload: Record<string, unknown> = {
         from,
         to: [email],
-        reply_to: isCareer ? talentInbox : clientInbox,
+        bcc: bccList.length ? bccList : undefined,
         subject,
         text,
       }
-      if (cc.length) payload.cc = cc
 
       const sent = await fetch('https://api.resend.com/emails', {
         method: 'POST',

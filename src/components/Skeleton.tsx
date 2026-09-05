@@ -370,7 +370,7 @@ export function CareersRouteSkeleton() {
         </div>
       </section>
 
-      {/* Workforce Model 3 Broad Titles */}
+      {/* Workforce Model 3 Available Titles */}
       <section className="max-w-7xl mx-auto px-6 lg:px-8 space-y-8">
         <div className="space-y-3">
           <Skeleton variant="rounded" className="w-40 h-5 rounded-md" />

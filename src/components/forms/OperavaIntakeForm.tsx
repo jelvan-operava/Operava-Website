@@ -2,6 +2,11 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import OtpVerify from './OtpVerify'
 import FormSuccess from './FormSuccess'
+import {
+  CAREER_POSITIONS,
+  SKILLS_SPECIALIZATIONS,
+  type CareerPosition,
+} from '../../data/careersData'
 
 export type IntakeKind = 'SERVICES' | 'CAREERS' | 'CONTACT'
 
@@ -44,12 +49,20 @@ const GENERAL_SERVICES = [
   'Other Inquiry',
 ]
 
-const POSITIONS = [
-  'OPERAVA Technology Executive',
-  'OPERAVA Customer Service Executive',
-  'OPERAVA Business Operations Executive',
-  'General application',
-]
+function normalizeCareerPosition(raw?: string): CareerPosition {
+  if (!raw) return 'OPERAVA Technology Executive'
+  const lower = raw.toLowerCase()
+  if (lower.includes('customer') || lower.includes('cx') || lower.includes('support') || lower.includes('service')) {
+    return 'OPERAVA Customer Experience Executive'
+  }
+  if (lower.includes('operations') || lower.includes('ops') || lower.includes('hr') || lower.includes('finance') || lower.includes('accounting') || lower.includes('recruitment')) {
+    return 'OPERAVA Business Operations Executive'
+  }
+  if (lower.includes('tech') || lower.includes('software') || lower.includes('developer') || lower.includes('engineer') || lower.includes('cloud')) {
+    return 'OPERAVA Technology Executive'
+  }
+  return 'OPERAVA Technology Executive'
+}
 
 interface Props {
   kind: IntakeKind
@@ -70,6 +83,7 @@ export default function OperavaIntakeForm({
   const [step, setStep] = useState<'form' | 'otp' | 'done'>('form')
   const [draftId, setDraftId] = useState('')
   const [maskedEmail, setMaskedEmail] = useState('')
+  const [devCode, setDevCode] = useState<string | undefined>(undefined)
   const [result, setResult] = useState<{ referenceId: string; name: string; formType: string }>({
     referenceId: '',
     name: '',
@@ -91,7 +105,8 @@ export default function OperavaIntakeForm({
     budget: '',
     websiteUrl: '',
     contactMethod: 'Email',
-    position: defaultPosition || 'General application',
+    position: normalizeCareerPosition(defaultPosition),
+    specialization: '',
     availability: '',
     experience: '',
     education: '',
@@ -104,7 +119,18 @@ export default function OperavaIntakeForm({
   })
 
   useEffect(() => {
-    if (defaultPosition) setForm((prev) => ({ ...prev, position: defaultPosition }))
+    if (defaultPosition) {
+      const normalized = normalizeCareerPosition(defaultPosition)
+      setForm((prev) => ({
+        ...prev,
+        position: normalized,
+        // If current specialization does not exist in new position, reset it
+        specialization:
+          SKILLS_SPECIALIZATIONS[normalized]?.includes(prev.specialization)
+            ? prev.specialization
+            : '',
+      }))
+    }
   }, [defaultPosition])
 
   useEffect(() => {
@@ -137,6 +163,9 @@ export default function OperavaIntakeForm({
     setError('')
     setSending(true)
     try {
+      if (kind === 'CAREERS' && !form.specialization) {
+        throw new Error('Please select a skills specialization from the dropdown.')
+      }
       if (kind === 'CAREERS' && !resumeKey && !form.portfolio.trim()) {
         throw new Error('Upload a resume (PDF/Word) or add a portfolio / LinkedIn URL before continuing.')
       }
@@ -157,10 +186,11 @@ export default function OperavaIntakeForm({
           websiteUrl: form.websiteUrl,
           contactMethod: form.contactMethod,
           position: form.position,
+          specialization: form.specialization,
           availability: form.availability,
           experience: form.experience,
           education: form.education,
-          skills: form.skills,
+          skills: form.specialization + (form.skills.trim() ? ` — Additional: ${form.skills.trim()}` : ''),
           portfolio: form.portfolio,
           additional: form.additional,
           resumeKey,
@@ -173,6 +203,7 @@ export default function OperavaIntakeForm({
       if (!res.ok) throw new Error(data.error || 'Unable to send verification code.')
       setDraftId(data.draftId)
       setMaskedEmail(data.maskedEmail)
+      setDevCode(data.devCode)
       setStep('otp')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to submit.')
@@ -190,6 +221,7 @@ export default function OperavaIntakeForm({
       <OtpVerify
         maskedEmail={maskedEmail}
         draftId={draftId}
+        devCode={devCode}
         onDraftIdChange={setDraftId}
         onVerified={(value) => {
           setResult(value)
@@ -202,7 +234,7 @@ export default function OperavaIntakeForm({
   }
 
   const field = 'w-full px-4 py-3 text-sm border border-gray-200 rounded-xl bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent transition-all'
-  const positionOptions = Array.from(new Set([...(defaultPosition ? [defaultPosition] : []), ...POSITIONS]))
+  const currentSpecializations = SKILLS_SPECIALIZATIONS[form.position as CareerPosition] || []
 
   return (
     <form onSubmit={submit} className="space-y-4 max-w-2xl">
@@ -386,13 +418,53 @@ export default function OperavaIntakeForm({
             <label className="block text-xs font-semibold text-gray-700 mb-1">
               Position Applied For <span className="text-red-500">*</span>
             </label>
-            <select required value={form.position} onChange={set('position')} className={field}>
-              {positionOptions.map((item) => (
+            <select
+              required
+              value={form.position}
+              onChange={(e) => {
+                const newPos = e.target.value as CareerPosition
+                setForm((prev) => ({
+                  ...prev,
+                  position: newPos,
+                  specialization:
+                    SKILLS_SPECIALIZATIONS[newPos]?.includes(prev.specialization)
+                      ? prev.specialization
+                      : '',
+                }))
+              }}
+              className={field}
+            >
+              {CAREER_POSITIONS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
               ))}
             </select>
+            <p className="text-[11px] text-gray-500 mt-1">
+              May be assigned to specific related tasks on available posts or based on your skills and specialization.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Skills Specialization <span className="text-red-500">*</span>
+            </label>
+            <select
+              required
+              value={form.specialization}
+              onChange={set('specialization')}
+              className={field}
+            >
+              <option value="">-- Select Skills Specialization --</option>
+              {currentSpecializations.map((spec) => (
+                <option key={spec} value={spec}>
+                  {spec}
+                </option>
+              ))}
+            </select>
+            <p className="text-[11px] text-gray-500 mt-1">
+              Select your primary domain of expertise. Work assignments will align with available client posts matching this specialization.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -424,13 +496,12 @@ export default function OperavaIntakeForm({
 
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">
-              Skills &amp; Specialization <span className="text-red-500">*</span>
+              Additional Technical Skills, Tools or Certifications (Optional)
             </label>
             <input
-              required
               value={form.skills}
               onChange={set('skills')}
-              placeholder="e.g., React, TypeScript, Cloud Infrastructure, Customer Support, etc."
+              placeholder="e.g., React, TypeScript, AWS, QuickBooks, Zendesk, Salesforce, etc."
               className={field}
             />
           </div>

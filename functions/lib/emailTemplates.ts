@@ -124,7 +124,8 @@ export const servicesConfirmationTemplate = `<!DOCTYPE html>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
                 <tr>
                   <td style="font-size:12px; line-height:1.55; color:#1F2937;">
-                    Best regards,<br>
+                    Regards,<br>
+                    <strong>Client Support Team</strong><br>
                     <strong>OPERAVA Global Solutions</strong>
                   </td>
                 </tr>
@@ -181,6 +182,12 @@ export const servicesConfirmationTemplate = `<!DOCTYPE html>
                     >
                       www.operavaglobal.com
                     </a>
+                  </td>
+                </tr>
+                <!-- NO REPLY NOTICE -->
+                <tr>
+                  <td style="padding:8px 0 0 0; font-family:Arial, Helvetica, sans-serif; font-size:9px; line-height:13.5px; color:#6B7280;">
+                    <em>Please do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.</em>
                   </td>
                 </tr>
                 <!-- CONFIDENTIALITY NOTICE -->
@@ -257,8 +264,8 @@ export const applicationConfirmationTemplate = `<!DOCTYPE html>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
                 <tr>
                   <td style="font-size:12px; line-height:1.55; color:#1F2937;">
-                    Best regards,<br>
-                    <strong>Talent Acquisition Team,</strong><br>
+                    Regards,<br>
+                    <strong>Talent Acquisition Team</strong><br>
                     <strong>OPERAVA Global Solutions</strong>
                   </td>
                 </tr>
@@ -315,6 +322,12 @@ export const applicationConfirmationTemplate = `<!DOCTYPE html>
                     >
                       www.operavaglobal.com
                     </a>
+                  </td>
+                </tr>
+                <!-- NO REPLY NOTICE -->
+                <tr>
+                  <td style="padding:8px 0 0 0; font-family:Arial, Helvetica, sans-serif; font-size:9px; line-height:13.5px; color:#6B7280;">
+                    <em>Please do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.</em>
                   </td>
                 </tr>
                 <!-- CONFIDENTIALITY NOTICE -->

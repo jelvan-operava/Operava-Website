@@ -10,6 +10,7 @@ import {
   makeReference,
   sendResend,
   senderFor,
+  resolveSecret,
   staffNotificationEmail,
   TALENT_RESEND_FROM,
   type FormEnv,
@@ -101,8 +102,10 @@ function payloadRows(payload: Record<string, unknown>): Array<{ label: string; v
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY) return json({ error: 'Email delivery is not configured.' }, 503)
-    const secret = env.OTP_SECRET || env.RESEND_API_KEY || ''
+    if (!env.RESEND_API_KEY && process.env.NODE_ENV === 'production') {
+      return json({ error: 'Email delivery is not configured.' }, 503)
+    }
+    const secret = resolveSecret(env)
     const body = (await request.json()) as { draftId?: string; code?: string }
     const draftId = String(body.draftId || '')
     const code = String(body.code || '').replace(/\D/g, '')
@@ -140,14 +143,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
 
     const rows = payloadRows(payload)
-    const staffInboxes = inboxFor(formType, env).filter((addr) => addr && addr.toLowerCase() !== email.toLowerCase())
-    const ccSeen = new Set<string>()
-    const ccList = staffInboxes.filter((addr) => {
-      const key = addr.toLowerCase()
-      if (key === email.toLowerCase() || ccSeen.has(key)) return false
-      ccSeen.add(key)
-      return true
-    })
     const isCareer = formType === 'CAREERS'
     const sourceLabel =
       formType === 'SERVICES'
@@ -163,31 +158,28 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       : clientConfirmationEmail({ name, email, referenceId, sourceLabel, rows })
 
     const text = isCareer
-      ? `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your application. Our team will review your profile and get in touch with you as soon as possible.\n\nTalent Acquisition Team,\nOperava Global Solutions`
-      : `CONFIRMATION\n\nHi ${name},\n\nThank you for submitting your inquiry. The team will get in touch with you as soon as possible.\n\nClient Support Team,\nOperava Global Solutions`
+      ? `CONFIRMATION\n\nHi ${name},\n\nThank you for contacting OPERAVA and for your interest in our opportunities.\n\nWe confirm that we have received your application. Reference: ${referenceId}.\n\nYour application will be reviewed by the appropriate team. If your qualifications match an available position or another suitable opportunity, a member of our Talent Acquisition Team may contact you through your preferred contact method.\n\nRegards,\nTalent Acquisition Team\nOPERAVA Global Solutions\n\nPlease do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.\nwww.operavaglobal.com`
+      : `CONFIRMATION\n\nHi ${name},\n\nThank you for contacting OPERAVA and for your interest in our services and business solutions.\n\nWe confirm that we have received your service inquiry. Reference: ${referenceId}.\n\nYour service inquiry will be reviewed by the appropriate OPERAVA team. A member of our Business Development, Client Support, or relevant service team may contact you to discuss your requirements.\n\nRegards,\nClient Support Team\nOPERAVA Global Solutions\n\nPlease do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.\nwww.operavaglobal.com`
 
-    await sendResend(env, {
-      from: isCareer ? APPLICANT_CONFIRMATION_FROM : senderFor(formType, env),
-      to: [email],
-      reply_to: isCareer ? TALENT_RESEND_FROM : CLIENT_RESEND_FROM,
-      subject: isCareer ? 'WE RECEIVED YOUR APPLICATION' : 'WE RECEIVED YOUR INQUIRY',
-      html,
-      text,
-    })
-    if (ccList.length) {
+    const bccEmail = isCareer
+      ? (env.TALENT_INBOX || 'talents@operavaglobal.com')
+      : (env.CLIENT_INBOX || 'hello@operavaglobal.com')
+
+    const bccList = [bccEmail].filter((addr) => addr && addr.toLowerCase() !== email.toLowerCase())
+
+    if (env.RESEND_API_KEY) {
       await sendResend(env, {
-        from: senderFor(formType, env),
-        to: ccList,
-        subject: isCareer ? 'New Application Received' : 'New Inquiry Received',
-        html: staffNotificationEmail({
-          formType,
-          referenceId,
-          email,
-          submittedAt: nowIso,
-          rows,
-        }),
+        from: 'Operava Notification <notification-noreply@operavaglobal.com>',
+        to: [email],
+        bcc: bccList.length ? bccList : undefined,
+        subject,
+        html,
         text,
       })
+    } else if (process.env.NODE_ENV !== 'production') {
+      console.warn('[DEV MODE] RESEND_API_KEY not configured. Skipping confirmation email delivery in dev mode.')
+    } else {
+      return json({ error: 'Email delivery is not configured.' }, 503)
     }
 
     return json({ ok: true, referenceId, formType, name })

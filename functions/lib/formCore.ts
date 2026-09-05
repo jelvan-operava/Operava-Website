@@ -16,12 +16,18 @@ export interface FormEnv {
   TALENT_INBOX?: string
 }
 
-export const DEFAULT_RESEND_FROM = 'OPERAVA <notification-noreply@operavaglobal.com>'
-export const OTP_RESEND_FROM = 'OPERAVA <notification-noreply@operavaglobal.com>'
-export const CLIENT_RESEND_FROM = 'OPERAVA <hello@operavaglobal.com>'
-export const TALENT_RESEND_FROM = 'OPERAVA <talents@operavaglobal.com>'
-export const APPLICANT_CONFIRMATION_FROM = 'OPERAVA - Talent Acquisition Team <hello@operavaglobal.com>'
+export const DEFAULT_RESEND_FROM = 'Operava Notification <notification-noreply@operavaglobal.com>'
+export const OTP_RESEND_FROM = 'Operava Notification <notification-noreply@operavaglobal.com>'
+export const NOTIFICATION_NOREPLY_FROM = 'Operava Notification <notification-noreply@operavaglobal.com>'
+export const CLIENT_RESEND_FROM = 'hello@operavaglobal.com'
+export const TALENT_RESEND_FROM = 'talents@operavaglobal.com'
+export const APPLICANT_CONFIRMATION_FROM = 'Operava Notification <notification-noreply@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
+export const DEFAULT_OTP_SECRET = 'operava-form-secret'
+
+export function resolveSecret(env: FormEnv): string {
+  return env.OTP_SECRET || env.RESEND_API_KEY || DEFAULT_OTP_SECRET
+}
 
 export const EMAIL_RE =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
@@ -381,8 +387,7 @@ export function inboxFor(type: FormType, env: FormEnv) {
 }
 
 export function senderFor(type: FormType, env: FormEnv) {
-  if (type === 'CAREERS') return `OPERAVA <${env.TALENT_INBOX || 'talents@operavaglobal.com'}>`
-  return `OPERAVA <${env.CLIENT_INBOX || 'hello@operavaglobal.com'}>`
+  return env.RESEND_FROM || DEFAULT_RESEND_FROM
 }
 
 export function purposeLabel(type: FormType) {

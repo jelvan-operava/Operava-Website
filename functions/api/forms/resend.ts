@@ -6,6 +6,7 @@ import {
   otpEmailText,
   purposeLabel,
   sendResend,
+  resolveSecret,
   OTP_RESEND_FROM,
   type FormEnv,
   type FormType,
@@ -92,8 +93,10 @@ async function issueSignedDraft(
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY) return json({ error: 'Email delivery is not configured.' }, 503)
-    const secret = env.OTP_SECRET || env.RESEND_API_KEY || ''
+    if (!env.RESEND_API_KEY && process.env.NODE_ENV === 'production') {
+      return json({ error: 'Email delivery is not configured.' }, 503)
+    }
+    const secret = resolveSecret(env)
     const body = (await request.json()) as { draftId?: string }
     const draftId = String(body.draftId || '')
     if (!draftId) return json({ error: 'Missing draft.' }, 400)
@@ -121,15 +124,23 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       lastSentAt: now,
     })
 
-    await sendResend(env, {
-      from: OTP_RESEND_FROM,
-      to: [signed.email],
-      subject: 'Operava Notification',
-      html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
-      text: otpEmailText(payloadObj.name || 'there', purposeLabel(signed.formType), code),
-    })
+    if (env.RESEND_API_KEY) {
+      await sendResend(env, {
+        from: 'Operava Notification <notification-noreply@operavaglobal.com>',
+        to: [signed.email],
+        subject: 'Operava Notification',
+        html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
+        text: otpEmailText(payloadObj.name || 'there', purposeLabel(signed.formType), code),
+      })
+    } else {
+      console.warn(`[DEV MODE] RESEND_API_KEY not configured. Resent verification code for ${signed.email}: ${code}`)
+    }
 
-    return json({ ok: true, draftId: newDraftId })
+    return json({
+      ok: true,
+      draftId: newDraftId,
+      ...(process.env.NODE_ENV !== 'production' && !env.RESEND_API_KEY ? { devCode: code } : {}),
+    })
   } catch {
     return json({ error: 'Unable to resend the code.' }, 500)
   }

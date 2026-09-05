@@ -70,21 +70,20 @@ export default function Terms() {
     {
       id: 'section-5',
       num: '5',
-      title: 'GENERALIST AND SPECIALIST WORKFORCE MODEL',
+      title: 'AVAILABLE WORKFORCE EXECUTIVE POSITIONS',
       content: [
-        'OPERAVA may use broad professional titles such as:',
+        'OPERAVA structures workforce opportunities across three available executive positions:',
       ],
       bullets: [
         'OPERAVA Technology Executive',
-        'OPERAVA Customer Service Executive',
         'OPERAVA Business Operations Executive',
+        'OPERAVA Customer Experience Executive',
       ],
       trailingContent: [
-        'These titles are intentionally broad. Employees will not necessarily perform every function associated with a position.',
-        'Actual assignments depend on client requirements, education, experience, demonstrated competency, assessments, training, and project requirements.',
-        'A Business Operations Executive may be assigned to HR operations, accounting support, finance operations, data processing, administrative operations, or another related function.',
-        'A Technology Executive may be assigned to IT, cloud, web, software, application, systems, database, programming, or another related technology function.',
-        'A Customer Service Executive may be assigned to voice, chat, email, customer support, account support, or another related customer-service function.',
+        'Candidates and employees may be assigned to specific related tasks on available posts or based on their skills, qualifications, client requirements, demonstrated competency, assessments, and specialization.',
+        'An OPERAVA Business Operations Executive may be assigned to specific related tasks on available posts or based on skills in HR, accounting and finance, recruitment, training and development, data processing, or related administrative operations.',
+        'An OPERAVA Technology Executive may be assigned to specific related tasks on available posts or based on skills in software engineering, cloud infrastructure, web and mobile systems, programming, or related technology functions.',
+        'An OPERAVA Customer Experience Executive may be assigned to specific related tasks on available posts or based on skills in customer care, technical support, omnichannel communication, client account management, or related customer experience functions.',
       ],
     },
     {

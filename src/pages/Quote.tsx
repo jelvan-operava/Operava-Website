@@ -11,7 +11,11 @@ export default function Quote() {
         <p className="text-sm text-gray-600 mb-8">
           Client inquiries only. Job applications use Careers. Email verification is required before OPERAVA files the request.
         </p>
-        <OperavaIntakeForm kind="SERVICES" defaultService={params.get('service') || undefined} />
+        <OperavaIntakeForm
+          kind="SERVICES"
+          defaultService={params.get('service') || undefined}
+          defaultCategory={params.get('category') || undefined}
+        />
       </div>
     </main>
   )

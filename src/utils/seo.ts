@@ -317,7 +317,7 @@ export function getMetadataForPath(pathname: string): PageMetadata {
         },
         {
           q: 'What roles does OPERAVA actively hire for?',
-          a: 'We hire software engineers, front-end/back-end developers, UI/UX designers, customer service representatives, technical support agents, QA testers, and data specialists.',
+          a: 'We actively recruit across three executive positions: OPERAVA Technology Executive, OPERAVA Business Operations Executive, and OPERAVA Customer Experience Executive.',
         },
       ],
     }
