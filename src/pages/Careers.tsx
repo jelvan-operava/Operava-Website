@@ -145,7 +145,7 @@ export default function Careers() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight mb-4">
-              3 Available Executive Careers
+              Open Executive Careers
             </h2>
             <p className="text-base text-gray-600 leading-relaxed font-normal">
               OPERAVA offers career positions across three core executive tracks. Candidates may be assigned to specific related tasks on available posts or based on your skills, demonstrated competencies, and chosen specialization.
