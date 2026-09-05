@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { MapPin, Briefcase, Clock, Send, ArrowRight, Plus, X } from 'lucide-react'
+import { MapPin, Briefcase, Clock, Send, Plus, X } from 'lucide-react'
 
 export interface CareerCardData {
   id: string
@@ -11,6 +11,7 @@ export interface CareerCardData {
   summary?: string
   desc?: string
   assignments?: string[]
+  qualifications?: string[]
   image?: string
   location?: string
   type?: string
@@ -25,6 +26,8 @@ interface CareerCardProps {
   onApply?: (roleTitle: string) => void
   onSelectTrack?: (trackCode: string) => void
   className?: string
+  isFlipped?: boolean
+  onFlipChange?: (flipped: boolean) => void
 }
 
 export default function CareerCard({
@@ -34,12 +37,20 @@ export default function CareerCard({
   onApply,
   onSelectTrack,
   className = '',
+  isFlipped,
+  onFlipChange,
 }: CareerCardProps) {
   const [imgError, setImgError] = useState(false)
-  const [flipped, setFlipped] = useState(false)
+  const [internalFlipped, setInternalFlipped] = useState(false)
   const IconComponent = career.icon
 
-  const toggleFlip = () => setFlipped((v) => !v)
+  const flipped = typeof isFlipped === 'boolean' ? isFlipped : internalFlipped
+  const setFlipped = (next: boolean | ((prev: boolean) => boolean)) => {
+    const value = typeof next === 'function' ? next(flipped) : next
+    if (onFlipChange) onFlipChange(value)
+    else setInternalFlipped(value)
+  }
+  const toggleFlip = () => setFlipped(!flipped)
 
   if (variant === 'landscape') {
     return (
@@ -58,7 +69,6 @@ export default function CareerCard({
           className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[24px]"
           loading="lazy"
         />
-
         <div className="relative z-10 p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex flex-col sm:flex-row items-start gap-5 flex-1">
             {career.image && !imgError ? (
@@ -76,52 +86,15 @@ export default function CareerCard({
                 <IconComponent className="w-10 h-10 text-violet-300" />
               </div>
             ) : null}
-
             <div className="flex-1">
               <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight group-hover:text-violet-200 transition-colors">
                 {career.title}
               </h3>
-
               <p className="text-xs sm:text-sm text-[#e2dbff] max-w-2xl my-2.5 leading-relaxed font-normal">
                 {career.desc || career.summary}
               </p>
-
-              <div className="flex flex-wrap items-center gap-2 text-xs text-white/90 mt-3">
-                {career.location && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 text-white/90 border border-white/15 backdrop-blur-xs font-medium">
-                    <MapPin className="w-3.5 h-3.5 text-violet-300" />
-                    {career.location}
-                  </span>
-                )}
-                {career.type && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 text-white/90 border border-white/15 backdrop-blur-xs font-medium">
-                    <Briefcase className="w-3.5 h-3.5 text-violet-300" />
-                    {career.type}
-                  </span>
-                )}
-                {career.level && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 text-white/90 border border-white/15 backdrop-blur-xs font-medium">
-                    <Clock className="w-3.5 h-3.5 text-violet-300" />
-                    {career.level}
-                  </span>
-                )}
-              </div>
-
-              {career.assignments && career.assignments.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-3.5">
-                  {career.assignments.slice(0, 3).map((item, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2.5 py-0.5 rounded-md text-[11px] bg-white/10 text-violet-100 border border-white/15 backdrop-blur-xs font-medium"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
-
           <div className="flex sm:flex-row lg:flex-col xl:flex-row items-center gap-3 shrink-0 self-start sm:self-auto">
             <button
               type="button"
@@ -132,7 +105,6 @@ export default function CareerCard({
               <Send className="w-3.5 h-3.5 mr-2 inline-block" />
               <span>Apply for this Role</span>
             </button>
-
             <Link
               to={`/apply?role=${encodeURIComponent(career.title)}`}
               id={`btn-direct-${career.id}`}
@@ -146,6 +118,8 @@ export default function CareerCard({
     )
   }
 
+  const positionLabel = career.shortTitle || career.title
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
@@ -155,20 +129,7 @@ export default function CareerCard({
       id={`career-card-${career.id}`}
       className={`operava-flip-scene w-full ${className}`}
     >
-      <div
-        className={`operava-flip-inner${flipped ? ' is-flipped' : ''}`}
-        role="button"
-        tabIndex={0}
-        aria-pressed={flipped}
-        aria-label={flipped ? `Hide details for ${career.title}` : `Show details for ${career.title}`}
-        onClick={toggleFlip}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            toggleFlip()
-          }
-        }}
-      >
+      <div className={`operava-flip-inner${flipped ? ' is-flipped' : ''}`}>
         <div
           className="operava-flip-face operava-flip-face-front operava-card-frame group flex flex-col items-center justify-between"
           aria-hidden={flipped}
@@ -181,7 +142,7 @@ export default function CareerCard({
             loading="lazy"
           />
 
-          <div className="operava-image-container relative z-10">
+          <div className="operava-image-container relative z-10 flex items-center justify-center !mb-4">
             {career.image && !imgError ? (
               <img
                 src={career.image}
@@ -189,6 +150,7 @@ export default function CareerCard({
                 onError={() => setImgError(true)}
                 referrerPolicy="no-referrer"
                 loading="lazy"
+                className="!object-contain max-h-full max-w-full mx-auto"
               />
             ) : IconComponent ? (
               <div className="relative z-10 flex items-center justify-center p-4">
@@ -197,30 +159,18 @@ export default function CareerCard({
             ) : null}
           </div>
 
-          <div className="relative z-10 w-full flex flex-col items-center flex-1 justify-center">
-            <h3 className="operava-card-title line-clamp-2 min-h-[3.25rem] flex items-center justify-center text-center mb-0">
-              {career.title}
-            </h3>
-          </div>
-
           <div className="relative z-10 mt-auto w-full flex items-center gap-2">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                if (onSelectTrack) onSelectTrack(career.code)
-                if (onApply) onApply(career.title)
-              }}
-              id={`btn-career-${career.id}`}
-              className="operava-learn-more-btn !py-2 !px-3 !text-[11px] !tracking-wide flex-1 flex items-center justify-center gap-1.5"
+            <div
+              className="operava-learn-more-btn !py-2 !px-3 !text-[11px] !tracking-wide flex-1 flex items-center justify-center text-center pointer-events-none select-none cursor-default"
+              aria-hidden="true"
             >
-              <span>Apply</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
+              <span className="line-clamp-1">{positionLabel}</span>
+            </div>
 
             <button
               type="button"
-              aria-label={`Flip card for ${career.title}`}
+              aria-label={flipped ? `Hide details for ${career.title}` : `Show details for ${career.title}`}
+              aria-pressed={flipped}
               onClick={(e) => {
                 e.stopPropagation()
                 toggleFlip()
@@ -228,7 +178,10 @@ export default function CareerCard({
               id={`btn-flip-${career.id}`}
               className="shrink-0 w-9 h-9 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
             >
-              <Plus className="w-4 h-4" strokeWidth={2.5} />
+              <Plus
+                className={`w-4 h-4 transition-transform duration-500 ease-out ${flipped ? 'rotate-45' : 'rotate-0'}`}
+                strokeWidth={2.5}
+              />
             </button>
           </div>
         </div>
@@ -247,9 +200,14 @@ export default function CareerCard({
 
           <div className="relative z-10 w-full h-full flex flex-col min-h-0">
             <div className="flex items-start justify-between gap-2 mb-2 shrink-0">
-              <h3 className="text-base sm:text-lg font-bold text-white leading-snug pr-2 line-clamp-2">
-                {career.shortTitle || career.title}
-              </h3>
+              <div className="pr-2">
+                <h3 className="text-base sm:text-lg font-bold text-white leading-snug line-clamp-2">
+                  {positionLabel}
+                </h3>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-200/90 mt-0.5">
+                  100% Remote
+                </p>
+              </div>
               <button
                 type="button"
                 aria-label="Flip card back"
@@ -263,52 +221,67 @@ export default function CareerCard({
               </button>
             </div>
 
-            <p className="text-xs text-[#e2dbff] leading-relaxed mb-3 shrink-0">
+            <p className="text-xs text-[#e2dbff] leading-relaxed mb-2 shrink-0">
               {career.summary || career.desc}
             </p>
 
-            {career.assignments && career.assignments.length > 0 && (
-              <div className="flex-1 min-h-0 overflow-y-auto pr-1">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-violet-200/90 mb-2">
-                  Assignment meaning
-                </p>
-                <ul className="space-y-1.5">
-                  {career.assignments.map((item, i) => (
-                    <li
-                      key={i}
-                      className="text-[11px] text-white/90 leading-snug pl-2 border-l-2 border-violet-400/50"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-3">
+              {career.assignments && career.assignments.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-violet-200/90 mb-1.5">
+                    Core Remote Assignments
+                  </p>
+                  <ul className="space-y-1">
+                    {career.assignments.map((item, i) => (
+                      <li key={i} className="text-[11px] text-white/90 leading-snug pl-2 border-l-2 border-violet-400/50">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-            <p className="text-[10px] text-violet-200/80 leading-snug mt-3 shrink-0">
-              Candidates may be assigned to related tasks based on skills, client needs, assessments, and specialization track.{' '}
-              <Link
-                to="/terms#section-5"
-                onClick={(e) => e.stopPropagation()}
-                className="underline font-semibold text-violet-100 hover:text-white"
+              {career.qualifications && career.qualifications.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-violet-200/90 mb-1.5">
+                    Qualifications
+                  </p>
+                  <ul className="space-y-1">
+                    {career.qualifications.map((item, i) => (
+                      <li key={i} className="text-[11px] text-white/90 leading-snug pl-2 border-l-2 border-white/25">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-3 shrink-0 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setFlipped(false)
+                  if (onSelectTrack) onSelectTrack(career.code)
+                  if (onApply) onApply(career.title)
+                }}
+                className="operava-learn-more-btn !py-2 !px-3 !text-[10px] !tracking-wide flex-1 flex items-center justify-center"
               >
-                Terms Section 5
-              </Link>
-            </p>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                setFlipped(false)
-                if (onSelectTrack) onSelectTrack(career.code)
-                if (onApply) onApply(career.title)
-              }}
-              className="operava-learn-more-btn relative z-10 mt-3 shrink-0 !py-2 !px-3 !text-[11px] !tracking-wide w-full flex items-center justify-center gap-1.5"
-            >
-              <span>Apply</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
+                <span className="line-clamp-1">Apply Remotely — {positionLabel}</span>
+              </button>
+              <button
+                type="button"
+                aria-label="Flip card back"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setFlipped(false)
+                }}
+                className="shrink-0 w-9 h-9 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80"
+              >
+                <Plus className="w-4 h-4 rotate-45" strokeWidth={2.5} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
