@@ -312,12 +312,14 @@ video {
   text-align: center;
 }
 
+/* Learn More / Apply — transparent bg, black text, purple accent (no solid embed fill) */
 .operava-learn-more-btn {
   width: 100%;
   padding: 13px;
-  background-color: #ffffff;
-  border: 1px solid #ffffff;
-  color: #5e42be;
+  background-color: transparent;
+  background-image: none;
+  border: 1px solid #6D28D9;
+  color: #000000;
   font-size: 14px;
   font-weight: 700;
   border-radius: 8px;
@@ -329,13 +331,15 @@ video {
   align-items: center;
   justify-content: center;
   text-decoration: none;
+  box-shadow: none;
 }
 
 .operava-learn-more-btn:hover {
-  background-color: #4a32a3;
-  color: #ffffff;
-  border-color: #4a32a3;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  background-color: transparent;
+  background-image: none;
+  color: #6D28D9;
+  border-color: #6D28D9;
+  box-shadow: none;
 }
 
 /* ── LANDSCAPE SHELL CARD (Cloudinary only — no purple fill or borders) ── */
@@ -398,10 +402,7 @@ video {
   transform: scale(1.06);
 }
 
-/* ── PHYSICAL 3D CARD FLIP (career portrait) ──
-   Outer scene holds exact layout footprint.
-   Inner rotates only rotateY around center — no translate.
-   Both faces absolute, identical size, backface-hidden. */
+/* ── PHYSICAL 3D CARD FLIP (career portrait) ── */
 .operava-flip-scene {
   position: relative;
   width: 100%;
