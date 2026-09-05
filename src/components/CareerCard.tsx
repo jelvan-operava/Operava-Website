@@ -128,14 +128,14 @@ export default function CareerCard({
       transition={{ duration: 0.45, delay: (index % 4) * 0.08 }}
       id={`career-card-${career.id}`}
       className={`operava-flip-scene w-full ${className}`}
-      style={{ minHeight: 640 }}
     >
       <div
         className={`operava-flip-inner${flipped ? ' is-flipped' : ''}`}
-        style={{ minHeight: 640, cursor: 'default' }}
+        style={{ cursor: 'default' }}
       >
+        {/* FRONT — original card size; model fills with ~5px inset; controls overlay feet */}
         <div
-          className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group flex flex-col items-center !p-3 h-full"
+          className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group relative flex flex-col !p-[5px] h-full overflow-hidden"
           aria-hidden={flipped}
         >
           <img
@@ -146,7 +146,8 @@ export default function CareerCard({
             loading="lazy"
           />
 
-          <div className="operava-career-model-stage relative z-10 flex-1 w-full min-h-[480px] flex items-center justify-center overflow-hidden px-1 pt-1 pb-1">
+          {/* Model fills available area inside 5px inset; does not grow the card */}
+          <div className="relative z-10 flex-1 w-full min-h-0 overflow-hidden rounded-[14px]">
             {career.image && !imgError ? (
               <img
                 src={career.image}
@@ -154,18 +155,19 @@ export default function CareerCard({
                 onError={() => setImgError(true)}
                 referrerPolicy="no-referrer"
                 loading="lazy"
-                className="w-full h-full max-w-full max-h-full object-contain object-center block"
+                className="absolute inset-0 w-full h-full object-contain object-center block"
               />
             ) : IconComponent ? (
-              <div className="relative z-10 flex items-center justify-center p-4">
+              <div className="absolute inset-0 flex items-center justify-center p-4">
                 <IconComponent className="w-20 h-20 text-violet-300" />
               </div>
             ) : null}
           </div>
 
-          <div className="relative z-10 mt-auto w-full flex items-center gap-2 shrink-0">
+          {/* Overlay bottom of webp to cover foot cut; + inset from card edge */}
+          <div className="absolute z-20 left-[10px] right-[14px] bottom-[10px] flex items-center gap-2">
             <div
-              className="operava-learn-more-btn !py-2 !px-3 !text-[11px] !tracking-wide flex-1 flex items-center justify-center text-center pointer-events-none select-none cursor-default"
+              className="operava-learn-more-btn !py-2 !px-3 !text-[11px] !tracking-wide flex-1 flex items-center justify-center text-center pointer-events-none select-none cursor-default shadow-md"
               aria-hidden="true"
             >
               <span className="line-clamp-1">{positionLabel}</span>
