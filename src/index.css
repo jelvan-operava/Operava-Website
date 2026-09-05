@@ -227,29 +227,27 @@ video {
   }
 }
 
-/* ── SERVICE CARD REFERENCE STYLES (Cloudinary Operava Contents Card Shell) ── */
+/* ── SERVICE / CAREER PORTRAIT SHELL (Cloudinary only — no purple fill or borders) ── */
 .operava-card-frame {
   position: relative;
-  background-color: #240e48;
-  background-image: url('https://res.cloudinary.com/b5i5bwwa/image/upload/Operava-contents-card.png');
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: transparent;
+  background-image: none;
   border-radius: 20px;
   padding: 26px 22px 24px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 15px 40px rgba(25, 9, 58, 0.35);
-  border: 1px solid rgba(138, 92, 246, 0.22);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow: none;
+  border: none;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .operava-card-frame:hover {
   transform: translateY(-5px);
-  box-shadow: 0 22px 50px rgba(35, 11, 75, 0.48);
-  border-color: rgba(168, 85, 247, 0.45);
+  box-shadow: none;
+  border-color: transparent;
 }
 
 .operava-image-container {
@@ -341,33 +339,30 @@ video {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* ── OPERAVA LANDSCAPE SHELL CARD (Cloudinary Shell_card.png) ── */
+/* ── LANDSCAPE SHELL CARD (Cloudinary only — no purple fill or borders) ── */
 .operava-landscape-card-frame {
   position: relative;
-  background-color: #240e48;
-  background-image: url('https://res.cloudinary.com/b5i5bwwa/image/upload/v1788593069/Shell_card.png');
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: transparent;
+  background-image: none;
   border-radius: 24px;
   box-sizing: border-box;
-  box-shadow: 0 15px 40px rgba(25, 9, 58, 0.35);
-  border: 1px solid rgba(138, 92, 246, 0.25);
+  box-shadow: none;
+  border: none;
   overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .operava-landscape-card-frame:hover {
   transform: translateY(-4px);
-  box-shadow: 0 22px 50px rgba(35, 11, 75, 0.48);
-  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: none;
+  border-color: transparent;
 }
 
 .operava-landscape-image-container {
   border-radius: 16px;
   overflow: hidden;
   position: relative;
-  background-color: rgba(36, 14, 72, 0.6);
+  background-color: transparent;
   background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.06) 30%, transparent 60%);
   background-size: 100% 100%;
   background-position: center;

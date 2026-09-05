@@ -165,7 +165,7 @@ export default function Careers() {
               />
             ))}
           </div>
-          <div className="operava-landscape-card-frame relative rounded-3xl p-6 sm:p-8 shadow-xl border border-violet-500/25 overflow-hidden">
+          <div className="operava-landscape-card-frame relative rounded-3xl p-6 sm:p-8 overflow-hidden">
             <img
               src="https://res.cloudinary.com/b5i5bwwa/image/upload/v1788593069/Shell_card.png"
               alt=""
@@ -216,8 +216,7 @@ export default function Careers() {
             {hiringStages.map((stage, i) => (
               <div
                 key={stage.step}
-                className="relative overflow-hidden rounded-2xl p-6 min-h-[220px] flex flex-col border border-violet-500/25 shadow-lg"
-                style={{ backgroundColor: '#240e48' }}
+                className="relative overflow-hidden rounded-2xl p-6 min-h-[220px] flex flex-col bg-transparent border-0 shadow-none"
               >
                 <img
                   src="https://res.cloudinary.com/b5i5bwwa/image/upload/v1788594538/Shell_card3.png"
