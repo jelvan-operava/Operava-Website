@@ -15,6 +15,18 @@
   --color-violet-900: #4C1D95;
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Slightly smaller type scale site-wide */
+  --text-xs: 0.7rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.175rem;
+  --text-2xl: 1.35rem;
+  --text-3xl: 1.6rem;
+  --text-4xl: 1.85rem;
+  --text-5xl: 2.25rem;
+  --text-6xl: 2.75rem;
 }
 
 *, *::before, *::after {
@@ -23,6 +35,7 @@
 
 html {
   scroll-behavior: smooth;
+  font-size: 93.75%; /* 15px root — scales rem-based titles & body */
 }
 
 [dir="rtl"] {
@@ -36,6 +49,8 @@ body {
   background-color: #ffffff;
   color: #111111;
   overflow-x: hidden;
+  font-size: 0.9375rem;
+  line-height: 1.55;
 }
 
 /* Hide scrollbar by default, show on scroll */
@@ -295,7 +310,7 @@ video {
 
 .operava-card-title {
   color: #ffffff;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   margin: 0 0 10px 0;
   text-transform: capitalize;
@@ -306,7 +321,7 @@ video {
 
 .operava-card-description {
   color: #e2dbff;
-  font-size: 14px;
+  font-size: 12.5px;
   line-height: 1.55;
   margin: 0 0 24px 0;
   text-align: center;
@@ -314,11 +329,11 @@ video {
 
 .operava-learn-more-btn {
   width: 100%;
-  padding: 13px;
+  padding: 11px;
   background-color: #ffffff;
   border: 1px solid #ffffff;
   color: #5e42be;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   border-radius: 8px;
   cursor: pointer;
