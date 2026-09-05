@@ -1,28 +1,25 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
-  Briefcase,
-  MapPin,
-  Sparkles,
-  Users,
-  Building2,
-  HeartHandshake,
   ArrowRight,
-  Cpu,
+  Wifi,
+  Laptop,
   Headphones,
-  FileSpreadsheet,
+  Globe2,
+  ShieldCheck,
+  Home,
+  Sparkles,
 } from 'lucide-react'
-import { useLanguage } from '../i18n/LanguageContext'
 import OperavaIntakeForm from '../components/forms/OperavaIntakeForm'
 import CareerCard from '../components/CareerCard'
 import { type CareerPosition } from '../data/careersData'
 
 export default function Careers() {
-  const { t } = useLanguage()
   const [searchParams] = useSearchParams()
   const [selectedRole, setSelectedRole] = useState<string>(
     searchParams.get('role') || 'OPERAVA Technology Executive'
   )
+  const [openCardId, setOpenCardId] = useState<string | null>(null)
 
   useEffect(() => {
     const role = searchParams.get('role')
@@ -33,28 +30,29 @@ export default function Careers() {
     }
   }, [searchParams])
 
-  const cultureImages = [
-    { url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80', caption: 'Collaborative Engineering Sprints', tag: 'Engineering' },
-    { url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80', caption: 'Customer Success & Leadership Desks', tag: 'Operations' },
-    { url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=900&q=80', caption: 'Modern Hybrid Office & Tech Facilities', tag: 'Workplace' },
-    { url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=900&q=80', caption: 'Continuous Upskilling & Mentorship Programs', tag: 'Growth' },
-  ]
-
   const executiveTracks = [
     {
       id: 'tech-exec',
       code: 'tech',
       title: 'OPERAVA Technology Executive' as CareerPosition,
       shortTitle: 'Technology Executive',
-      icon: Cpu,
-      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/f_auto,q_auto/v1787278539/software.webp',
-      summary: 'May be assigned to specific related tasks on available posts or based on your skills in software engineering, web/mobile development, cloud systems, or technical infrastructure.',
+      image: 'https://res.cloudinary.com/b5i5bwwa/image/upload/OPERAVA_TECH_1000x1350_v3.webp',
+      summary:
+        'For builders, engineers, and technical problem-solvers. Work remotely on international projects in software engineering, web/mobile development, and cloud systems.',
       assignments: [
-        'Full-Stack Web & Mobile Software Development',
-        'Cloud Infrastructure, DevOps & Architecture (AWS, GCP, Azure)',
-        'Backend Microservices & API Engineering',
+        'Full-Stack Web & Mobile Development',
+        'Cloud Infrastructure, DevOps & Systems Architecture (AWS, GCP, Azure)',
+        'Backend Engineering, Microservices & API Development',
         'Database Architecture & Administration',
-        'QA Engineering, Testing & Systems Security',
+        'QA Engineering, Testing & Cybersecurity',
+      ],
+      qualifications: [
+        "Bachelor's Degree in IT, CS, Engineering or equivalent hands-on experience",
+        'Hands-on experience in at least one: JavaScript/TypeScript, Python, PHP, Java, .NET, React Native, Flutter',
+        'Knowledge of Git, REST APIs, databases (MySQL, PostgreSQL, MongoDB) and Agile workflow',
+        'Familiarity with cloud (AWS/GCP/Azure) is a strong advantage',
+        'Strong problem-solving and English communication skills',
+        'Remote-Ready: Own PC/Laptop, stable internet (50 Mbps+), backup power/internet',
       ],
     },
     {
@@ -62,15 +60,23 @@ export default function Careers() {
       code: 'ops',
       title: 'OPERAVA Business Operations Executive' as CareerPosition,
       shortTitle: 'Business Operations Executive',
-      icon: FileSpreadsheet,
-      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/f_auto,q_auto/v1787258203/backoffice.webp',
-      summary: 'May be assigned to specific related tasks on available posts or based on your skills in HR, accounting and finance, recruitment, training and development, or business operations.',
+      image: 'https://res.cloudinary.com/b5i5bwwa/image/upload/OPERAVA_OPS_1000x1350_v3.webp',
+      summary:
+        'For detail-driven operators and business enablers. Work remotely supporting HR, Finance, Recruitment, and business operations for global companies.',
       assignments: [
-        'Human Resources (HR) Operations & People Care',
-        'Accounting, Bookkeeping & Financial Reporting',
-        'Talent Acquisition, Recruitment & Sourcing',
-        'Training, Upskilling & Professional Development',
-        'Audited Data Processing, Records & Workflow Administration',
+        'Remote HR Operations & People Care',
+        'Remote Accounting, Bookkeeping & Financial Reporting',
+        'Remote Talent Acquisition & Sourcing',
+        'Remote Training & Professional Development Coordination',
+        'Audited Data Processing & Workflow Administration',
+      ],
+      qualifications: [
+        "Bachelor's Degree in Business, HR, Finance, Accountancy, or related field",
+        '1+ year experience in HR, recruitment, bookkeeping, or admin. Strong fresh grads welcome.',
+        'Proficient in Google Workspace / MS Excel, and tools like QuickBooks, Xero, HRIS, or ATS',
+        'High attention to detail, data accuracy, and confidentiality',
+        'Excellent organizational and English communication skills',
+        'Remote-Ready: Own PC/Laptop, stable internet (50 Mbps+), quiet workspace',
       ],
     },
     {
@@ -78,15 +84,23 @@ export default function Careers() {
       code: 'cx',
       title: 'OPERAVA Customer Experience Executive' as CareerPosition,
       shortTitle: 'Customer Experience Executive',
-      icon: Headphones,
-      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/f_auto,q_auto/v1787256801/customer_service.webp',
-      summary: 'May be assigned to specific related tasks on available posts or based on your skills in customer care, technical help desk, omnichannel communication, or client account management.',
+      image: 'https://res.cloudinary.com/b5i5bwwa/image/upload/OPERAVA_CX_1000x1350_v3.webp',
+      summary:
+        'For client-focused communicators and service leaders. Work remotely delivering world-class customer support for international brands.',
       assignments: [
-        'Omnichannel Support (Live Chat, Email & Ticket Resolution)',
-        'High-Touch Inbound & Outbound Voice Communications',
-        'Technical Help Desk & Incident Triage (Tier 1 & Tier 2)',
-        'Customer Success, Onboarding & Client Retention',
-        'Escalation Management, CSAT Monitoring & Quality Assurance',
+        'Omnichannel Support (Live Chat, Email & Ticket Resolution) — Remote',
+        'High-Touch Inbound & Outbound Voice Support — Remote',
+        'Technical Helpdesk & Incident Triage (Tier 1 & 2) — Remote',
+        'Customer Success, Onboarding & Client Retention — Remote',
+        'Escalation Management & Quality Assurance — Remote',
+      ],
+      qualifications: [
+        'At least 1 year in customer service, tech support, or client-facing BPO role',
+        'Excellent English communication — fluent in chat, email, and phone with neutral accent',
+        'Experience with Zendesk, Freshdesk, Intercom, Salesforce, or HubSpot',
+        'Customer-centric, patient, and skilled in de-escalation and CSAT improvement',
+        'Willing to work on US / shifting / night schedules from home',
+        'Remote-Ready: Own PC/Laptop, stable internet (50 Mbps+), noise-canceling headset, quiet workspace, backup power',
       ],
     },
   ]
@@ -99,13 +113,20 @@ export default function Careers() {
     { step: '05', title: 'Engagement Documentation', desc: 'Final selection, structured onboarding documentation, hardware provisioning, and project commencement.' },
   ]
 
-  const perks = [
-    { title: t('careers.perk1.title', 'Remote Work'), desc: t('careers.perk1.desc', 'Work from home or access our modern collaboration hubs across the Philippines.'), icon: Users },
-    { title: t('careers.perk2.title', 'Accelerated Growth & Upskilling'), desc: t('careers.perk2.desc', 'Dedicated budget for certifications, cloud accreditations, and technical mentorship.'), icon: Sparkles },
-    { title: t('careers.perk3.title', 'Comprehensive Healthcare & HMO'), desc: t('careers.perk3.desc', 'Top-tier medical coverage from Day 1 including dependent coverage and wellness benefits.'), icon: HeartHandshake },
-    { title: t('careers.perk4.title', 'Modern Hardware & Tooling Allowance'), desc: t('careers.perk4.desc', 'Company-issued laptops, ergonomic workstation allowances, and modern dev stacks.'), icon: Building2 },
-    { title: t('careers.perk5.title', 'Competitive Global Pay'), desc: t('careers.perk5.desc', 'Market-leading salaries, performance bonuses, night differentials, and 13th month pay.'), icon: Briefcase },
-    { title: t('careers.perk6.title', 'Global Exposure & Impact'), desc: t('careers.perk6.desc', 'Work directly with international clients across North America, Europe, and Asia-Pacific.'), icon: MapPin },
+  const whyRemote = [
+    { title: '100% Work-From-Home', desc: 'Fully remote roles for Philippine-based talent serving international clients.', icon: Home },
+    { title: 'Global Clients', desc: 'Work with organizations across North America, Europe, and Asia-Pacific.', icon: Globe2 },
+    { title: 'Continuous Upskilling', desc: 'Mentorship, certifications, and collaborative engineering sprints.', icon: Sparkles },
+    { title: 'Career Growth Path', desc: 'Performance-based growth with clear specialization tracks.', icon: ShieldCheck },
+  ]
+
+  const remoteRequirements = [
+    'Philippine-based talent, authorized to work remotely',
+    'Own equipment: Laptop/Desktop (i5 gen 8+ / M1+, 8GB RAM min), webcam, headset',
+    'Stable internet connection (50 Mbps minimum) + backup connection/power',
+    'Quiet, professional home office setup',
+    'Strong English proficiency (B2–C1 level) and ability to work independently',
+    'Willing to undergo assessments and client interviews via video call',
   ]
 
   const handleApply = (roleTitle: string) => {
@@ -123,11 +144,15 @@ export default function Careers() {
         </div>
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
           <div className="max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-300 mb-4">100% Remote · Philippine Talent · Global Clients</p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6">
-              {t('careers.title', 'Build your career. Operate in advance.')}
+              Build Your Career. Operate in Advance.
             </h1>
-            <p className="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl font-normal">
-              {t('careers.desc', 'Join a global team delivering mission-critical IT infrastructure, advanced software systems, and high-performance BPO operations worldwide.')}
+            <p className="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl font-normal mb-4">
+              Join a global team powering technology, operations, and business processes for organizations worldwide. All positions are 100% Remote.
+            </p>
+            <p className="text-base text-gray-400 leading-relaxed max-w-2xl">
+              We hire top Filipino talent to work from home for international clients across Technology, Business Operations, and Customer Experience.
             </p>
           </div>
         </div>
@@ -137,10 +162,10 @@ export default function Careers() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight mb-4">
-              Open Executive Careers
+              Open Remote Executive Career Tracks
             </h2>
             <p className="text-base text-gray-600 leading-relaxed font-normal">
-              OPERAVA offers career positions across three core executive tracks. Candidates may be assigned to specific related tasks on available posts or based on your skills, demonstrated competencies, and chosen specialization.
+              Three core remote tracks. Tap the + on a card for core assignments, qualifications, and remote requirements. Final assignments follow verified skills, specialization, assessments, and client needs.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
@@ -151,29 +176,17 @@ export default function Careers() {
                 variant="portrait"
                 index={idx}
                 onApply={handleApply}
+                isFlipped={openCardId === exec.id}
+                onFlipChange={(next) => setOpenCardId(next ? exec.id : null)}
               />
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="py-16 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="mb-10">
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight">Where Talent Meets World-Class Execution</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {cultureImages.map((img, idx) => (
-              <div key={idx} className="group relative h-64 rounded-3xl overflow-hidden shadow-lg border border-gray-100">
-                <img src={img.url} alt={img.caption} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-950/90 via-gray-950/30 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4">
-                  <span className="inline-block px-2.5 py-0.5 rounded-full bg-violet-600/90 text-white text-[10px] font-bold uppercase tracking-wider mb-1">{img.tag}</span>
-                  <p className="text-white text-sm font-semibold leading-snug">{img.caption}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <p className="mt-8 text-sm text-gray-500 max-w-3xl">
+            All roles are fully remote. Final assignments are based on verified skills, specialization, assessment results, and client requirements.{' '}
+            <Link to="/terms#section-5" className="text-violet-700 font-semibold underline">
+              See Terms — Section 5
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -211,14 +224,19 @@ export default function Careers() {
 
       <section className="py-20 bg-gray-950 text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">{t('careers.whyTitle', 'Benefits Built for High Performers')}</h2>
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Why Work Remotely at OPERAVA?</h2>
+            <p className="mt-3 text-sm text-gray-400">
+              100% Work-From-Home · Global Clients · Continuous Upskilling & Mentorship · Collaborative Engineering Sprints · Career Growth Path · Performance-Based Growth
+            </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {perks.map((item, idx) => {
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {whyRemote.map((item, idx) => {
+              const Icon = item.icon
               return (
-                <div key={idx} className="p-8 bg-white/5 border border-white/10 rounded-3xl hover:border-violet-500/40 hover:bg-white/10 transition-all duration-200 group">
-                  <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                <div key={idx} className="p-6 bg-white/5 border border-white/10 rounded-3xl hover:border-violet-500/40 hover:bg-white/10 transition-all duration-200">
+                  <Icon className="w-6 h-6 text-violet-300 mb-3" />
+                  <h3 className="text-base font-bold text-white mb-1.5">{item.title}</h3>
                   <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
                 </div>
               )
@@ -227,12 +245,41 @@ export default function Careers() {
         </div>
       </section>
 
+      <section className="py-16 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="max-w-3xl mb-10">
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Standard Remote Work Requirements</h2>
+            <p className="text-base text-gray-600">Applies to all tracks.</p>
+          </div>
+          <ul className="grid sm:grid-cols-2 gap-4 max-w-4xl">
+            {remoteRequirements.map((req, i) => (
+              <li key={i} className="flex gap-3 items-start text-sm text-gray-700 leading-relaxed">
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-violet-600 shrink-0" />
+                <span>{req}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-8 flex flex-wrap gap-4 text-xs text-gray-500">
+            <span className="inline-flex items-center gap-1.5"><Laptop className="w-3.5 h-3.5" /> Own equipment</span>
+            <span className="inline-flex items-center gap-1.5"><Wifi className="w-3.5 h-3.5" /> 50 Mbps+ internet</span>
+            <span className="inline-flex items-center gap-1.5"><Headphones className="w-3.5 h-3.5" /> Headset & quiet space</span>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4 tracking-tight">Ready to Submit Your Application?</h2>
-          <p className="text-base text-gray-500 mb-8 max-w-xl mx-auto">Select from our 3 available executive titles and specify your skills specialization in the application form below.</p>
-          <button type="button" onClick={() => handleApply('OPERAVA Technology Executive')} className="inline-flex items-center gap-2 px-8 py-4 text-sm font-bold text-white bg-violet-700 rounded-2xl hover:bg-violet-800 active:scale-95 transition-all shadow-lg shadow-violet-700/25">
-            <span>Start Application</span><ArrowRight className="w-4 h-4" />
+          <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4 tracking-tight">Ready to Apply Remotely?</h2>
+          <p className="text-base text-gray-500 mb-8 max-w-xl mx-auto">
+            Choose a track, open the card for qualifications, then submit your application below.
+          </p>
+          <button
+            type="button"
+            onClick={() => handleApply('OPERAVA Technology Executive')}
+            className="inline-flex items-center gap-2 px-8 py-4 text-sm font-bold text-white bg-violet-700 rounded-2xl hover:bg-violet-800 active:scale-95 transition-all shadow-lg shadow-violet-700/25"
+          >
+            <span>Start Application</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </section>
@@ -252,7 +299,11 @@ export default function Careers() {
             <OperavaIntakeForm key={selectedRole} kind="CAREERS" defaultPosition={selectedRole} />
           </div>
           <p className="mt-4 text-xs text-gray-500">
-            Prefer a dedicated page? Continue at <Link to={`/apply?role=${encodeURIComponent(selectedRole)}`} className="text-violet-700 font-semibold underline">/apply</Link>.
+            Prefer a dedicated page? Continue at{' '}
+            <Link to={`/apply?role=${encodeURIComponent(selectedRole)}`} className="text-violet-700 font-semibold underline">
+              /apply
+            </Link>
+            .
           </p>
         </div>
       </section>
