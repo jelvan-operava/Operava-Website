@@ -60,7 +60,6 @@ body {
 }
 
 /* ── STRICT VIDEO & MEDIA CONTROLS SUPPRESSION ── */
-/* Completely hides and disables any native browser play/pause buttons, start playback overlays, and control bars */
 video::-webkit-media-controls,
 video::-webkit-media-controls-play-button,
 video::-webkit-media-controls-start-playback-button,
@@ -397,6 +396,71 @@ video {
 
 .operava-landscape-card-frame:hover .operava-landscape-image-container img {
   transform: scale(1.06);
+}
+
+/* ── PHYSICAL 3D CARD FLIP (career portrait) ──
+   Outer scene holds exact layout footprint.
+   Inner rotates only rotateY around center — no translate.
+   Both faces absolute, identical size, backface-hidden. */
+.operava-flip-scene {
+  position: relative;
+  width: 100%;
+  min-height: 540px;
+  height: 100%;
+  perspective: 1400px;
+  -webkit-perspective: 1400px;
+}
+
+.operava-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 540px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center center;
+  cursor: pointer;
+}
+
+.operava-flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.operava-flip-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-origin: center center;
+  box-sizing: border-box;
+}
+
+.operava-flip-face-front {
+  transform: rotateY(0deg);
+}
+
+.operava-flip-face-back {
+  transform: rotateY(180deg);
+}
+
+/* Hover lift must NOT fight the 3D flip transform */
+.operava-flip-face.operava-card-frame:hover {
+  transform: none;
+}
+.operava-flip-face-front.operava-card-frame:hover {
+  transform: rotateY(0deg);
+}
+.operava-flip-face-back.operava-card-frame:hover {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .operava-flip-inner {
+    transition: none;
+  }
 }
 
 .animate-scale-up {
