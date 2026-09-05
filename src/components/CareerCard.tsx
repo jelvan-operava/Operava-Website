@@ -127,13 +127,13 @@ export default function CareerCard({
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: (index % 4) * 0.08 }}
       id={`career-card-${career.id}`}
-      className={`operava-flip-scene w-full ${className}`}
+      className={`operava-flip-scene w-full max-w-[360px] mx-auto md:max-w-none ${className}`}
     >
       <div
         className={`operava-flip-inner${flipped ? ' is-flipped' : ''}`}
         style={{ cursor: 'default' }}
       >
-        {/* FRONT — original card size; model fills with ~5px inset; controls overlay feet */}
+        {/* FRONT */}
         <div
           className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group relative flex flex-col !p-[5px] h-full overflow-hidden"
           aria-hidden={flipped}
@@ -146,8 +146,8 @@ export default function CareerCard({
             loading="lazy"
           />
 
-          {/* Model fills available area inside 5px inset; does not grow the card */}
-          <div className="relative z-10 flex-1 w-full min-h-0 overflow-hidden rounded-[14px]">
+          {/* Centered model — ~10% larger, clipped to 5px inset */}
+          <div className="relative z-10 flex-1 w-full min-h-0 overflow-hidden rounded-[14px] flex items-center justify-center">
             {career.image && !imgError ? (
               <img
                 src={career.image}
@@ -155,22 +155,25 @@ export default function CareerCard({
                 onError={() => setImgError(true)}
                 referrerPolicy="no-referrer"
                 loading="lazy"
-                className="absolute inset-0 w-full h-full object-contain object-center block"
+                className="block w-full h-full object-contain object-center origin-center scale-[1.1]"
               />
             ) : IconComponent ? (
-              <div className="absolute inset-0 flex items-center justify-center p-4">
+              <div className="flex items-center justify-center p-4">
                 <IconComponent className="w-20 h-20 text-violet-300" />
               </div>
             ) : null}
           </div>
 
-          {/* Overlay bottom of webp to cover foot cut; + inset from card edge */}
-          <div className="absolute z-20 left-[10px] right-[14px] bottom-[10px] flex items-center gap-2">
+          {/*
+            Bottom overlay: centered title + inset +
+            min-height ~40px (~1cm) so the bar covers the foot cut
+          */}
+          <div className="absolute z-20 left-[10px] right-[12px] bottom-[8px] sm:bottom-[10px] flex items-center justify-center min-h-[40px] gap-2">
             <div
-              className="operava-learn-more-btn !py-2 !px-3 !text-[11px] !tracking-wide flex-1 flex items-center justify-center text-center pointer-events-none select-none cursor-default shadow-md"
+              className="operava-learn-more-btn !py-2.5 !px-3 !text-[11px] sm:!text-xs !tracking-wide flex-1 flex items-center justify-center text-center pointer-events-none select-none cursor-default shadow-md min-h-[40px]"
               aria-hidden="true"
             >
-              <span className="line-clamp-1">{positionLabel}</span>
+              <span className="line-clamp-1 text-center w-full">{positionLabel}</span>
             </div>
 
             <button
@@ -182,7 +185,7 @@ export default function CareerCard({
                 toggleFlip()
               }}
               id={`btn-flip-${career.id}`}
-              className="shrink-0 w-9 h-9 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
+              className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
             >
               <Plus
                 className={`w-4 h-4 transition-transform duration-500 ease-out ${flipped ? 'rotate-45' : 'rotate-0'}`}
