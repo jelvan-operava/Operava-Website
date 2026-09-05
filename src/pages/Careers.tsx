@@ -14,9 +14,7 @@ import {
   Cpu,
   Headphones,
   FileSpreadsheet,
-  Layers,
   Scale,
-  ClipboardCheck,
 } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 import OperavaIntakeForm from '../components/forms/OperavaIntakeForm'
@@ -133,10 +131,6 @@ export default function Careers() {
         </div>
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-900/60 border border-violet-500/30 text-violet-300 text-xs font-bold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3.5 h-3.5" />
-              {t('careers.badge', 'Join OPERAVA Global Team')}
-            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6">
               {t('careers.title', 'Build your career. Operate in advance.')}
             </h1>
@@ -150,9 +144,6 @@ export default function Careers() {
       <section className="py-20 lg:py-24 bg-slate-50 border-b border-gray-200/80">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-bold uppercase tracking-wider mb-3">
-              <Layers className="w-3.5 h-3.5" /><span>Workforce Architecture</span>
-            </div>
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight mb-4">
               3 Available Executive Careers
             </h2>
@@ -201,7 +192,6 @@ export default function Careers() {
       <section className="py-16 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="mb-10">
-            <span className="text-xs font-bold uppercase tracking-[0.18em] text-violet-700 block mb-2">Life at OPERAVA</span>
             <h2 className="text-3xl font-black text-gray-900 tracking-tight">Where Talent Meets World-Class Execution</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -222,7 +212,6 @@ export default function Careers() {
       <section className="py-20 bg-gray-50/70 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-violet-100 text-violet-800 text-xs font-bold uppercase tracking-wider mb-2"><ClipboardCheck className="w-3.5 h-3.5" /><span>Assessment &amp; Selection</span></div>
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">Transparent 5-Stage Hiring Journey</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
@@ -242,7 +231,6 @@ export default function Careers() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
             <div>
-              <span className="text-xs font-bold uppercase tracking-[0.18em] text-violet-700 block mb-2">Join Our Talent Roster</span>
               <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">{t('careers.openingsTitle', 'Current Openings')}</h2>
             </div>
             <div className="text-sm text-gray-500"><span className="font-bold text-violet-700">{filteredRoles.length} Active Positions</span> · Global &amp; Philippines Applicants Welcome</div>
@@ -303,7 +291,6 @@ export default function Careers() {
       <section className="py-20 bg-gray-950 text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-violet-400 block mb-2">Why Join OPERAVA</span>
             <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">{t('careers.whyTitle', 'Benefits Built for High Performers')}</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -334,7 +321,6 @@ export default function Careers() {
       <section id="application-form" className="py-20 bg-slate-50 border-t border-gray-200 scroll-mt-20">
         <div className="max-w-3xl mx-auto px-6 lg:px-8">
           <div className="mb-8">
-            <p className="text-xs font-bold uppercase tracking-widest text-violet-700 mb-2">Careers</p>
             <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Submit your application</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
               Email verification is required. After you verify, Talent and HR receive your application and you get a branded confirmation with a reference number.

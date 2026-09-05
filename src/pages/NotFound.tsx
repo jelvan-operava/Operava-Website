@@ -7,7 +7,6 @@ export default function NotFound() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-white pt-16">
       <div className="max-w-md mx-auto px-6 text-center">
-        <p className="text-xs font-semibold tracking-[0.14em] uppercase text-violet-700 mb-4">404</p>
         <h1 className="text-5xl font-black text-gray-900 mb-4">
           {t('notFound.title', 'Page not found.')}
         </h1>

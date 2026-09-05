@@ -30,10 +30,19 @@ export default function ServiceCard({
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: (index % 4) * 0.08 }}
       id={`service-card-${service.slug}`}
-      className={`operava-card-frame group w-full ${className}`}
+      className={`operava-card-frame group relative w-full ${className}`}
     >
+      {/* Shell Card Graphic Layer */}
+      <img
+        src="https://res.cloudinary.com/b5i5bwwa/image/upload/Operava-contents-card.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[20px]"
+        loading="lazy"
+      />
+
       {/* Image Container with Focused Spotlight Glow */}
-      <div className="operava-image-container">
+      <div className="operava-image-container relative z-10">
         {service.image && !imgError ? (
           <img
             src={service.image}
@@ -54,7 +63,7 @@ export default function ServiceCard({
       </div>
 
       {/* Typography Section */}
-      <div className="w-full flex flex-col items-center flex-1">
+      <div className="relative z-10 w-full flex flex-col items-center flex-1">
         <h2 className="operava-card-title line-clamp-2 min-h-[3.25rem] flex items-center justify-center">
           {service.name}
         </h2>
@@ -82,7 +91,7 @@ export default function ServiceCard({
       <Link
         to={`/services/${service.category}/${service.slug}`}
         id={`btn-explore-${service.slug}`}
-        className="operava-learn-more-btn mt-auto"
+        className="operava-learn-more-btn relative z-10 mt-auto"
       >
         <span>{t('common.learnMore', 'Learn More')}</span>
       </Link>

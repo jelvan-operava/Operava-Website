@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ShieldCheck, ShieldAlert, ArrowLeft, Mail, FileText, CheckCircle } from 'lucide-react'
+import { ShieldAlert, ArrowLeft, Mail, FileText, CheckCircle } from 'lucide-react'
 
 export default function Privacy() {
   const sections = [
@@ -338,10 +338,6 @@ export default function Privacy() {
       {/* Hero Header */}
       <section className="pt-28 pb-14 lg:pt-36 lg:pb-16 bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.18em] uppercase text-violet-700 mb-3">
-            <ShieldCheck className="w-4 h-4" />
-            <span>OPERAVA GLOBAL SOLUTIONS</span>
-          </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight leading-tight mb-3">
             PRIVACY POLICY AND PRIVACY NOTICE
           </h1>
@@ -506,9 +502,6 @@ export default function Privacy() {
 
           {/* Slogan Banner */}
           <div className="mt-12 p-8 rounded-2xl bg-gradient-to-r from-violet-900 to-purple-900 text-white text-center shadow-md">
-            <p className="text-xs font-bold tracking-[0.25em] uppercase text-violet-300 mb-2">
-              OPERAVA GLOBAL SOLUTIONS
-            </p>
             <p className="text-2xl sm:text-3xl font-black tracking-tight mb-2">
               OPERAVA — OPERATING IN ADVANCE.
             </p>

@@ -2,7 +2,7 @@ import express, { type Request as ExpressRequest, type Response as ExpressRespon
 import path from 'path'
 import { createServer as createViteServer } from 'vite'
 import { GoogleGenAI } from '@google/genai'
-import type { FormEnv } from './functions/lib/formCore.ts'
+import { clientConfirmationEmail, applicantConfirmationEmail, type FormEnv } from './functions/lib/formCore.ts'
 import { onRequestPost as formsStartHandler } from './functions/api/forms/start.ts'
 import { onRequestPost as formsVerifyHandler } from './functions/api/forms/verify.ts'
 import { onRequestPost as formsResendHandler } from './functions/api/forms/resend.ts'
@@ -122,7 +122,7 @@ function uniqueEmails(list: string[], exclude: string): string[] {
 
 async function startServer() {
   const app = express()
-  const PORT = Number(process.env.PORT || 3000)
+  const PORT = 3000
 
   app.use(express.json())
 
@@ -203,12 +203,42 @@ async function startServer() {
         .filter(Boolean)
         .join('\n')
 
+      const rows = [
+        { label: 'Email', value: email },
+        { label: 'Phone', value: clean(body.phone, 40) },
+        { label: 'Country / Location', value: clean(body.country, 80) },
+        { label: 'Company / Organization', value: clean(body.company, 160) },
+        { label: 'Inquiry Category', value: kind },
+        { label: 'Service Interested In', value: service },
+        { label: 'Project Requirements', value: notes },
+        { label: 'Position Applied For', value: role },
+        { label: 'Engagement Model', value: clean(body.teamModel, 80) },
+        { label: 'Timeline', value: clean(body.timeline, 80) },
+      ].filter((r) => Boolean(r.value))
+
+      const html = isCareer
+        ? applicantConfirmationEmail({
+            name,
+            email,
+            referenceId: ticketId,
+            sourceLabel: 'Application',
+            rows,
+          })
+        : clientConfirmationEmail({
+            name,
+            email,
+            referenceId: ticketId,
+            sourceLabel: 'Service Inquiry',
+            rows,
+          })
+
       const payload: Record<string, unknown> = {
         from,
         to: [email],
         bcc: bccList.length ? bccList : undefined,
         subject,
         text,
+        html,
       }
 
       const sent = await fetch('https://api.resend.com/emails', {
@@ -281,7 +311,11 @@ async function startServer() {
     }
   })
 
-  if (process.env.NODE_ENV !== 'production') {
+  const isProduction =
+    process.env.NODE_ENV === 'production' ||
+    process.env.npm_lifecycle_event === 'start'
+
+  if (!isProduction) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',

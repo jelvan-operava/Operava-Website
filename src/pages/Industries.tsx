@@ -72,9 +72,6 @@ export default function Industries() {
       <section className="pt-28 pb-16 lg:pt-36 lg:pb-20 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold tracking-[0.14em] uppercase text-violet-700 mb-4">
-              {t('industries.badge', 'Industries')}
-            </p>
             <h1 className="text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6">
               {t('industries.builtFor', 'Built for different industries.')}<br />
               {t('industries.designedAround', 'Designed around your operation.')}

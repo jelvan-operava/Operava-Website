@@ -9,6 +9,7 @@ import DraggableMarquee from '../components/DraggableMarquee'
 import TypewriterHero from '../components/TypewriterHero'
 import HomeMediaLoader from '../components/HomeMediaLoader'
 import ToolsEcosystemMarquee from '../components/ToolsEcosystemMarquee'
+import OperavaCover from '../components/OperavaCover'
 
 function useIntersection(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
@@ -133,16 +134,8 @@ export default function Home() {
       <main className={`overflow-x-hidden transition-opacity duration-700 ${isHomeReady ? 'opacity-100' : 'opacity-0'}`}>
         {/* ── HERO SECTION WITH COVER PHOTO BACKGROUND ── */}
         <section className="relative w-full pt-16 sm:pt-20 lg:pt-0 min-h-0 lg:min-h-screen flex flex-col justify-end overflow-hidden bg-white lg:bg-gray-950">
-          {/* Cover Photo Background - 100% Clear & Fully Visible (Zero Blur, Uncropped Full Landscape on Mobile) */}
-          <div className="relative w-full lg:absolute lg:inset-0 lg:w-full lg:h-full overflow-hidden pointer-events-none z-0">
-            <img
-              src="https://res.cloudinary.com/sdaxzncs/image/upload/v1786240859/Cover%20Photo.png"
-              alt="OPERAVA Global Solutions Cover"
-              className="w-full h-auto block object-contain object-center lg:w-full lg:h-full lg:object-cover lg:object-center"
-              referrerPolicy="no-referrer"
-              loading="eager"
-            />
-          </div>
+          {/* Operava Cover Automatic Slideshow - 5 Rotating Covers with Cinematic Crossfade */}
+          <OperavaCover />
 
           {/* Hero Bottom Content (Single Line, Placed below the line at the bottom) */}
           <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-0 lg:pb-10">
@@ -160,14 +153,10 @@ export default function Home() {
 
           <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div className="max-w-3xl mb-16 lg:mb-20">
-              <div className="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-50 border border-violet-200/70 text-violet-700 text-xs font-semibold uppercase tracking-widest mb-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-600 animate-pulse" />
-                <span>{t('section.services.badge', 'Capabilities')}</span>
-              </div>
-              <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                 Built for the way modern businesses operate.
               </h2>
-              <p className="reveal reveal-delay-2 text-base sm:text-lg text-gray-600 mt-4 leading-relaxed">
+              <p className="reveal reveal-delay-1 text-base sm:text-lg text-gray-600 mt-4 leading-relaxed">
                 OPERAVA bridges enterprise technology, specialized global talent, and high-precision operational processes into a single unified delivery engine.
               </p>
             </div>
@@ -231,15 +220,6 @@ export default function Home() {
                 >
                   {/* Text Content Column */}
                   <div className="w-full lg:w-1/2 flex flex-col justify-center">
-                    <div className="flex items-center gap-2.5 mb-3">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-violet-100 text-violet-700 text-xs font-bold tracking-wider uppercase">
-                        {item.number}
-                      </span>
-                      <span className="text-xs font-semibold tracking-wider uppercase text-gray-500">
-                        {item.category}
-                      </span>
-                    </div>
-
                     <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
                       {item.title}
                     </h3>
@@ -292,14 +272,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
               <div className="max-w-2xl">
-                <div className="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-100/80 text-violet-700 text-xs font-semibold uppercase tracking-widest mb-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 animate-pulse" />
-                  <span>{t('nav.services.it', 'Information Technology')}</span>
-                </div>
-                <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+                <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                   {t('section.it.title', 'Technology and operations, connected.')}
                 </h2>
-                <p className="reveal reveal-delay-2 text-base text-gray-500 mt-4 leading-relaxed">
+                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">
                   {t(
                     'section.it.desc',
                     'Technology solutions that help organizations build digital products, modernize infrastructure, connect systems and operate securely at scale.'
@@ -329,14 +305,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
               <div className="max-w-2xl">
-                <div className="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-50 text-violet-700 text-xs font-semibold uppercase tracking-widest mb-3 border border-violet-100">
-                  <span className="w-1.5 h-1.5 rounded-full bg-violet-600 animate-pulse" />
-                  <span>{t('nav.services.bpo', 'Business Process Outsourcing')}</span>
-                </div>
-                <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+                <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                   {t('section.bpo.title', 'Extend your capabilities. Scale your operations.')}
                 </h2>
-                <p className="reveal reveal-delay-2 text-base text-gray-500 mt-4 leading-relaxed">
+                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">
                   {t(
                     'section.bpo.desc',
                     'Flexible business process services that help organizations extend their capabilities, improve efficiency and scale operations without unnecessary overhead.'
@@ -368,14 +340,10 @@ export default function Home() {
         <section ref={modelRef} className="py-20 lg:py-28 bg-gray-950 text-white overflow-hidden relative">
           <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
             <div className="max-w-2xl mb-14">
-              <div className="reveal inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-950/80 border border-violet-800/60 text-violet-300 text-xs font-semibold uppercase tracking-widest mb-3">
-                <span className="w-2 h-2 rounded-full bg-violet-400 animate-ping inline-block" />
-                <span>{t('model.badge', 'Our Framework')}</span>
-              </div>
-              <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-white">
+              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-white">
                 {t('model.title', 'The OPERAVA Operating Model')}
               </h2>
-              <p className="reveal reveal-delay-2 text-sm text-gray-400 mt-2">
+              <p className="reveal reveal-delay-1 text-sm text-gray-400 mt-2">
                 {t('model.subtitle', 'A structured, agile methodology designed for seamless transition and rapid scaling.')}
               </p>
             </div>
@@ -405,14 +373,10 @@ export default function Home() {
         <section ref={industriesRef} className="py-20 lg:py-28 bg-white relative">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="max-w-2xl mb-12">
-              <div className="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-50 text-violet-700 text-xs font-semibold uppercase tracking-widest mb-3 border border-violet-100">
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-600 animate-pulse" />
-                <span>{t('industries.badge', 'Sectors We Serve')}</span>
-              </div>
-              <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                 {t('industries.title', 'Specialized Solutions Across Global Industries')}
               </h2>
-              <p className="reveal reveal-delay-2 text-base text-gray-500 mt-3">
+              <p className="reveal reveal-delay-1 text-base text-gray-500 mt-3">
                 {t('industries.subtitle', 'Tailored digital solutions and dedicated operational teams designed for specific industry compliance and workflows.')}
               </p>
             </div>
@@ -454,14 +418,10 @@ export default function Home() {
 
           <div className="relative max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="reveal text-xs font-semibold tracking-[0.14em] uppercase text-violet-200 mb-4 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-200 animate-pulse" />
-                Global Workforce
-              </p>
-              <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6">
+              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6">
                 Extend your team without extending your complexity.
               </h2>
-              <p className="reveal reveal-delay-2 text-base sm:text-lg text-violet-100 leading-relaxed mb-8">
+              <p className="reveal reveal-delay-1 text-base sm:text-lg text-violet-100 leading-relaxed mb-8">
                 OPERAVA provides access to skilled professionals who can support technology, customer operations, administration and specialized business processes remotely.
               </p>
               <div className="reveal reveal-delay-3">
@@ -499,11 +459,7 @@ export default function Home() {
         <section ref={techRef} className="py-20 lg:py-28 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="max-w-2xl mb-12">
-              <div className="reveal inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-50 text-violet-700 text-xs font-semibold uppercase tracking-widest mb-3 border border-violet-100">
-                <span className="w-1.5 h-1.5 rounded-full bg-violet-600 animate-pulse" />
-                <span>Technology</span>
-              </div>
-              <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                 Technology that moves your business forward.
               </h2>
             </div>
@@ -527,14 +483,7 @@ export default function Home() {
         <section ref={whyRef} className="py-20 lg:py-28 bg-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <div className="max-w-2xl mb-12">
-              <p className="reveal text-xs font-semibold tracking-[0.14em] uppercase text-violet-700 mb-3 flex items-center gap-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-600"></span>
-                </span>
-                {t('why.badge', 'Why OPERAVA')}
-              </p>
-              <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
+              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                 {t('why.title', 'Engineered for Performance & Scalability')}
               </h2>
             </div>

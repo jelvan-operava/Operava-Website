@@ -425,9 +425,6 @@ export default function DraggableMarquee() {
     <section className="py-20 bg-gray-50/60 overflow-hidden relative border-y border-gray-100">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <span className="text-xs font-bold uppercase tracking-[0.18em] text-violet-700 mb-2 block">
-            {t('marquee.badge', 'OPERATIONAL INSIGHTS & INNOVATIONS')}
-          </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight leading-tight">
             {t('marquee.title', 'Operava Operational Insights & Innovations')}
           </h2>

@@ -1366,17 +1366,6 @@ export default function RefundPolicy() {
             <span className="text-violet-200">Refund Policy</span>
           </div>
 
-          <div className="flex items-center gap-3 mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/20 border border-violet-400/30 text-violet-200 text-xs font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-violet-400" />
-              Official Corporate Policy
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-medium">
-              <Clock className="w-3.5 h-3.5" />
-              Version 1.0 • Published
-            </span>
-          </div>
-
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white mb-4">
             Refund Policy
           </h1>

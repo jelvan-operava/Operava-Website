@@ -114,25 +114,19 @@ export function brandedEmailShell(options: {
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${BRAND.canvas};padding:28px 16px;">
     <tr><td align="center">
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:${BRAND.white};border-radius:20px;overflow:hidden;border:1px solid ${BRAND.line};box-shadow:0 12px 40px rgba(13,10,25,0.06);">
-        <!-- Header bar -->
+        <!-- PLAIN HEADER VIOLET LINE ONLY (line like on the signature) -->
         <tr>
-          <td style="background:linear-gradient(135deg,${BRAND.ink} 0%,#1a1030 55%,${BRAND.violetDeep} 100%);padding:22px 28px;">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-              <tr>
-                <td style="vertical-align:middle;text-align:left;">
-                  <div style="font-size:18px;letter-spacing:0.14em;font-weight:700;color:#FFFFFF;text-transform:uppercase;">OPERAVA</div>
-                  <div style="font-size:11px;color:#E9D5FF;margin-top:3px;">www.operavaglobal.com</div>
-                </td>
-              </tr>
-            </table>
+          <td style="height:2px;line-height:2px;background:#8A5CF6;font-size:0;border-top-left-radius:19px;border-top-right-radius:19px;">
+            &nbsp;
           </td>
         </tr>
-        <!-- Accent line -->
-        <tr><td style="height:4px;background:linear-gradient(90deg,${BRAND.violet},${BRAND.violetDeep},#A855F7);font-size:0;line-height:0;">&nbsp;</td></tr>
         <!-- Body -->
         <tr>
           <td style="padding:28px 28px 8px;">
-            <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${BRAND.violet};">${escapeHtml(eyebrow)}</p>
+            <div style="font-family:Arial,Helvetica,sans-serif;font-weight:900;font-size:18px;letter-spacing:3px;line-height:1;color:#8A5CF6;margin-bottom:14px;">
+              OPERAVA
+            </div>
+            <p style="margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8A5CF6;">${escapeHtml(eyebrow)}</p>
             <h1 style="margin:0 0 14px;font-size:22px;line-height:1.3;font-weight:700;color:${BRAND.ink};">${escapeHtml(title)}</h1>
             <div style="font-size:14px;line-height:1.65;color:${BRAND.muted};">${introHtml}</div>
           </td>
@@ -176,40 +170,131 @@ export function renderEmailTemplate(template: string, replacements: Record<strin
 }
 
 export function plainConfirmationEmail(options: {
- title: string
- introHtml: string
- bodyHtml: string
+  title: string
+  introHtml: string
+  bodyHtml: string
+  department?: string
 }): string {
- return `<!DOCTYPE html>
+  const departmentName = options.department || 'Client Support Team'
+  return `<!DOCTYPE html>
 <html lang="en">
- <head>
-   <meta charset="utf-8" />
-   <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <title>${escapeHtml(options.title)}</title>
- </head>
- <body style="margin:0;padding:0;background:${BRAND.canvas};font-family:Arial,Helvetica,sans-serif;color:${BRAND.body};">
-   <div style="max-width:600px;margin:0 auto;padding:32px 20px;background:${BRAND.white};border:1px solid ${BRAND.line};border-radius:16px;">
-     <h1 style="margin:0 0 16px;font-size:24px;line-height:1.3;color:${BRAND.ink};">${escapeHtml(options.title)}</h1>
-     <div style="font-size:14px;line-height:1.7;color:${BRAND.body};">${options.introHtml}</div>
-     <div style="font-size:14px;line-height:1.7;color:${BRAND.body};">${options.bodyHtml}</div>
-     <p style="margin:24px 0 0;font-size:14px;line-height:1.7;color:${BRAND.body};">
-       Best regards,<br />
-       <strong>OPERAVA Global Solutions</strong>
-     </p>
-     <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:16px;">
-       <tbody>
-         <tr>
-           <td>
-             <img src="https://res.cloudinary.com/sdaxzncs/image/upload/v1787451792/operava-signature.jpg" alt="OPERAVA Global Solutions" style="max-width:100%;height:auto;border:0;" />
-           </td>
-         </tr>
-       </tbody>
-     </table>
-     <p style="margin:12px 0 0;font-size:12px;line-height:1.6;color:${BRAND.muted};">
-       SEC and BIR Registered, website: <a href="https://www.operavaglobal.com" style="color:${BRAND.violet};">www.operavaglobal.com</a><br />
-     </p>
-   </div>
- </body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${escapeHtml(options.title)}</title>
+  </head>
+  <body style="margin:0;padding:0;background:#F8F7FC;font-family:Arial,Helvetica,sans-serif;color:#1F2937;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:#F8F7FC;margin:0;padding:0;">
+      <tr>
+        <td align="center" style="padding:32px 20px;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
+            style="width:100%;max-width:600px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;border-collapse:separate;overflow:hidden;">
+            <!-- PLAIN HEADER VIOLET LINE ONLY (line like on the signature) -->
+            <tr>
+              <td style="height:2px;line-height:2px;background:#8A5CF6;font-size:0;border-top-left-radius:15px;border-top-right-radius:15px;">
+                &nbsp;
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 24px;">
+                <h1 style="margin:0 0 14px 0;padding:0;font-size:18px;line-height:1.35;font-weight:700;color:#0B0F19;letter-spacing:0.3px;">
+                  ${escapeHtml(options.title)}
+                </h1>
+                <div style="font-size:12px;line-height:1.55;color:#1F2937;">
+                  ${options.introHtml}
+                </div>
+                <div style="font-size:12px;line-height:1.55;color:#1F2937;margin-top:12px;">
+                  ${options.bodyHtml}
+                </div>
+                <!-- CLOSING -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
+                  <tr>
+                    <td style="font-size:12px;line-height:1.55;color:#1F2937;">
+                      Regards,<br>
+                      <strong>${escapeHtml(departmentName)}</strong><br>
+                      <strong>OPERAVA Global Solutions</strong>
+                    </td>
+                  </tr>
+                </table>
+                <!-- SIGNATURE -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;border-collapse:collapse;">
+                  <!-- TOP PURPLE LINE -->
+                  <tr>
+                    <td style="height:2px;line-height:2px;background:#8A5CF6;font-size:0;">
+                      &nbsp;
+                    </td>
+                  </tr>
+                  <!-- SIGNATURE HEADER -->
+                  <tr>
+                    <td style="padding:10px 0;">
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <!-- OPERAVA BRAND -->
+                          <td valign="middle" style="padding-right:14px;white-space:nowrap;">
+                            <div style="font-family:Arial,Helvetica,sans-serif;font-weight:900;font-size:20px;letter-spacing:3.5px;line-height:1;color:#8A5CF6;">
+                              OPERAVA
+                            </div>
+                            <div style="font-family:Arial,Helvetica,sans-serif;font-size:8px;letter-spacing:2px;color:#6B7280;margin-top:3px;font-weight:600;">
+                              GLOBAL SOLUTIONS
+                            </div>
+                          </td>
+                          <!-- SIGNATURE IMAGE -->
+                          <td valign="middle" align="right" style="width:100%;">
+                            <img
+                              src="https://res.cloudinary.com/sdaxzncs/image/upload/v1787451792/operava-signature.jpg"
+                              width="280"
+                              alt="OPERAVA Global Solutions"
+                              style="display:block;border:0;max-width:280px;width:100%;height:auto;margin-left:auto;"
+                            >
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <!-- BOTTOM PURPLE LINE -->
+                  <tr>
+                    <td style="height:2px;line-height:2px;background:#8A5CF6;font-size:0;">
+                      &nbsp;
+                    </td>
+                  </tr>
+                  <!-- COMPANY INFORMATION -->
+                  <tr>
+                    <td style="padding:6px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:8.5px;line-height:12px;color:#6B7280;">
+                      SEC and BIR Registered, website:
+                      <a
+                        href="https://www.operavaglobal.com"
+                        target="_blank"
+                        style="color:#8A5CF6;text-decoration:none;font-weight:600;"
+                      >
+                        www.operavaglobal.com
+                      </a>
+                    </td>
+                  </tr>
+                  <!-- NO REPLY NOTICE -->
+                  <tr>
+                    <td style="padding:8px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:13.5px;color:#6B7280;">
+                      <em>Please do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.</em>
+                    </td>
+                  </tr>
+                  <!-- CONFIDENTIALITY NOTICE -->
+                  <tr>
+                    <td style="padding:14px 0 0 0;">
+                      <div style="font-family:Arial,Helvetica,sans-serif;font-size:9.5px;font-weight:700;font-style:italic;text-decoration:underline;color:#111827;margin-bottom:3px;">
+                        CONFIDENTIALITY NOTICE
+                      </div>
+                      <div style="font-family:Arial,Helvetica,sans-serif;font-size:9px;line-height:13.5px;font-style:italic;color:#4B5563;text-align:justify;">
+                        This email and any attachments may contain confidential or privileged information intended only for the recipient(s). If you received this email in error, please notify the sender immediately and delete it. Any unauthorized use, disclosure, copying, or distribution is prohibited. OPERAVA accepts no responsibility for viruses or transmission errors; please scan attachments before opening.
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>`
 }
 

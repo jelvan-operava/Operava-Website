@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   ArrowRight,
   Layers,
-  Sparkles,
   Award,
   GraduationCap,
   HeartHandshake,
@@ -145,10 +144,6 @@ export default function About() {
       <section className="pt-28 pb-16 lg:pt-36 lg:pb-24 bg-gradient-to-b from-gray-50 via-white to-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-100/80 border border-violet-200 text-violet-800 text-xs font-semibold uppercase tracking-wider mb-6">
-              <Sparkles className="w-3.5 h-3.5" />
-              ABOUT OPERAVA GLOBAL SOLUTIONS
-            </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-[1.1] mb-6">
               Operating in Advance.
             </h1>
@@ -174,9 +169,6 @@ export default function About() {
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
-            <p className="text-xs font-bold uppercase tracking-wider text-violet-700 mb-3">
-              OPERATING PHILOSOPHY
-            </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">
               The OPERAVA Formula
             </h2>
@@ -197,9 +189,6 @@ export default function About() {
                     <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center text-violet-700 mb-4">
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-violet-600 block mb-1">
-                      {item.badge}
-                    </span>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
                       {item.title}
                     </h3>
@@ -218,9 +207,6 @@ export default function About() {
       <section className="py-16 lg:py-24 bg-gray-50 border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
-            <p className="text-xs font-bold uppercase tracking-wider text-violet-700 mb-3">
-              LEGAL ENTITY & COMPLIANCE
-            </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">
               Corporate Registration & Governance
             </h2>
@@ -262,9 +248,6 @@ export default function About() {
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <p className="text-xs font-bold uppercase tracking-wider text-violet-700 mb-3">
-              FLEXIBLE DELIVERY MODELS
-            </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">
               Scaled to Your Actual Needs
             </h2>
@@ -285,9 +268,6 @@ export default function About() {
                     <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-violet-700 mb-5">
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-violet-700 block mb-1">
-                      {model.subtitle}
-                    </span>
                     <h3 className="text-2xl font-bold text-gray-900 mb-3">
                       {model.title}
                     </h3>
@@ -323,9 +303,6 @@ export default function About() {
       <section className="py-16 lg:py-24 bg-gray-950 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
-            <p className="text-xs font-bold uppercase tracking-wider text-violet-400 mb-3">
-              REMOTE-FIRST ADVANTAGE
-            </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight mb-4">
               Why Remote Operations Matter
             </h2>
@@ -392,9 +369,6 @@ export default function About() {
       <section className="py-16 lg:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
-            <p className="text-xs font-bold uppercase tracking-wider text-violet-700 mb-3">
-              WORKFORCE & TALENT DEVELOPMENT
-            </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">
               Accessible Employment & Scholarships
             </h2>
@@ -446,9 +420,6 @@ export default function About() {
       <section className="py-16 lg:py-24 bg-gray-50 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <p className="text-xs font-bold uppercase tracking-wider text-violet-700 mb-3">
-              WHAT OPERAVA DELIVERS
-            </p>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">
               Integrated Technology & BPO Solutions
             </h2>

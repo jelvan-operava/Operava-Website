@@ -84,12 +84,6 @@ export default function ServiceDetail() {
 
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12">
             <div className="max-w-2xl lg:max-w-xl xl:max-w-2xl">
-              <div className="flex items-center gap-3 mb-5">
-                <span className="px-3 py-1 text-xs font-semibold text-violet-700 bg-violet-50 rounded-full">
-                  {categoryLabel}
-                </span>
-                <span className="text-xs font-mono text-gray-400">#{service.number}</span>
-              </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6">
                 {service.name}
               </h1>
@@ -280,9 +274,6 @@ export default function ServiceDetail() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
             <div>
-              <p className="text-xs font-semibold tracking-[0.14em] uppercase text-violet-700 mb-2">
-                {categoryLabel}
-              </p>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
                 {t('serviceDetail.relatedHeading', 'More Services in this Area')}
               </h2>

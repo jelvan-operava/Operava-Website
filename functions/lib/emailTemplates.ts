@@ -16,25 +16,19 @@ export const otpEmailTemplate = `<!DOCTYPE html>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F8F7FC;padding:28px 16px;">
     <tr><td align="center">
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#FFFFFF;border-radius:16px;overflow:hidden;border:1px solid #E5E7EB;box-shadow:0 8px 28px rgba(13,10,25,0.04);">
-        <!-- Header bar -->
+        <!-- PLAIN HEADER VIOLET LINE ONLY (line like on the signature) -->
         <tr>
-          <td style="background:linear-gradient(135deg,#0B0F19 0%,#1a1030 55%,#5B21B6 100%);padding:18px 24px;">
-            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-              <tr>
-                <td style="vertical-align:middle;text-align:left;">
-                  <div style="font-size:16px;letter-spacing:0.14em;font-weight:700;color:#FFFFFF;text-transform:uppercase;">OPERAVA</div>
-                  <div style="font-size:10px;color:#E9D5FF;margin-top:2px;">www.operavaglobal.com</div>
-                </td>
-              </tr>
-            </table>
+          <td style="height:2px;line-height:2px;background:#8A5CF6;font-size:0;border-top-left-radius:15px;border-top-right-radius:15px;">
+            &nbsp;
           </td>
         </tr>
-        <!-- Accent line -->
-        <tr><td style="height:3px;background:linear-gradient(90deg,#6D28D9,#5B21B6,#A855F7);font-size:0;line-height:0;">&nbsp;</td></tr>
         <!-- Body -->
         <tr>
-          <td style="padding:24px 24px 8px;">
-            <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6D28D9;">Email verification</p>
+          <td style="padding:28px 24px 8px;">
+            <div style="font-family:Arial,Helvetica,sans-serif;font-weight:900;font-size:18px;letter-spacing:3px;line-height:1;color:#8A5CF6;margin-bottom:14px;">
+              OPERAVA
+            </div>
+            <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8A5CF6;">Email verification</p>
             <h1 style="margin:0 0 12px;font-size:18px;line-height:1.35;font-weight:700;color:#0B0F19;">Your verification code</h1>
             <div style="font-size:12px;line-height:1.55;color:#4B5563;">
               <p style="margin:0;">Use this one-time code to verify your email for your <strong>{{PURPOSE}}</strong>. The code expires in <strong>10 minutes</strong>.</p>
@@ -86,7 +80,13 @@ export const servicesConfirmationTemplate = `<!DOCTYPE html>
       <td align="center" style="padding:32px 20px;">
         <!-- MAIN CONTAINER -->
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
-          style="width:100%; max-width:600px; background:#FFFFFF; border:1px solid #E5E7EB; border-radius:16px; border-collapse:separate;">
+          style="width:100%; max-width:600px; background:#FFFFFF; border:1px solid #E5E7EB; border-radius:16px; border-collapse:separate; overflow:hidden;">
+          <!-- PLAIN HEADER VIOLET LINE ONLY (line like on the signature) -->
+          <tr>
+            <td style="height:2px; line-height:2px; background:#8A5CF6; font-size:0; border-top-left-radius:15px; border-top-right-radius:15px;">
+              &nbsp;
+            </td>
+          </tr>
           <tr>
             <td style="padding:28px 24px;">
               <!-- TITLE -->
@@ -226,7 +226,13 @@ export const applicationConfirmationTemplate = `<!DOCTYPE html>
       <td align="center" style="padding:32px 20px;">
         <!-- MAIN CONTAINER -->
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"
-          style="width:100%; max-width:600px; background:#FFFFFF; border:1px solid #E5E7EB; border-radius:16px; border-collapse:separate;">
+          style="width:100%; max-width:600px; background:#FFFFFF; border:1px solid #E5E7EB; border-radius:16px; border-collapse:separate; overflow:hidden;">
+          <!-- PLAIN HEADER VIOLET LINE ONLY (line like on the signature) -->
+          <tr>
+            <td style="height:2px; line-height:2px; background:#8A5CF6; font-size:0; border-top-left-radius:15px; border-top-right-radius:15px;">
+              &nbsp;
+            </td>
+          </tr>
           <tr>
             <td style="padding:28px 24px;">
               <!-- TITLE -->

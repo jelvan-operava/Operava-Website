@@ -283,14 +283,6 @@ export default function PartnersAndTools() {
       {/* ── PART 1: ENTERPRISE SECURITY & GOVERNANCE ── */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <div className="max-w-3xl mb-14 text-left">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-50 border border-violet-200/80 text-violet-700 text-xs font-semibold uppercase tracking-widest mb-4">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-600"></span>
-            </span>
-            <span>Security, Compliance & Ecosystem</span>
-          </div>
-
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-950 tracking-tight leading-tight">
             Designed with enterprise security and strict compliance in mind.
           </h2>
@@ -342,11 +334,6 @@ export default function PartnersAndTools() {
 
       {/* ── PART 2: CONNECTED ENTERPRISE PLATFORMS & TOOLS ── */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-10 text-center relative z-10 pt-4 border-t border-gray-100/80">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-50 border border-violet-200/80 text-violet-700 text-xs font-semibold uppercase tracking-widest mb-3">
-          <Sparkles className="w-3.5 h-3.5 text-violet-600" />
-          <span>Connected Platforms & Tools</span>
-        </div>
-
         <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-950 tracking-tight leading-tight max-w-2xl mx-auto">
           Deep integrations with the tools powering modern business.
         </h3>

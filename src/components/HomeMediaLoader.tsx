@@ -10,10 +10,10 @@ interface AssetToLoad {
 
 const CRITICAL_ASSETS: AssetToLoad[] = [
   {
-    id: 'cover-photo',
-    name: 'Hero Visual Cover',
+    id: 'operava-cover-1',
+    name: 'Operava Cover 1',
     type: 'image',
-    url: 'https://res.cloudinary.com/sdaxzncs/image/upload/v1786240859/Cover%20Photo.png',
+    url: 'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788584251/Operava-cover1.webp',
   },
   {
     id: 'cap-tech',
@@ -32,6 +32,30 @@ const CRITICAL_ASSETS: AssetToLoad[] = [
     name: 'Business Processes Graphic',
     type: 'image',
     url: 'https://res.cloudinary.com/sdaxzncs/image/upload/bpo_outsourcing_data_customer_exec_FULLY_TRANSPARENT_eto94y.png',
+  },
+  {
+    id: 'operava-cover-2',
+    name: 'Operava Cover 2',
+    type: 'image',
+    url: 'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788584250/Operava-cover2.webp',
+  },
+  {
+    id: 'operava-cover-3',
+    name: 'Operava Cover 3',
+    type: 'image',
+    url: 'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788584250/Operava-cover3.webp',
+  },
+  {
+    id: 'operava-cover-4',
+    name: 'Operava Cover 4',
+    type: 'image',
+    url: 'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788584250/Operava-cover4.webp',
+  },
+  {
+    id: 'operava-cover-5',
+    name: 'Operava Cover 5',
+    type: 'image',
+    url: 'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788584249/Operava-cover5.webp',
   },
   {
     id: 'workforce-bottom',

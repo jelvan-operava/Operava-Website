@@ -80,9 +80,6 @@ export default function StackedPlaybooks() {
   return (
     <section className="py-24 bg-white relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-16 text-center">
-        <span className="text-xs font-bold uppercase tracking-[0.2em] text-violet-700 mb-3 inline-block">
-          {t('playbooks.badge', 'Proven Methodologies')}
-        </span>
         <h2 className="text-4xl sm:text-5xl font-black text-gray-950 tracking-tight leading-tight">
           {t('playbooks.title', 'Stacked Playbooks for Global Velocity')}
         </h2>
@@ -107,9 +104,6 @@ export default function StackedPlaybooks() {
           >
             {/* Left Content Panel */}
             <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16 xl:p-20 flex flex-col justify-center items-start">
-              <span className={`text-xs sm:text-sm font-black tracking-[0.2em] uppercase mb-4 ${card.tagClass}`}>
-                {card.tagline}
-              </span>
               <h3 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight mb-6">
                 {card.title}
               </h3>
