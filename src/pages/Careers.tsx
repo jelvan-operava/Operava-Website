@@ -15,15 +15,11 @@ import {
 import { useLanguage } from '../i18n/LanguageContext'
 import OperavaIntakeForm from '../components/forms/OperavaIntakeForm'
 import CareerCard from '../components/CareerCard'
-import {
-  CAREER_OPENINGS,
-  type CareerPosition,
-} from '../data/careersData'
+import { type CareerPosition } from '../data/careersData'
 
 export default function Careers() {
   const { t } = useLanguage()
   const [searchParams] = useSearchParams()
-  const [selectedTrack, setSelectedTrack] = useState<string>('all')
   const [selectedRole, setSelectedRole] = useState<string>(
     searchParams.get('role') || 'OPERAVA Technology Executive'
   )
@@ -103,10 +99,6 @@ export default function Careers() {
     { step: '05', title: 'Engagement Documentation', desc: 'Final selection, structured onboarding documentation, hardware provisioning, and project commencement.' },
   ]
 
-  const roles = CAREER_OPENINGS
-
-  const filteredRoles = selectedTrack === 'all' ? roles : roles.filter((role) => role.code === selectedTrack)
-
   const perks = [
     { title: t('careers.perk1.title', 'Remote Work'), desc: t('careers.perk1.desc', 'Work from home or access our modern collaboration hubs across the Philippines.'), icon: Users },
     { title: t('careers.perk2.title', 'Accelerated Growth & Upskilling'), desc: t('careers.perk2.desc', 'Dedicated budget for certifications, cloud accreditations, and technical mentorship.'), icon: Sparkles },
@@ -158,10 +150,7 @@ export default function Careers() {
                 career={exec}
                 variant="portrait"
                 index={idx}
-                onSelectTrack={(code) => {
-                  setSelectedTrack(code)
-                  document.getElementById('openings')?.scrollIntoView({ behavior: 'smooth' })
-                }}
+                onApply={handleApply}
               />
             ))}
           </div>
@@ -215,54 +204,6 @@ export default function Careers() {
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="openings" className="py-20 bg-white scroll-mt-20">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">{t('careers.openingsTitle', 'Current Openings')}</h2>
-            </div>
-            <div className="text-sm text-gray-500"><span className="font-bold text-violet-700">{filteredRoles.length} Active Positions</span> · Global &amp; Philippines Applicants Welcome</div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 mb-8">
-            <button
-              onClick={() => setSelectedTrack('all')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === 'all' ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            >
-              All Available Positions ({roles.length})
-            </button>
-            <button
-              onClick={() => setSelectedTrack('tech')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === 'tech' ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            >
-              Technology Executive ({roles.filter((r) => r.code === 'tech').length})
-            </button>
-            <button
-              onClick={() => setSelectedTrack('ops')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === 'ops' ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            >
-              Business Operations Executive ({roles.filter((r) => r.code === 'ops').length})
-            </button>
-            <button
-              onClick={() => setSelectedTrack('cx')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${selectedTrack === 'cx' ? 'bg-violet-700 text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            >
-              Customer Experience Executive ({roles.filter((r) => r.code === 'cx').length})
-            </button>
-          </div>
-          <div className="grid gap-6">
-            {filteredRoles.map((role, idx) => (
-              <CareerCard
-                key={role.id}
-                career={role}
-                variant="landscape"
-                index={idx}
-                onApply={handleApply}
-              />
             ))}
           </div>
         </div>
