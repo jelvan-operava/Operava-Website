@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { MapPin, Briefcase, Clock, Send, ArrowRight } from 'lucide-react'
+import { MapPin, Briefcase, Clock, Send, ArrowRight, Plus, X } from 'lucide-react'
 
 export interface CareerCardData {
   id: string
@@ -36,6 +36,7 @@ export default function CareerCard({
   className = '',
 }: CareerCardProps) {
   const [imgError, setImgError] = useState(false)
+  const [flipped, setFlipped] = useState(false)
   const IconComponent = career.icon
 
   if (variant === 'landscape') {
@@ -150,7 +151,7 @@ export default function CareerCard({
     )
   }
 
-  // Default: Portrait Variant (Matches ServiceCard.tsx visual style)
+  // Portrait Variant — flip card with smaller Apply + white circle plus
   return (
     <motion.div
       initial={{ opacity: 0, y: 18 }}
@@ -158,72 +159,171 @@ export default function CareerCard({
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.45, delay: (index % 4) * 0.08 }}
       id={`career-card-${career.id}`}
-      className={`operava-card-frame group relative w-full flex flex-col items-center justify-between ${className}`}
+      className={`relative w-full ${className}`}
+      style={{ perspective: '1200px' }}
     >
-      {/* Shell Card Graphic Layer */}
-      <img
-        src="https://res.cloudinary.com/b5i5bwwa/image/upload/Operava-contents-card.png"
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[20px]"
-        loading="lazy"
-      />
-
-      {/* Image Container with Focused Spotlight Glow */}
-      <div className="operava-image-container relative z-10">
-        {career.image && !imgError ? (
+      <div
+        className="relative w-full transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        style={{
+          transformStyle: 'preserve-3d',
+          transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+          minHeight: '100%',
+        }}
+      >
+        {/* FRONT */}
+        <div
+          className="operava-card-frame group relative w-full flex flex-col items-center justify-between"
+          style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
+        >
           <img
-            src={career.image}
-            alt={career.title}
-            onError={() => setImgError(true)}
-            referrerPolicy="no-referrer"
+            src="https://res.cloudinary.com/b5i5bwwa/image/upload/Operava-contents-card.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[20px]"
             loading="lazy"
           />
-        ) : IconComponent ? (
-          <div className="relative z-10 flex items-center justify-center p-4">
-            <IconComponent className="w-16 h-16 text-violet-300" />
+
+          <div className="operava-image-container relative z-10">
+            {career.image && !imgError ? (
+              <img
+                src={career.image}
+                alt={career.title}
+                onError={() => setImgError(true)}
+                referrerPolicy="no-referrer"
+                loading="lazy"
+              />
+            ) : IconComponent ? (
+              <div className="relative z-10 flex items-center justify-center p-4">
+                <IconComponent className="w-16 h-16 text-violet-300" />
+              </div>
+            ) : null}
           </div>
-        ) : null}
-      </div>
 
-      {/* Typography Section */}
-      <div className="relative z-10 w-full flex flex-col items-center flex-1">
-        <h3 className="operava-card-title line-clamp-2 min-h-[3.25rem] flex items-center justify-center text-center">
-          {career.title}
-        </h3>
+          <div className="relative z-10 w-full flex flex-col items-center flex-1">
+            <h3 className="operava-card-title line-clamp-2 min-h-[3.25rem] flex items-center justify-center text-center">
+              {career.title}
+            </h3>
 
-        <p className="operava-card-description line-clamp-3 min-h-[3.75rem] text-center">
-          {career.summary || career.desc}
-        </p>
+            <p className="operava-card-description line-clamp-3 min-h-[3.75rem] text-center">
+              {career.summary || career.desc}
+            </p>
 
-        {/* Assignments / Capability Badges */}
-        {career.assignments && career.assignments.length > 0 && (
-          <ul className="flex flex-wrap justify-center gap-1.5 mb-5 w-full">
-            {career.assignments.slice(0, 3).map((cap, i) => (
-              <li
-                key={i}
-                className="px-2.5 py-1 text-xs font-medium bg-white/10 text-white/90 rounded-lg border border-white/15 backdrop-blur-xs transition-colors"
+            {career.assignments && career.assignments.length > 0 && (
+              <ul className="flex flex-wrap justify-center gap-1.5 mb-5 w-full">
+                {career.assignments.slice(0, 3).map((cap, i) => (
+                  <li
+                    key={i}
+                    className="px-2.5 py-1 text-xs font-medium bg-white/10 text-white/90 rounded-lg border border-white/15 backdrop-blur-xs transition-colors"
+                  >
+                    {cap}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Smaller Apply + white circle plus */}
+          <div className="relative z-10 mt-auto w-full flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (onSelectTrack) onSelectTrack(career.code)
+                if (onApply) onApply(career.title)
+              }}
+              id={`btn-career-${career.id}`}
+              className="operava-learn-more-btn !py-2 !px-3 !text-[11px] !tracking-wide flex-1 flex items-center justify-center gap-1.5"
+            >
+              <span>Apply</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+
+            <button
+              type="button"
+              aria-label={`Show meaning for ${career.title}`}
+              onClick={(e) => {
+                e.stopPropagation()
+                setFlipped(true)
+              }}
+              id={`btn-flip-${career.id}`}
+              className="shrink-0 w-9 h-9 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
+            >
+              <Plus className="w-4 h-4" strokeWidth={2.5} />
+            </button>
+          </div>
+        </div>
+
+        {/* BACK — meaning / full context */}
+        <div
+          className="operava-card-frame absolute inset-0 w-full flex flex-col items-center justify-between"
+          style={{
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+          }}
+        >
+          <img
+            src="https://res.cloudinary.com/b5i5bwwa/image/upload/Operava-contents-card.png"
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[20px]"
+            loading="lazy"
+          />
+
+          <div className="relative z-10 w-full flex flex-col flex-1 min-h-0 overflow-y-auto">
+            <div className="flex items-start justify-between gap-2 mb-3">
+              <h3 className="text-base sm:text-lg font-bold text-white leading-snug pr-2">
+                {career.shortTitle || career.title}
+              </h3>
+              <button
+                type="button"
+                aria-label="Close meaning"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setFlipped(false)
+                }}
+                className="shrink-0 w-8 h-8 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
               >
-                {cap}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                <X className="w-3.5 h-3.5" strokeWidth={2.5} />
+              </button>
+            </div>
 
-      {/* Action Button */}
-      <button
-        type="button"
-        onClick={() => {
-          if (onSelectTrack) onSelectTrack(career.code)
-          if (onApply) onApply(career.title)
-        }}
-        id={`btn-career-${career.id}`}
-        className="operava-learn-more-btn relative z-10 mt-auto flex items-center justify-center gap-2"
-      >
-        <span>View {career.shortTitle || 'Role'}</span>
-        <ArrowRight className="w-3.5 h-3.5" />
-      </button>
+            <p className="text-xs sm:text-sm text-[#e2dbff] leading-relaxed mb-4">
+              {career.summary || career.desc}
+            </p>
+
+            {career.assignments && career.assignments.length > 0 && (
+              <div className="mt-auto">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-violet-200/90 mb-2">
+                  Assignment meaning
+                </p>
+                <ul className="space-y-1.5">
+                  {career.assignments.map((item, i) => (
+                    <li
+                      key={i}
+                      className="text-[11px] sm:text-xs text-white/90 leading-snug pl-2 border-l-2 border-violet-400/50"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setFlipped(false)
+              if (onSelectTrack) onSelectTrack(career.code)
+              if (onApply) onApply(career.title)
+            }}
+            className="operava-learn-more-btn relative z-10 mt-4 !py-2 !px-3 !text-[11px] !tracking-wide w-full flex items-center justify-center gap-1.5"
+          >
+            <span>Apply</span>
+            <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
     </motion.div>
   )
 }
