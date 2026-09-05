@@ -135,7 +135,7 @@ export default function CareerCard({
         style={{ minHeight: 640, cursor: 'default' }}
       >
         <div
-          className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group flex flex-col items-center"
+          className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group flex flex-col items-center !p-3 h-full"
           aria-hidden={flipped}
         >
           <img
@@ -146,7 +146,7 @@ export default function CareerCard({
             loading="lazy"
           />
 
-          <div className="operava-career-model-stage relative z-10 flex-1 w-full min-h-0 flex items-center justify-center overflow-hidden">
+          <div className="operava-career-model-stage relative z-10 flex-1 w-full min-h-[480px] flex items-center justify-center overflow-hidden px-1 pt-1 pb-1">
             {career.image && !imgError ? (
               <img
                 src={career.image}
@@ -154,6 +154,7 @@ export default function CareerCard({
                 onError={() => setImgError(true)}
                 referrerPolicy="no-referrer"
                 loading="lazy"
+                className="w-full h-full max-w-full max-h-full object-contain object-center block"
               />
             ) : IconComponent ? (
               <div className="relative z-10 flex items-center justify-center p-4">
