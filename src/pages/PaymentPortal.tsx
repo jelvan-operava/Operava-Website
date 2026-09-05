@@ -11,7 +11,6 @@ import {
   Download,
   Printer,
   ArrowRight,
-  HelpCircle,
   Mail,
   Phone,
   RefreshCw,
@@ -1280,8 +1279,7 @@ Terms & Conditions:    https://www.operavaglobal.com/terms
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto text-xs sm:text-sm">
             <div className="bg-white border border-violet-100 rounded-2xl p-5 space-y-2 shadow-xs">
-              <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-violet-600" />
+              <h4 className="font-bold text-slate-900">
                 Will I receive an official tax invoice and receipt?
               </h4>
               <p className="text-slate-600 leading-relaxed text-xs">
@@ -1290,8 +1288,7 @@ Terms & Conditions:    https://www.operavaglobal.com/terms
             </div>
 
             <div className="bg-white border border-violet-100 rounded-2xl p-5 space-y-2 shadow-xs">
-              <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-violet-600" />
+              <h4 className="font-bold text-slate-900">
                 How long do international wire transfers take to clear?
               </h4>
               <p className="text-slate-600 leading-relaxed text-xs">
@@ -1300,8 +1297,7 @@ Terms & Conditions:    https://www.operavaglobal.com/terms
             </div>
 
             <div className="bg-white border border-violet-100 rounded-2xl p-5 space-y-2 shadow-xs">
-              <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-violet-600" />
+              <h4 className="font-bold text-slate-900">
                 What currencies are accepted without conversion loss?
               </h4>
               <p className="text-slate-600 leading-relaxed text-xs">
@@ -1310,8 +1306,7 @@ Terms & Conditions:    https://www.operavaglobal.com/terms
             </div>
 
             <div className="bg-white border border-violet-100 rounded-2xl p-5 space-y-2 shadow-xs">
-              <h4 className="font-bold text-slate-900 flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-violet-600" />
+              <h4 className="font-bold text-slate-900">
                 How are milestone refunds or billing disputes handled?
               </h4>
               <p className="text-slate-600 leading-relaxed text-xs">

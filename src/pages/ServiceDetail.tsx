@@ -127,21 +127,9 @@ export default function ServiceDetail() {
               
               {service.serviceMessage && (
                 <div className="p-6 rounded-2xl bg-violet-50/70 border border-violet-100 text-violet-950">
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-8 h-8 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0 mt-0.5">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-xs font-bold uppercase tracking-wider text-violet-700 mb-1.5">
-                        Strategic Perspective
-                      </h3>
-                      <p className="text-sm font-medium leading-relaxed text-gray-800 italic">
-                        "{service.serviceMessage}"
-                      </p>
-                    </div>
-                  </div>
+                  <p className="text-sm font-medium leading-relaxed text-gray-800 italic">
+                    "{service.serviceMessage}"
+                  </p>
                 </div>
               )}
             </div>

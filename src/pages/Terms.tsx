@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FileText, ShieldAlert, ArrowLeft, Building } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 
 export default function Terms() {
   const sections = [
@@ -341,23 +341,17 @@ export default function Terms() {
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
           {/* Important Notice Box */}
           <div className="mb-10 p-6 sm:p-7 rounded-2xl bg-amber-50/90 border border-amber-200 text-amber-950 shadow-xs">
-            <div className="flex items-start gap-3.5">
-              <ShieldAlert className="w-6 h-6 text-amber-700 shrink-0 mt-0.5" />
-              <div>
-                <h2 className="text-base font-bold text-amber-900 uppercase tracking-wide mb-1.5">
-                  IMPORTANT NOTICE
-                </h2>
-                <p className="text-sm sm:text-base leading-relaxed text-amber-900/90">
-                  This is a general corporate and website framework for OPERAVA Global Solutions OPC. Specific client agreements, employment agreements, statements of work, NDAs, data-processing agreements, and other contracts may supplement or supersede these Terms for the applicable relationship. This document should be reviewed by qualified Philippine counsel before publication or contractual use.
-                </p>
-              </div>
-            </div>
+            <h2 className="text-base font-bold text-amber-900 uppercase tracking-wide mb-1.5">
+              IMPORTANT NOTICE
+            </h2>
+            <p className="text-sm sm:text-base leading-relaxed text-amber-900/90">
+              This is a general corporate and website framework for OPERAVA Global Solutions OPC. Specific client agreements, employment agreements, statements of work, NDAs, data-processing agreements, and other contracts may supplement or supersede these Terms for the applicable relationship. This document should be reviewed by qualified Philippine counsel before publication or contractual use.
+            </p>
           </div>
 
           {/* Quick Table of Contents / Outline Bar */}
           <div className="mb-10 p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-violet-600" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
               Table of Contents (31 Sections)
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
@@ -435,8 +429,7 @@ export default function Terms() {
 
                 {/* Contact Card Specific Decoration */}
                 {section.isContactCard && (
-                  <div className="mt-4 p-5 rounded-xl bg-violet-50/70 border border-violet-100 text-violet-950 flex items-start gap-3.5">
-                    <Building className="w-5 h-5 text-violet-700 shrink-0 mt-0.5" />
+                  <div className="mt-4 p-5 rounded-xl bg-violet-50/70 border border-violet-100 text-violet-950">
                     <div className="text-sm">
                       <p className="font-bold text-violet-900">OPERAVA Global Solutions</p>
                       <p className="text-violet-800">Initial Philippine office: Pagudpud, Ilocos Norte 2919, Philippines</p>

@@ -13,10 +13,7 @@ import {
   GraduationCap,
   HeartHandshake,
   MapPin,
-  FileCheck,
-  Server,
-  Headphones,
-  Laptop
+  FileCheck
 } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 import HangingFeaturesBanner from '../components/HangingFeaturesBanner'
@@ -151,9 +148,6 @@ export default function About() {
               Technology, Workforce & Business Process Outsourcing — Connected Remotely and Globally.
             </p>
             <div className="p-5 sm:p-6 bg-violet-900 text-white rounded-2xl shadow-xl shadow-violet-900/10 max-w-3xl mb-8">
-              <p className="text-xs font-bold tracking-widest uppercase text-violet-300 mb-1">
-                OUR CORE PURPOSE
-              </p>
               <p className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                 MAKE WORK AND SERVICES ACCESSIBLE — ANYTIME, ANYWHERE.
               </p>
@@ -179,16 +173,12 @@ export default function About() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {coreFormula.map((item, idx) => {
-              const Icon = item.icon
               return (
                 <div
                   key={idx}
                   className="p-6 rounded-2xl border border-gray-100 bg-white hover:border-violet-200 hover:shadow-lg hover:shadow-violet-100/50 transition-all flex flex-col justify-between"
                 >
                   <div>
-                    <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center text-violet-700 mb-4">
-                      <Icon className="w-6 h-6" />
-                    </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
                       {item.title}
                     </h3>
@@ -217,26 +207,20 @@ export default function About() {
 
           <div className="grid md:grid-cols-2 gap-6">
             {complianceHighlights.map((item, idx) => {
-              const Icon = item.icon
               return (
                 <div
                   key={idx}
-                  className="p-6 sm:p-8 rounded-2xl bg-white border border-gray-200/80 shadow-sm hover:border-violet-200 transition-all flex gap-5"
+                  className="p-6 sm:p-8 rounded-2xl bg-white border border-gray-200/80 shadow-sm hover:border-violet-200 transition-all flex flex-col justify-start"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-violet-100/60 text-violet-700 flex items-center justify-center shrink-0">
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs font-semibold text-violet-700 mb-2">
-                      {item.authority}
-                    </p>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {item.desc}
-                    </p>
-                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs font-semibold text-violet-700 mb-2">
+                    {item.authority}
+                  </p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
               )
             })}
@@ -258,16 +242,12 @@ export default function About() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {deliveryModels.map((model, idx) => {
-              const Icon = model.icon
               return (
                 <div
                   key={idx}
                   className={`p-8 rounded-2xl border ${model.accent} flex flex-col justify-between transition-all hover:shadow-xl`}
                 >
                   <div>
-                    <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-violet-700 mb-5">
-                      <Icon className="w-6 h-6" />
-                    </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-3">
                       {model.title}
                     </h3>
@@ -313,8 +293,7 @@ export default function About() {
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all">
-              <h3 className="text-xl font-bold text-violet-300 mb-4 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-violet-400" />
+              <h3 className="text-xl font-bold text-violet-300 mb-4">
                 For Businesses & Organizations
               </h3>
               <ul className="space-y-3.5 text-sm text-gray-300">
@@ -338,8 +317,7 @@ export default function About() {
             </div>
 
             <div className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:border-violet-500/30 transition-all">
-              <h3 className="text-xl font-bold text-blue-300 mb-4 flex items-center gap-2">
-                <Users2 className="w-5 h-5 text-blue-400" />
+              <h3 className="text-xl font-bold text-blue-300 mb-4">
                 For Professionals & Teams
               </h3>
               <ul className="space-y-3.5 text-sm text-gray-300">
@@ -379,12 +357,8 @@ export default function About() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {workforceInitiatives.map((item, idx) => {
-              const Icon = item.icon
               return (
                 <div key={idx} className="p-6 sm:p-8 rounded-2xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-violet-200 hover:shadow-lg transition-all">
-                  <div className="w-12 h-12 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center mb-5">
-                    <Icon className="w-6 h-6" />
-                  </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
                     {item.title}
                   </h3>
@@ -432,14 +406,9 @@ export default function About() {
             {/* IT Services Card */}
             <div className="p-8 rounded-2xl bg-white border border-gray-200 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center">
-                    <Laptop className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">Information Technology</h3>
-                    <p className="text-xs text-violet-700 font-semibold">8 Core Areas + Cloud Infrastructure</p>
-                  </div>
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-gray-900">Information Technology</h3>
+                  <p className="text-xs text-violet-700 font-semibold">8 Core Areas + Cloud Infrastructure</p>
                 </div>
                 <p className="text-sm text-gray-600 mb-6 leading-relaxed">
                   Software Development, Web & Mobile Applications, SaaS & Platform Development, IT Systems, Computer Programming, IT Consulting, Systems Integration, Database Services, and Cloud Solutions.
@@ -467,14 +436,9 @@ export default function About() {
             {/* BPO Services Card */}
             <div className="p-8 rounded-2xl bg-white border border-gray-200 shadow-sm flex flex-col justify-between">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
-                    <Headphones className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900">Business Process Outsourcing</h3>
-                    <p className="text-xs text-blue-700 font-semibold">8 Core Operations & Support Areas</p>
-                  </div>
+                <div className="mb-4">
+                  <h3 className="text-xl font-bold text-gray-900">Business Process Outsourcing</h3>
+                  <p className="text-xs text-blue-700 font-semibold">8 Core Operations & Support Areas</p>
                 </div>
                 <p className="text-sm text-gray-600 mb-6 leading-relaxed">
                   Customer Service (voice, chat, email), Technical Support, Help Desk operations, Back-Office Administration, Data Processing, Data Entry, Document Processing, and Virtual Assistance.

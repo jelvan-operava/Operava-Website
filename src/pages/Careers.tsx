@@ -3,21 +3,18 @@ import { Link, useSearchParams } from 'react-router-dom'
 import {
   Briefcase,
   MapPin,
-  Clock,
   Sparkles,
   Users,
   Building2,
   HeartHandshake,
-  CheckCircle2,
   ArrowRight,
-  Send,
   Cpu,
   Headphones,
   FileSpreadsheet,
-  Scale,
 } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 import OperavaIntakeForm from '../components/forms/OperavaIntakeForm'
+import CareerCard from '../components/CareerCard'
 import {
   CAREER_OPENINGS,
   type CareerPosition,
@@ -54,6 +51,7 @@ export default function Careers() {
       title: 'OPERAVA Technology Executive' as CareerPosition,
       shortTitle: 'Technology Executive',
       icon: Cpu,
+      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/f_auto,q_auto/v1787278539/software.webp',
       summary: 'May be assigned to specific related tasks on available posts or based on your skills in software engineering, web/mobile development, cloud systems, or technical infrastructure.',
       assignments: [
         'Full-Stack Web & Mobile Software Development',
@@ -69,6 +67,7 @@ export default function Careers() {
       title: 'OPERAVA Business Operations Executive' as CareerPosition,
       shortTitle: 'Business Operations Executive',
       icon: FileSpreadsheet,
+      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/f_auto,q_auto/v1787258203/backoffice.webp',
       summary: 'May be assigned to specific related tasks on available posts or based on your skills in HR, accounting and finance, recruitment, training and development, or business operations.',
       assignments: [
         'Human Resources (HR) Operations & People Care',
@@ -84,6 +83,7 @@ export default function Careers() {
       title: 'OPERAVA Customer Experience Executive' as CareerPosition,
       shortTitle: 'Customer Experience Executive',
       icon: Headphones,
+      image: 'https://res.cloudinary.com/sdaxzncs/image/upload/f_auto,q_auto/v1787256801/customer_service.webp',
       summary: 'May be assigned to specific related tasks on available posts or based on your skills in customer care, technical help desk, omnichannel communication, or client account management.',
       assignments: [
         'Omnichannel Support (Live Chat, Email & Ticket Resolution)',
@@ -152,37 +152,35 @@ export default function Careers() {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 mb-12">
-            {executiveTracks.map((exec) => {
-              const Icon = exec.icon
-              return (
-                <div key={exec.id} className="bg-white rounded-3xl p-8 border border-gray-200/80 shadow-md hover:shadow-xl hover:border-violet-300 transition-all duration-300 flex flex-col justify-between group">
-                  <div>
-                    <div className="mb-6"><div className="w-12 h-12 rounded-2xl bg-violet-50 text-violet-700 flex items-center justify-center border border-violet-100"><Icon className="w-6 h-6" /></div></div>
-                    <h3 className="text-xl font-bold text-gray-900 tracking-tight mb-3">{exec.title}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed mb-6 font-normal">{exec.summary}</p>
-                    <div className="border-t border-gray-100 pt-5 mb-6">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Potential Tasks &amp; Focus Areas:</h4>
-                      <ul className="space-y-2">
-                        {exec.assignments.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-xs text-gray-700"><CheckCircle2 className="w-3.5 h-3.5 text-violet-600 shrink-0 mt-0.5" /><span>{item}</span></li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                  <button onClick={() => { setSelectedTrack(exec.code); document.getElementById('openings')?.scrollIntoView({ behavior: 'smooth' }) }} className="w-full py-3 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-800 text-xs font-bold transition-colors inline-flex items-center justify-center gap-2">
-                    <span>View {exec.shortTitle} Role</span><ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )
-            })}
+            {executiveTracks.map((exec, idx) => (
+              <CareerCard
+                key={exec.id}
+                career={exec}
+                variant="portrait"
+                index={idx}
+                onSelectTrack={(code) => {
+                  setSelectedTrack(code)
+                  document.getElementById('openings')?.scrollIntoView({ behavior: 'smooth' })
+                }}
+              />
+            ))}
           </div>
-          <div className="rounded-3xl bg-white border border-gray-200/90 p-6 sm:p-8 shadow-xs">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0"><Scale className="w-5 h-5" /></div>
-              <div className="text-sm text-gray-600 space-y-3 leading-relaxed">
-                <h4 className="text-base font-bold text-gray-900">Task Assignments &amp; Position Governance</h4>
-                <p>Candidates and employees may be assigned to specific related tasks on available posts or based on their skills, qualifications, client specifications, assessments, and chosen specialization track.</p>
-                <div className="pt-2"><Link to="/terms#section-5" className="inline-flex items-center gap-1 text-xs font-bold text-violet-700 hover:text-violet-900 underline"><span>Read full Terms Section 5</span><ArrowRight className="w-3 h-3" /></Link></div>
+          <div className="operava-landscape-card-frame relative rounded-3xl p-6 sm:p-8 shadow-xl border border-violet-500/25 overflow-hidden">
+            <img
+              src="https://res.cloudinary.com/b5i5bwwa/image/upload/v1788593069/Shell_card.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[24px]"
+              loading="lazy"
+            />
+            <div className="relative z-10 text-white space-y-3 leading-relaxed">
+              <h4 className="text-base font-bold text-white">Task Assignments &amp; Position Governance</h4>
+              <p className="text-sm text-[#e2dbff]">Candidates and employees may be assigned to specific related tasks on available posts or based on their skills, qualifications, client specifications, assessments, and chosen specialization track.</p>
+              <div className="pt-2">
+                <Link to="/terms#section-5" className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-200 hover:text-white underline transition-colors">
+                  <span>Read full Terms Section 5</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </div>
           </div>
@@ -262,27 +260,14 @@ export default function Careers() {
             </button>
           </div>
           <div className="grid gap-6">
-            {filteredRoles.map((role) => (
-              <div key={role.id} className="p-6 sm:p-8 rounded-3xl bg-white border border-gray-200 hover:border-violet-300 hover:shadow-lg transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 group">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 border border-gray-100 hidden sm:block"><img src={role.image} alt={role.title} className="w-full h-full object-cover" /></div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-violet-700 transition-colors">{role.title}</h3>
-                    <p className="text-xs sm:text-sm text-gray-600 max-w-2xl my-2 leading-relaxed">{role.desc}</p>
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
-                      <span className="flex items-center gap-1 font-medium text-gray-500"><MapPin className="w-3.5 h-3.5 text-violet-600" />{role.location}</span><span>•</span>
-                      <span className="flex items-center gap-1 font-medium text-gray-500"><Briefcase className="w-3.5 h-3.5 text-violet-600" />{role.type}</span><span>•</span>
-                      <span className="flex items-center gap-1 font-medium text-gray-500"><Clock className="w-3.5 h-3.5 text-violet-600" />{role.level}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  <button onClick={() => handleApply(role.title)} className="inline-flex items-center gap-2 px-6 py-3.5 text-xs font-bold text-white bg-violet-700 rounded-xl hover:bg-violet-800 active:scale-95 transition-all shadow-sm">
-                    <Send className="w-3.5 h-3.5" /><span>Apply for this Role</span>
-                  </button>
-                  <Link to={`/apply?role=${encodeURIComponent(role.title)}`} className="inline-flex items-center px-4 py-3.5 text-xs font-semibold text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">Direct Link</Link>
-                </div>
-              </div>
+            {filteredRoles.map((role, idx) => (
+              <CareerCard
+                key={role.id}
+                career={role}
+                variant="landscape"
+                index={idx}
+                onApply={handleApply}
+              />
             ))}
           </div>
         </div>
@@ -295,10 +280,8 @@ export default function Careers() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {perks.map((item, idx) => {
-              const Icon = item.icon
               return (
                 <div key={idx} className="p-8 bg-white/5 border border-white/10 rounded-3xl hover:border-violet-500/40 hover:bg-white/10 transition-all duration-200 group">
-                  <div className="w-12 h-12 rounded-2xl bg-violet-600/20 border border-violet-400/30 flex items-center justify-center mb-6 text-violet-300"><Icon className="w-6 h-6" /></div>
                   <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
                   <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
                 </div>

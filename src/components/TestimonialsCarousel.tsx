@@ -10,7 +10,6 @@ import {
   TrendingUp,
   Building2,
   ShieldCheck,
-  Award,
 } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 
@@ -238,10 +237,6 @@ export default function TestimonialsCarousel() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 lg:mb-16 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-900/40 border border-violet-500/30 text-violet-300 text-xs font-bold uppercase tracking-wider mb-4">
-              <Award className="w-3.5 h-3.5 text-violet-400" />
-              <span>{t('testimonials.badge', 'Verified Enterprise Outcomes')}</span>
-            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
               {t('testimonials.title', 'Trusted by Global Engineering & Operations Leaders')}
             </h2>

@@ -5,7 +5,6 @@ import {
   ShieldCheck,
   ArrowLeft,
   Search,
-  Building,
   Mail,
   ExternalLink,
   ChevronRight,
@@ -14,7 +13,6 @@ import {
   RefreshCw,
   Clock,
   AlertCircle,
-  Calculator,
   HelpCircle,
   BookOpen,
 } from 'lucide-react'
@@ -1541,8 +1539,7 @@ export default function RefundPolicy() {
                         {/* Subsection formula box */}
                         {sub.formula && (
                           <div className="mt-3 p-4 rounded-xl bg-violet-50 border border-violet-200 text-violet-950">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Calculator className="w-4 h-4 text-violet-700" />
+                            <div className="mb-2">
                               <span className="text-xs font-bold uppercase tracking-wider text-violet-800">
                                 Illustrative Refund Formula
                               </span>
@@ -1588,18 +1585,13 @@ export default function RefundPolicy() {
                 {/* Contact Card for Section 47 & 42 */}
                 {section.contactCard && (
                   <div className="mt-6 p-6 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200 text-violet-950">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2.5 bg-violet-600 text-white rounded-xl shadow-xs">
-                        <Building className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 text-base">
-                          {section.contactCard.company}
-                        </h4>
-                        <p className="text-xs text-violet-700">
-                          Official Refund & Customer Support Channels
-                        </p>
-                      </div>
+                    <div className="mb-4">
+                      <h4 className="font-bold text-gray-900 text-base">
+                        {section.contactCard.company}
+                      </h4>
+                      <p className="text-xs text-violet-700">
+                        Official Refund & Customer Support Channels
+                      </p>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
@@ -1659,9 +1651,6 @@ export default function RefundPolicy() {
           <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl" />
 
           <div className="relative z-10 text-center max-w-2xl mx-auto">
-            <p className="text-xs font-bold tracking-[0.25em] uppercase text-violet-400 mb-2">
-              OPERAVA GLOBAL SOLUTIONS
-            </p>
             <h3 className="text-2xl sm:text-3xl font-black tracking-tight mb-3">
               OPERAVA — OPERATING IN ADVANCE.
             </h3>

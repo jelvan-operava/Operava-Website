@@ -96,7 +96,6 @@ export default function OtpVerify({
 
   return (
     <div className="max-w-md mx-auto text-center space-y-5">
-      <p className="text-xs font-bold tracking-[0.2em] text-violet-700">OPERAVA</p>
       <h2 className="text-2xl font-black text-gray-900">Verify your email</h2>
       <p className="text-sm text-gray-600">We sent a 6-digit verification code to:<br /><strong>{maskedEmail}</strong></p>
       <div className="flex justify-center gap-2" role="group" aria-label="Verification code">

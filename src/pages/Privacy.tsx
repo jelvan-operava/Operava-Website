@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ShieldAlert, ArrowLeft, Mail, FileText, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Mail } from 'lucide-react'
 
 export default function Privacy() {
   const sections = [
@@ -362,26 +362,20 @@ export default function Privacy() {
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
           {/* Important Notice Box */}
           <div className="mb-10 p-6 sm:p-7 rounded-2xl bg-violet-50/80 border border-violet-200 text-violet-950 shadow-xs">
-            <div className="flex items-start gap-3.5">
-              <ShieldAlert className="w-6 h-6 text-violet-700 shrink-0 mt-0.5" />
-              <div>
-                <h2 className="text-base font-bold text-violet-950 uppercase tracking-wide mb-1.5">
-                  IMPORTANT NOTICE
-                </h2>
-                <p className="text-sm sm:text-base leading-relaxed text-violet-900/90 mb-2">
-                  This Privacy Policy describes how OPERAVA Global Solutions (&quot;OPERAVA,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) may collect, use, disclose, retain, secure, and otherwise process personal information in connection with websites, recruitment, employment, client services, business operations, communications, and digital platforms.
-                </p>
-                <p className="text-sm sm:text-base leading-relaxed text-violet-900/90">
-                  It is designed around transparency, legitimate purpose, and proportionality under the Philippine Data Privacy Act of 2012 and its implementing rules. It should be reviewed against OPERAVA&apos;s actual processing activities, systems, contracts, retention schedules, and current regulatory requirements before publication.
-                </p>
-              </div>
-            </div>
+            <h2 className="text-base font-bold text-violet-950 uppercase tracking-wide mb-1.5">
+              IMPORTANT NOTICE
+            </h2>
+            <p className="text-sm sm:text-base leading-relaxed text-violet-900/90 mb-2">
+              This Privacy Policy describes how OPERAVA Global Solutions (&quot;OPERAVA,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) may collect, use, disclose, retain, secure, and otherwise process personal information in connection with websites, recruitment, employment, client services, business operations, communications, and digital platforms.
+            </p>
+            <p className="text-sm sm:text-base leading-relaxed text-violet-900/90">
+              It is designed around transparency, legitimate purpose, and proportionality under the Philippine Data Privacy Act of 2012 and its implementing rules. It should be reviewed against OPERAVA&apos;s actual processing activities, systems, contracts, retention schedules, and current regulatory requirements before publication.
+            </p>
           </div>
 
           {/* Quick Table of Contents */}
           <div className="mb-10 p-5 rounded-2xl bg-white border border-gray-200 shadow-xs">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-violet-600" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
               Table of Contents (31 Sections)
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-xs">
@@ -483,8 +477,7 @@ export default function Privacy() {
                             : 'bg-slate-50 border-slate-200 text-gray-900'
                         }`}
                       >
-                        <div className="flex items-center gap-2 mb-1.5">
-                          <CheckCircle className="w-4 h-4 text-violet-600 shrink-0" />
+                        <div className="mb-1.5">
                           <h3 className="text-sm font-black tracking-wide uppercase text-violet-900">
                             {pr.name}
                           </h3>

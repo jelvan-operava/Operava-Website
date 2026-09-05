@@ -1,7 +1,6 @@
 import {
   ShieldCheck,
   Zap,
-  Globe2,
   Clock,
   Lock,
   Award,
@@ -73,10 +72,6 @@ export default function HangingFeaturesBanner() {
 
         {/* Top Header */}
         <div className="text-center mb-8 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-violet-300 text-xs font-bold uppercase tracking-wider mb-2">
-            <Globe2 className="w-3.5 h-3.5" />
-            OPERAVA Enterprise Advantage
-          </div>
           <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
             Engineered For Frictionless Reliability
           </h3>
