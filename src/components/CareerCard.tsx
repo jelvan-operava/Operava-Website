@@ -177,7 +177,7 @@ export default function CareerCard({
             </div>
           </div>
 
-          {/* Circle + — fixed right-bottom of card; independent of title */}
+          {/* Circle + — right-bottom, nudged a bit left and up */}
           <button
             type="button"
             aria-label={flipped ? `Hide details for ${career.title}` : `Show details for ${career.title}`}
@@ -187,7 +187,7 @@ export default function CareerCard({
               toggleFlip()
             }}
             id={`btn-flip-${career.id}`}
-            className="absolute z-30 right-[12px] bottom-[12px] shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
+            className="absolute z-30 right-[20px] bottom-[20px] shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
           >
             <Plus
               className={`w-4 h-4 transition-transform duration-500 ease-out ${flipped ? 'rotate-45' : 'rotate-0'}`}
