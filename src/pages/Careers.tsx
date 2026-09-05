@@ -168,7 +168,7 @@ export default function Careers() {
               Three core remote tracks. Tap the + on a card for core assignments, qualifications, and remote requirements. Final assignments follow verified skills, specialization, assessments, and client needs.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center md:justify-items-stretch">
             {executiveTracks.map((exec, idx) => (
               <CareerCard
                 key={exec.id}
