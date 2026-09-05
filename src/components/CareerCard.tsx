@@ -135,7 +135,7 @@ export default function CareerCard({
       >
         {/* FRONT */}
         <div
-          className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group relative flex flex-col !p-[5px] h-full overflow-hidden"
+          className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group relative flex flex-col !p-[5px] h-full overflow-visible"
           aria-hidden={flipped}
         >
           <img
@@ -146,7 +146,7 @@ export default function CareerCard({
             loading="lazy"
           />
 
-          {/* Centered model — ~10% larger, clipped to 5px inset */}
+          {/* Model stage (clipped) */}
           <div className="relative z-10 flex-1 w-full min-h-0 overflow-hidden rounded-[14px] flex items-center justify-center">
             {career.image && !imgError ? (
               <img
@@ -165,12 +165,17 @@ export default function CareerCard({
           </div>
 
           {/*
-            Bottom overlay: centered title + inset +
-            min-height ~40px (~1cm) so the bar covers the foot cut
+            Outer-layer title bar:
+            - Anchored to card base, then moved up by one full button height (~40px)
+            - Horizontally centered on the card
+            - Sits above the webp (overflows onto the model feet)
           */}
-          <div className="absolute z-20 left-[10px] right-[12px] bottom-[8px] sm:bottom-[10px] flex items-center justify-center min-h-[40px] gap-2">
+          <div
+            className="pointer-events-none absolute z-30 left-1/2 -translate-x-1/2 bottom-[5px] w-[calc(100%-16px)] max-w-[calc(100%-16px)] flex items-center justify-center gap-2"
+            style={{ transform: 'translate(-50%, -100%)' }}
+          >
             <div
-              className="operava-learn-more-btn !py-2.5 !px-3 !text-[11px] sm:!text-xs !tracking-wide flex-1 flex items-center justify-center text-center pointer-events-none select-none cursor-default shadow-md min-h-[40px]"
+              className="operava-learn-more-btn pointer-events-none !py-2.5 !px-3 !text-[11px] sm:!text-xs !tracking-wide flex-1 flex items-center justify-center text-center select-none cursor-default shadow-md min-h-[40px]"
               aria-hidden="true"
             >
               <span className="line-clamp-1 text-center w-full">{positionLabel}</span>
@@ -185,7 +190,7 @@ export default function CareerCard({
                 toggleFlip()
               }}
               id={`btn-flip-${career.id}`}
-              className="shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
+              className="pointer-events-auto shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
             >
               <Plus
                 className={`w-4 h-4 transition-transform duration-500 ease-out ${flipped ? 'rotate-45' : 'rotate-0'}`}
