@@ -1,6 +1,8 @@
-import otpEmailTemplate from '../../Email Notification - OTP Format/otp-email.html'
-import servicesConfirmationTemplate from '../../Email Notification - OTP Format/services-confirmation-email.html'
-import applicationConfirmationTemplate from '../../Email Notification - OTP Format/application-confirmation-email.html'
+import {
+  otpEmailTemplate,
+  servicesConfirmationTemplate,
+  applicationConfirmationTemplate,
+} from './emailTemplates.ts'
 
 export type FormType = 'SERVICES' | 'CAREERS' | 'CONTACT'
 
@@ -242,13 +244,15 @@ function submissionListHtml(
 ) {
   const values: Array<[string, string]> = [
     ['Name', name],
-    ...fields.map(({ label, keys }) => [label, submissionValue(rows, ...keys)]),
+    ...fields
+      .map(({ label, keys }) => [label, submissionValue(rows, ...keys)] as [string, string])
+      .filter(([_, value]) => Boolean(value && value.trim() && value !== 'undefined')),
     ['Reference Number', referenceId],
   ]
-  return `<ul>${values
+  return `<ul style="margin:8px 0 14px 0;padding-left:18px;font-size:12px;line-height:1.55;color:#1F2937;">${values
     .map(
       ([label, value]) =>
-        `<li><b>${label}:</b> ${escapeHtml(value)}<br></li>`,
+        `<li style="margin-bottom:4px;font-size:12px;line-height:1.55;"><strong style="color:#0B0F19;">${escapeHtml(label)}:</strong> ${escapeHtml(value)}</li>`,
     )
     .join('')}</ul>`
 }
@@ -263,15 +267,23 @@ export function clientConfirmationEmail(opts: {
 }): string {
   return renderEmailTemplate(servicesConfirmationTemplate, {
     NAME: escapeHtml(opts.name),
-    DETAILS_LIST: submissionListHtml(opts.name, opts.rows, [
-      { label: 'Email', keys: ['Email'] },
-      { label: 'Phone', keys: ['Phone'] },
-      { label: 'Country/Location', keys: ['Country / Location', 'Country'] },
-      { label: 'Company/Organization', keys: ['Company'] },
-      { label: 'Service Interested In', keys: ['Service'] },
-      { label: 'Inquiry/Project Category', keys: ['Category'] },
-      { label: 'Preferred Contact Method', keys: ['Preferred contact', 'Preferred Contact Method'] },
-    ], opts.referenceId),
+    DETAILS_LIST: submissionListHtml(
+      opts.name,
+      opts.rows,
+      [
+        { label: 'Email', keys: ['Email'] },
+        { label: 'Phone', keys: ['Phone'] },
+        { label: 'Country / Location', keys: ['Country / Location', 'Country'] },
+        { label: 'Company / Organization', keys: ['Company'] },
+        { label: 'Inquiry Category', keys: ['Category'] },
+        { label: 'Service Interested In', keys: ['Service'] },
+        { label: 'Project Requirements', keys: ['Description', 'Message', 'Requirements'] },
+        { label: 'Estimated Budget', keys: ['Budget'] },
+        { label: 'Website / System URL', keys: ['Website / System URL', 'WebsiteUrl', 'Website'] },
+        { label: 'Preferred Contact Method', keys: ['Preferred contact', 'Preferred Contact Method'] },
+      ],
+      opts.referenceId,
+    ),
     REFERENCE_ID: escapeHtml(opts.referenceId),
   })
 }
@@ -284,22 +296,27 @@ export function applicantConfirmationEmail(opts: {
   sourceLabel: string
   rows: Array<{ label: string; value: string }>
 }): string {
-  return plainConfirmationEmail({
-    title: 'WE RECEIVED YOUR APPLICATION',
-    introHtml: `<p>Hi ${escapeHtml(opts.name)},<br></p>
-      <p>Thank you for contacting OPERAVA and for your interest in our opportunities.<br></p>
-      <p>We confirm that we have received your application. Your submitted information has been recorded as follows:<br></p>`,
-    bodyHtml: `${submissionListHtml(opts.name, opts.rows, [
-      { label: 'Email', keys: ['Email'] },
-      { label: 'Phone', keys: ['Phone'] },
-      { label: 'Country/Location', keys: ['Country / Location', 'Country'] },
-      { label: 'Category', keys: ['Category'] },
-      { label: 'Position', keys: ['Position', 'Role'] },
-      { label: 'Preferred Contact Method', keys: ['Preferred contact', 'Preferred Contact Method'] },
-    ], opts.referenceId)}
-      <p>Your application will be reviewed by the appropriate team. If your qualifications match an available position or another suitable opportunity, a member of our Talent Acquisition Team may contact you through your preferred contact method.<br></p>
-      <p>Please note that submitting an application does not guarantee employment or an interview. Your information may, however, be considered for current and future opportunities within OPERAVA.<br></p>
-      <p>Thank you for your interest in becoming part of OPERAVA.<br></p>`,
+  return renderEmailTemplate(applicationConfirmationTemplate, {
+    NAME: escapeHtml(opts.name),
+    DETAILS_LIST: submissionListHtml(
+      opts.name,
+      opts.rows,
+      [
+        { label: 'Email', keys: ['Email'] },
+        { label: 'Phone', keys: ['Phone'] },
+        { label: 'Country / Location', keys: ['Country / Location', 'Country'] },
+        { label: 'Position Applied For', keys: ['Position', 'Role'] },
+        { label: 'Availability', keys: ['Availability'] },
+        { label: 'Education Level', keys: ['Education'] },
+        { label: 'Skills & Specialization', keys: ['Skills'] },
+        { label: 'Work Experience', keys: ['Experience'] },
+        { label: 'Portfolio / Profile', keys: ['Portfolio', 'Resume / Portfolio', 'Website'] },
+        { label: 'Preferred Contact Method', keys: ['Preferred contact', 'Preferred Contact Method'] },
+        { label: 'Additional Information', keys: ['Additional notes', 'Additional', 'Notes'] },
+      ],
+      opts.referenceId,
+    ),
+    REFERENCE_ID: escapeHtml(opts.referenceId),
   })
 }
 
@@ -323,16 +340,10 @@ export function staffNotificationEmail(opts: {
   })
 }
 
-export function otpEmailHtml(name: string, purpose: string, code: string) {
-  return brandedEmailShell({
-    eyebrow: 'Email verification',
-    title: 'Your verification code',
-    introHtml: `<p style="margin:0;">Use this one-time code to verify your email for your <strong>${escapeHtml(purpose)}</strong>. The code expires in <strong>10 minutes</strong>.</p>`,
-    bodyHtml: `<div style="margin:8px 0 4px;padding:18px;border-radius:14px;background:${BRAND.violetSoft};border:1px solid #DDD6FE;text-align:center;">
-        <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:${BRAND.violet};margin-bottom:8px;">Verification code</div>
-        <div style="font-size:32px;font-weight:700;letter-spacing:0.28em;color:${BRAND.ink};">${escapeHtml(code)}</div>
-      </div>
-      <p style="margin:16px 0 0;font-size:12px;color:${BRAND.muted};">For your security, do not share this code. If you did not request it, you can ignore this email.</p>`,
+export function otpEmailHtml(_name: string, purpose: string, code: string) {
+  return renderEmailTemplate(otpEmailTemplate, {
+    PURPOSE: escapeHtml(purpose),
+    OTP_CODE: escapeHtml(code),
   })
 }
 

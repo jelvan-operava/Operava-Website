@@ -260,7 +260,7 @@ async function startServer() {
         })
 
         const response = await ai.models.generateContent({
-          model: 'gemini-3.7-flash',
+          model: 'gemini-3.8-flash',
           contents: contents,
           config: {
             systemInstruction: SYSTEM_INSTRUCTION,
@@ -290,7 +290,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist')
     app.use(express.static(distPath))
-    app.get('*all', (_req, res) => {
+    app.get(/.*/, (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'))
     })
   }

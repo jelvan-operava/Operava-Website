@@ -5,22 +5,76 @@ import FormSuccess from './FormSuccess'
 
 export type IntakeKind = 'SERVICES' | 'CAREERS' | 'CONTACT'
 
-const SERVICE_CATEGORIES = ['Information Technology', 'Business Process Outsourcing', 'Combined IT & BPO', 'Other']
-const IT_SERVICES = ['Software Development', 'Web & Mobile Application Development', 'SaaS & Platform Development', 'IT Systems Development', 'Computer Programming', 'IT Consulting', 'Systems Integration', 'Database Services', 'Cloud & Digital Infrastructure']
-const BPO_SERVICES = ['Customer Service', 'Technical Support', 'Help Desk Operations', 'Back-Office Operations', 'Data Processing', 'Data Entry', 'Document Processing', 'Virtual Assistance']
-const POSITIONS = ['OPERAVA Technology Executive', 'OPERAVA Customer Service Executive', 'OPERAVA Business Operations Executive', 'General application']
+const SERVICE_CATEGORIES = [
+  'Information Technology',
+  'Business Process Outsourcing',
+  'Combined IT & BPO',
+  'General Business Inquiry & Consultation',
+  'Other',
+]
+
+const IT_SERVICES = [
+  'Software Development',
+  'Web & Mobile Application Development',
+  'SaaS & Platform Development',
+  'IT Systems Development',
+  'Computer Programming',
+  'IT Consulting',
+  'Systems Integration',
+  'Database Services',
+  'Cloud & Digital Infrastructure',
+]
+
+const BPO_SERVICES = [
+  'Customer Service',
+  'Technical Support',
+  'Help Desk Operations',
+  'Back-Office Operations',
+  'Data Processing',
+  'Data Entry',
+  'Document Processing',
+  'Virtual Assistance',
+]
+
+const GENERAL_SERVICES = [
+  'General Business Consultation',
+  'Strategic IT & BPO Partnership',
+  'Custom Enterprise Solutions',
+  'General Operational Inquiry',
+  'Other Inquiry',
+]
+
+const POSITIONS = [
+  'OPERAVA Technology Executive',
+  'OPERAVA Customer Service Executive',
+  'OPERAVA Business Operations Executive',
+  'General application',
+]
 
 interface Props {
   kind: IntakeKind
   defaultPosition?: string
   defaultService?: string
+  defaultCategory?: string
 }
 
-export default function OperavaIntakeForm({ kind, defaultPosition, defaultService }: Props) {
+export default function OperavaIntakeForm({
+  kind: rawKind,
+  defaultPosition,
+  defaultService,
+  defaultCategory,
+}: Props) {
+  // Centralize to 2 primary forms: SERVICES and CAREERS
+  const kind = rawKind === 'CAREERS' ? 'CAREERS' : 'SERVICES'
+
   const [step, setStep] = useState<'form' | 'otp' | 'done'>('form')
   const [draftId, setDraftId] = useState('')
   const [maskedEmail, setMaskedEmail] = useState('')
-  const [result, setResult] = useState({ referenceId: '', name: '', formType: kind })
+  const [result, setResult] = useState<{ referenceId: string; name: string; formType: string }>({
+    referenceId: '',
+    name: '',
+    formType: kind,
+  })
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const [resumeKey, setResumeKey] = useState('')
@@ -31,8 +85,8 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
     email: '',
     phone: '',
     country: '',
-    category: 'Information Technology',
-    service: defaultService || '',
+    category: defaultCategory || (rawKind === 'CONTACT' ? 'General Business Inquiry & Consultation' : 'Information Technology'),
+    service: defaultService || (rawKind === 'CONTACT' ? 'General Business Consultation' : ''),
     description: '',
     budget: '',
     websiteUrl: '',
@@ -44,7 +98,6 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
     skills: '',
     portfolio: '',
     additional: '',
-    message: '',
     accurate: false,
     privacy: false,
     website: '',
@@ -54,10 +107,20 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
     if (defaultPosition) setForm((prev) => ({ ...prev, position: defaultPosition }))
   }, [defaultPosition])
 
-  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
-    setForm((prev) => ({ ...prev, [key]: value }))
-  }
+  useEffect(() => {
+    if (defaultService) setForm((prev) => ({ ...prev, service: defaultService }))
+  }, [defaultService])
+
+  useEffect(() => {
+    if (defaultCategory) setForm((prev) => ({ ...prev, category: defaultCategory }))
+  }, [defaultCategory])
+
+  const set =
+    (key: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const value = e.target.type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value
+      setForm((prev) => ({ ...prev, [key]: value }))
+    }
 
   const uploadResume = async (file: File) => {
     const data = new FormData()
@@ -89,7 +152,7 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
           country: form.country,
           category: form.category,
           service: form.service,
-          description: kind === 'CONTACT' ? form.message : form.description,
+          description: form.description,
           budget: form.budget,
           websiteUrl: form.websiteUrl,
           contactMethod: form.contactMethod,
@@ -100,7 +163,6 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
           skills: form.skills,
           portfolio: form.portfolio,
           additional: form.additional,
-          message: form.message,
           resumeKey,
           accurate: form.accurate,
           privacy: form.privacy,
@@ -119,7 +181,10 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
     }
   }
 
-  if (step === 'done') return <FormSuccess formType={result.formType} name={result.name} referenceId={result.referenceId} />
+  if (step === 'done') {
+    return <FormSuccess formType={result.formType} name={result.name} referenceId={result.referenceId} />
+  }
+
   if (step === 'otp') {
     return (
       <OtpVerify
@@ -136,50 +201,258 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
     )
   }
 
-  const field = 'w-full px-4 py-3 text-sm border border-gray-200 rounded-xl'
+  const field = 'w-full px-4 py-3 text-sm border border-gray-200 rounded-xl bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-violet-600 focus:border-transparent transition-all'
   const positionOptions = Array.from(new Set([...(defaultPosition ? [defaultPosition] : []), ...POSITIONS]))
 
   return (
     <form onSubmit={submit} className="space-y-4 max-w-2xl">
+      {/* Honeypot */}
       <input className="hidden" tabIndex={-1} autoComplete="off" value={form.website} onChange={set('website')} />
-      <input required value={form.name} onChange={set('name')} placeholder="Full Name" className={field} />
-      {kind === 'SERVICES' && <input value={form.company} onChange={set('company')} placeholder="Company / Organization Name (Optional)" className={field} />}
-      <input required type="email" value={form.email} onChange={set('email')} placeholder={kind === 'SERVICES' ? 'Business Email Address' : 'Email Address'} className={field} />
-      <input value={form.phone} onChange={set('phone')} placeholder={kind === 'CAREERS' ? 'Contact Number' : 'Contact Number (Optional)'} required={kind === 'CAREERS'} className={field} />
-      <input required={kind !== 'CONTACT'} value={form.country} onChange={set('country')} placeholder={kind === 'CAREERS' ? 'Country / Current Location' : 'Country / Location'} className={field} />
 
+      {/* Common Contact Fields */}
+      <div className="space-y-4">
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 mb-1">
+            Full Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            required
+            value={form.name}
+            onChange={set('name')}
+            placeholder="Jane Doe"
+            className={field}
+          />
+        </div>
+
+        {kind === 'SERVICES' && (
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Company / Organization Name (Optional)
+            </label>
+            <input
+              value={form.company}
+              onChange={set('company')}
+              placeholder="Acme Corp"
+              className={field}
+            />
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              {kind === 'SERVICES' ? 'Business Email Address' : 'Email Address'} <span className="text-red-500">*</span>
+            </label>
+            <input
+              required
+              type="email"
+              value={form.email}
+              onChange={set('email')}
+              placeholder="name@company.com"
+              className={field}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Contact / Phone Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              required
+              value={form.phone}
+              onChange={set('phone')}
+              placeholder="+1 (555) 000-0000"
+              className={field}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-gray-700 mb-1">
+            {kind === 'CAREERS' ? 'Country / Current Location' : 'Country / Location'} <span className="text-red-500">*</span>
+          </label>
+          <input
+            required
+            value={form.country}
+            onChange={set('country')}
+            placeholder="United States, Philippines, Canada, etc."
+            className={field}
+          />
+        </div>
+      </div>
+
+      {/* Centralized Services Form Fields */}
       {kind === 'SERVICES' && (
-        <>
-          <select value={form.category} onChange={set('category')} className={field}>
-            {SERVICE_CATEGORIES.map((item) => <option key={item}>{item}</option>)}
-          </select>
-          <select required value={form.service} onChange={set('service')} className={field}>
-            <option value="">Specific Service Needed</option>
-            <optgroup label="IT">{IT_SERVICES.map((item) => <option key={item}>{item}</option>)}</optgroup>
-            <optgroup label="BPO">{BPO_SERVICES.map((item) => <option key={item}>{item}</option>)}</optgroup>
-          </select>
-          <textarea required minLength={15} value={form.description} onChange={set('description')} rows={5} placeholder="Project Description / Requirements" className={field} />
-          <input value={form.budget} onChange={set('budget')} placeholder="Estimated Budget (Optional)" className={field} />
-          <input value={form.websiteUrl} onChange={set('websiteUrl')} placeholder="Website / Existing System URL (Optional)" className={field} />
-          <select value={form.contactMethod} onChange={set('contactMethod')} className={field}>
-            <option>Email</option>
-            <option>Phone</option>
-            <option>Either</option>
-          </select>
-        </>
+        <div className="space-y-4 pt-2 border-t border-gray-100">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Inquiry / Project Category <span className="text-red-500">*</span>
+            </label>
+            <select value={form.category} onChange={set('category')} className={field}>
+              {SERVICE_CATEGORIES.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Specific Service or Consultation Needed <span className="text-red-500">*</span>
+            </label>
+            <select required value={form.service} onChange={set('service')} className={field}>
+              <option value="">Select Service / Inquiry Type</option>
+              <optgroup label="Information Technology">
+                {IT_SERVICES.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Business Process Outsourcing (BPO)">
+                {BPO_SERVICES.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="General / Consultation">
+                {GENERAL_SERVICES.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Project Description / Inquiry Requirements <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              required
+              minLength={15}
+              value={form.description}
+              onChange={set('description')}
+              rows={5}
+              placeholder="Describe your project goals, scope of work, technical requirements, or consultation inquiry (minimum 15 characters)..."
+              className={field}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Estimated Budget (Optional)
+              </label>
+              <input
+                value={form.budget}
+                onChange={set('budget')}
+                placeholder="e.g., $10,000 - $25,000 USD"
+                className={field}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Preferred Contact Method
+              </label>
+              <select value={form.contactMethod} onChange={set('contactMethod')} className={field}>
+                <option value="Email">Email</option>
+                <option value="Phone">Phone</option>
+                <option value="Either">Either Email or Phone</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Website / Existing System URL (Optional)
+            </label>
+            <input
+              value={form.websiteUrl}
+              onChange={set('websiteUrl')}
+              placeholder="https://example.com"
+              className={field}
+            />
+          </div>
+        </div>
       )}
 
+      {/* Centralized Careers Form Fields */}
       {kind === 'CAREERS' && (
-        <>
-          <select required value={form.position} onChange={set('position')} className={field}>
-            {positionOptions.map((item) => <option key={item}>{item}</option>)}
-          </select>
-          <input required value={form.availability} onChange={set('availability')} placeholder="Availability" className={field} />
-          <textarea required value={form.experience} onChange={set('experience')} rows={3} placeholder="Relevant Work Experience" className={field} />
-          <input required value={form.education} onChange={set('education')} placeholder="Education Level" className={field} />
-          <input required value={form.skills} onChange={set('skills')} placeholder="Skills / Specialization" className={field} />
+        <div className="space-y-4 pt-2 border-t border-gray-100">
           <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">Resume (PDF or Word) — recommended</label>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Position Applied For <span className="text-red-500">*</span>
+            </label>
+            <select required value={form.position} onChange={set('position')} className={field}>
+              {positionOptions.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Availability / Notice Period <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                value={form.availability}
+                onChange={set('availability')}
+                placeholder="Immediate, 2 weeks, 1 month, etc."
+                className={field}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Highest Education Level <span className="text-red-500">*</span>
+              </label>
+              <input
+                required
+                value={form.education}
+                onChange={set('education')}
+                placeholder="Bachelor's, College Undergraduate, etc."
+                className={field}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Skills &amp; Specialization <span className="text-red-500">*</span>
+            </label>
+            <input
+              required
+              value={form.skills}
+              onChange={set('skills')}
+              placeholder="e.g., React, TypeScript, Cloud Infrastructure, Customer Support, etc."
+              className={field}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Relevant Work Experience <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              required
+              value={form.experience}
+              onChange={set('experience')}
+              rows={3}
+              placeholder="Summary of previous roles, key responsibilities, and relevant achievements..."
+              className={field}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Resume (PDF or Word) &mdash; recommended
+            </label>
             <input
               type="file"
               accept=".pdf,.doc,.docx,application/pdf"
@@ -187,33 +460,110 @@ export default function OperavaIntakeForm({ kind, defaultPosition, defaultServic
                 const file = e.target.files?.[0]
                 if (file) uploadResume(file).catch((err) => setError(err.message))
               }}
-              className="text-sm"
+              className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
             />
-            {resumeKey && <p className="text-xs text-emerald-700 mt-1">Resume ready{resumeName ? `: ${resumeName}` : ''}.</p>}
-            <p className="text-xs text-gray-500 mt-1">If upload is unavailable, add a portfolio or LinkedIn URL below.</p>
+            {resumeKey && (
+              <p className="text-xs text-emerald-700 mt-1 font-medium">
+                ✓ Resume attached{resumeName ? `: ${resumeName}` : ''}.
+              </p>
+            )}
+            <p className="text-xs text-gray-500 mt-1">
+              If upload is unavailable, provide your portfolio, GitHub, or LinkedIn URL below.
+            </p>
           </div>
-          <input value={form.portfolio} onChange={set('portfolio')} placeholder="Portfolio / LinkedIn / Professional Profile" className={field} />
-          <textarea value={form.additional} onChange={set('additional')} rows={3} placeholder="Additional Information (Optional)" className={field} />
-        </>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Portfolio / LinkedIn / Professional Profile URL
+            </label>
+            <input
+              value={form.portfolio}
+              onChange={set('portfolio')}
+              placeholder="https://linkedin.com/in/username or https://github.com/username"
+              className={field}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Preferred Contact Method
+              </label>
+              <select value={form.contactMethod} onChange={set('contactMethod')} className={field}>
+                <option value="Email">Email</option>
+                <option value="Phone">Phone</option>
+                <option value="Either">Either Email or Phone</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Additional Information (Optional)
+            </label>
+            <textarea
+              value={form.additional}
+              onChange={set('additional')}
+              rows={3}
+              placeholder="Any additional notes, certifications, or cover information..."
+              className={field}
+            />
+          </div>
+        </div>
       )}
 
-      {kind === 'CONTACT' && (
-        <textarea required minLength={10} value={form.message} onChange={set('message')} rows={5} placeholder="How can OPERAVA help?" className={field} />
+      {/* Consent & Verification Checkboxes */}
+      <div className="pt-2 space-y-2">
+        <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
+          <input
+            type="checkbox"
+            required
+            checked={form.accurate}
+            onChange={set('accurate')}
+            className="mt-0.5 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+          />
+          <span>I confirm that the information provided is accurate and complete.</span>
+        </label>
+        <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer">
+          <input
+            type="checkbox"
+            required
+            checked={form.privacy}
+            onChange={set('privacy')}
+            className="mt-0.5 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+          />
+          {kind === 'CAREERS' ? (
+            <span>
+              I acknowledge that my information will be processed for recruitment purposes in accordance with the{' '}
+              <Link to="/privacy" className="text-violet-700 underline font-medium">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          ) : (
+            <span>
+              I agree to the{' '}
+              <Link to="/privacy" className="text-violet-700 underline font-medium">
+                Privacy Policy
+              </Link>{' '}
+              and consent to OPERAVA contacting me regarding this inquiry.
+            </span>
+          )}
+        </label>
+      </div>
+
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700">
+          {error}
+        </div>
       )}
 
-      <label className="flex items-start gap-2 text-xs text-gray-600">
-        <input type="checkbox" required checked={form.accurate} onChange={set('accurate')} className="mt-0.5" />
-        I confirm that the information provided is accurate.
-      </label>
-      <label className="flex items-start gap-2 text-xs text-gray-600">
-        <input type="checkbox" required checked={form.privacy} onChange={set('privacy')} className="mt-0.5" />
-        {kind === 'CAREERS'
-          ? <span>I acknowledge that my information will be processed for recruitment purposes in accordance with the <Link to="/privacy" className="underline">Privacy Policy</Link>.</span>
-          : <span>I agree to the <Link to="/privacy" className="underline">Privacy Policy</Link> and consent to OPERAVA contacting me regarding this inquiry.</span>}
-      </label>
-      {error && <p className="text-xs text-red-600">{error}</p>}
-      <button type="submit" disabled={sending} className="px-6 py-3 rounded-xl bg-violet-700 text-white text-sm font-bold disabled:opacity-60">
-        {sending ? 'Sending code…' : 'Continue to email verification'}
+      <button
+        type="submit"
+        disabled={sending}
+        className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-violet-700 text-white text-sm font-bold hover:bg-violet-800 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {sending ? 'Sending verification code…' : 'Continue to email verification'}
       </button>
     </form>
   )
