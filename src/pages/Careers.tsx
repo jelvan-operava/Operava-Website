@@ -108,7 +108,7 @@ export default function Careers() {
   const filteredRoles = selectedTrack === 'all' ? roles : roles.filter((role) => role.code === selectedTrack)
 
   const perks = [
-    { title: t('careers.perk1.title', 'Flexible Remote Work'), desc: t('careers.perk1.desc', 'Work from home or access our modern collaboration hubs across the Philippines.'), icon: Users },
+    { title: t('careers.perk1.title', 'Remote Work'), desc: t('careers.perk1.desc', 'Work from home or access our modern collaboration hubs across the Philippines.'), icon: Users },
     { title: t('careers.perk2.title', 'Accelerated Growth & Upskilling'), desc: t('careers.perk2.desc', 'Dedicated budget for certifications, cloud accreditations, and technical mentorship.'), icon: Sparkles },
     { title: t('careers.perk3.title', 'Comprehensive Healthcare & HMO'), desc: t('careers.perk3.desc', 'Top-tier medical coverage from Day 1 including dependent coverage and wellness benefits.'), icon: HeartHandshake },
     { title: t('careers.perk4.title', 'Modern Hardware & Tooling Allowance'), desc: t('careers.perk4.desc', 'Company-issued laptops, ergonomic workstation allowances, and modern dev stacks.'), icon: Building2 },
