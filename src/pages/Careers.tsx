@@ -214,11 +214,26 @@ export default function Careers() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
             {hiringStages.map((stage, i) => (
-              <div key={stage.step} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs">
-                <div className="text-2xl font-black text-violet-700 mb-3">{stage.step}</div>
-                <h3 className="text-sm font-bold text-gray-900 mb-2 leading-snug">{stage.title}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">{stage.desc}</p>
-                <div className="mt-4 pt-3 border-t border-gray-100 text-[10px] font-semibold uppercase tracking-wider text-gray-400">Stage {i + 1} of 5</div>
+              <div
+                key={stage.step}
+                className="relative overflow-hidden rounded-2xl p-6 min-h-[220px] flex flex-col border border-violet-500/25 shadow-lg"
+                style={{ backgroundColor: '#240e48' }}
+              >
+                <img
+                  src="https://res.cloudinary.com/b5i5bwwa/image/upload/v1788594538/Shell_card3.png"
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-2xl"
+                  loading="lazy"
+                />
+                <div className="relative z-10 flex flex-col flex-1">
+                  <div className="text-2xl font-black text-white mb-3">{stage.step}</div>
+                  <h3 className="text-sm font-bold text-white mb-2 leading-snug">{stage.title}</h3>
+                  <p className="text-xs text-[#e2dbff] leading-relaxed flex-1">{stage.desc}</p>
+                  <div className="mt-4 pt-3 border-t border-white/15 text-[10px] font-semibold uppercase tracking-wider text-violet-200/80">
+                    Stage {i + 1} of 5
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -323,4 +338,3 @@ export default function Careers() {
     </main>
   )
 }
-
