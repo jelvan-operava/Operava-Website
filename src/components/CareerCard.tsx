@@ -164,40 +164,36 @@ export default function CareerCard({
             ) : null}
           </div>
 
-          {/*
-            Outer-layer title bar:
-            - Anchored to card base, then moved up by one full button height (~40px)
-            - Horizontally centered on the card
-            - Sits above the webp (overflows onto the model feet)
-          */}
+          {/* Title only — centered on webp, slightly higher, not tied to + */}
           <div
-            className="pointer-events-none absolute z-30 left-1/2 -translate-x-1/2 bottom-[5px] w-[calc(100%-16px)] max-w-[calc(100%-16px)] flex items-center justify-center gap-2"
-            style={{ transform: 'translate(-50%, -100%)' }}
+            className="pointer-events-none absolute z-30 left-1/2 w-[min(240px,calc(100%-56px))]"
+            style={{ bottom: '56px', transform: 'translateX(-50%)' }}
           >
             <div
-              className="operava-learn-more-btn pointer-events-none !py-2.5 !px-3 !text-[11px] sm:!text-xs !tracking-wide flex-1 flex items-center justify-center text-center select-none cursor-default shadow-md min-h-[40px]"
+              className="operava-learn-more-btn pointer-events-none !py-2.5 !px-3 !text-[11px] sm:!text-xs !tracking-wide w-full flex items-center justify-center text-center select-none cursor-default shadow-md min-h-[40px]"
               aria-hidden="true"
             >
               <span className="line-clamp-1 text-center w-full">{positionLabel}</span>
             </div>
-
-            <button
-              type="button"
-              aria-label={flipped ? `Hide details for ${career.title}` : `Show details for ${career.title}`}
-              aria-pressed={flipped}
-              onClick={(e) => {
-                e.stopPropagation()
-                toggleFlip()
-              }}
-              id={`btn-flip-${career.id}`}
-              className="pointer-events-auto shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
-            >
-              <Plus
-                className={`w-4 h-4 transition-transform duration-500 ease-out ${flipped ? 'rotate-45' : 'rotate-0'}`}
-                strokeWidth={2.5}
-              />
-            </button>
           </div>
+
+          {/* Circle + — fixed right-bottom of card; independent of title */}
+          <button
+            type="button"
+            aria-label={flipped ? `Hide details for ${career.title}` : `Show details for ${career.title}`}
+            aria-pressed={flipped}
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleFlip()
+            }}
+            id={`btn-flip-${career.id}`}
+            className="absolute z-30 right-[12px] bottom-[12px] shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white text-[#5e42be] flex items-center justify-center shadow-md border border-white/80 hover:scale-105 active:scale-95 transition-transform"
+          >
+            <Plus
+              className={`w-4 h-4 transition-transform duration-500 ease-out ${flipped ? 'rotate-45' : 'rotate-0'}`}
+              strokeWidth={2.5}
+            />
+          </button>
         </div>
 
         <div
