@@ -128,10 +128,14 @@ export default function CareerCard({
       transition={{ duration: 0.45, delay: (index % 4) * 0.08 }}
       id={`career-card-${career.id}`}
       className={`operava-flip-scene w-full ${className}`}
+      style={{ minHeight: 640 }}
     >
-      <div className={`operava-flip-inner${flipped ? ' is-flipped' : ''}`}>
+      <div
+        className={`operava-flip-inner${flipped ? ' is-flipped' : ''}`}
+        style={{ minHeight: 640, cursor: 'default' }}
+      >
         <div
-          className="operava-flip-face operava-flip-face-front operava-card-frame group flex flex-col items-center justify-between"
+          className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group flex flex-col items-center"
           aria-hidden={flipped}
         >
           <img
@@ -142,7 +146,7 @@ export default function CareerCard({
             loading="lazy"
           />
 
-          <div className="operava-image-container relative z-10 flex items-center justify-center !mb-4">
+          <div className="operava-career-model-stage relative z-10 flex-1 w-full min-h-0 flex items-center justify-center overflow-hidden">
             {career.image && !imgError ? (
               <img
                 src={career.image}
@@ -150,16 +154,15 @@ export default function CareerCard({
                 onError={() => setImgError(true)}
                 referrerPolicy="no-referrer"
                 loading="lazy"
-                className="!object-contain max-h-full max-w-full mx-auto"
               />
             ) : IconComponent ? (
               <div className="relative z-10 flex items-center justify-center p-4">
-                <IconComponent className="w-16 h-16 text-violet-300" />
+                <IconComponent className="w-20 h-20 text-violet-300" />
               </div>
             ) : null}
           </div>
 
-          <div className="relative z-10 mt-auto w-full flex items-center gap-2">
+          <div className="relative z-10 mt-auto w-full flex items-center gap-2 shrink-0">
             <div
               className="operava-learn-more-btn !py-2 !px-3 !text-[11px] !tracking-wide flex-1 flex items-center justify-center text-center pointer-events-none select-none cursor-default"
               aria-hidden="true"
