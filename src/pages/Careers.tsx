@@ -165,7 +165,7 @@ export default function Careers() {
               />
             ))}
           </div>
-          <div className="operava-landscape-card-frame relative rounded-3xl p-6 sm:p-8 overflow-hidden">
+          <div className="operava-landscape-card-frame relative rounded-3xl p-4 sm:p-5 overflow-hidden">
             <img
               src="https://res.cloudinary.com/b5i5bwwa/image/upload/v1788593069/Shell_card.png"
               alt=""
@@ -173,13 +173,13 @@ export default function Careers() {
               className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[24px]"
               loading="lazy"
             />
-            <div className="relative z-10 text-white space-y-3 leading-relaxed">
-              <h4 className="text-base font-bold text-white">Task Assignments &amp; Position Governance</h4>
-              <p className="text-sm text-[#e2dbff]">Candidates and employees may be assigned to specific related tasks on available posts or based on their skills, qualifications, client specifications, assessments, and chosen specialization track.</p>
-              <div className="pt-2">
-                <Link to="/terms#section-5" className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-200 hover:text-white underline transition-colors">
+            <div className="relative z-10 text-white space-y-1.5 leading-snug">
+              <h4 className="text-sm font-bold text-white">Task Assignments &amp; Position Governance</h4>
+              <p className="text-xs text-[#e2dbff]">Candidates and employees may be assigned to specific related tasks on available posts or based on their skills, qualifications, client specifications, assessments, and chosen specialization track.</p>
+              <div className="pt-1">
+                <Link to="/terms#section-5" className="inline-flex items-center gap-1 text-[11px] font-bold text-violet-200 hover:text-white underline transition-colors">
                   <span>Read full Terms Section 5</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>
             </div>
