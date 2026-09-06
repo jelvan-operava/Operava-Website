@@ -137,10 +137,15 @@ export default function Careers() {
 
   return (
     <main>
-      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 bg-gray-950 text-white overflow-hidden">
-        <div className="absolute inset-0 z-0 opacity-20">
-          <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80" alt="OPERAVA Global Team" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/80 to-gray-950" />
+      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-white overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80"
+            alt="OPERAVA Global Team"
+            className="w-full h-full object-cover"
+          />
+          {/* Black overlay at ~30% transparency (70% opacity) */}
+          <div className="absolute inset-0 bg-gray-950/70" />
         </div>
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
           <div className="max-w-3xl">
