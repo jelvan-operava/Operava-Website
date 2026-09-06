@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
-import { MapPin, Briefcase, Clock, Send, Plus, X } from 'lucide-react'
+import { Send, Plus, X } from 'lucide-react'
 
 export interface CareerCardData {
   id: string
@@ -133,51 +133,24 @@ export default function CareerCard({
         className={`operava-flip-inner${flipped ? ' is-flipped' : ''}`}
         style={{ cursor: 'default' }}
       >
-        {/* FRONT */}
+        {/* FRONT — full cover image only + circle + */}
         <div
-          className="operava-flip-face operava-flip-face-front operava-card-frame operava-career-front group relative flex flex-col !p-[5px] h-full overflow-visible"
+          className="operava-flip-face operava-flip-face-front relative h-full overflow-hidden rounded-[20px]"
           aria-hidden={flipped}
         >
-          <img
-            src="https://res.cloudinary.com/b5i5bwwa/image/upload/Operava-contents-card.png"
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[20px]"
-            loading="lazy"
-          />
+          {career.image && !imgError ? (
+            <img
+              src={career.image}
+              alt={career.title}
+              onError={() => setImgError(true)}
+              referrerPolicy="no-referrer"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-b from-violet-800 to-violet-950" />
+          )}
 
-          {/* Model stage (clipped) */}
-          <div className="relative z-10 flex-1 w-full min-h-0 overflow-hidden rounded-[14px] flex items-center justify-center">
-            {career.image && !imgError ? (
-              <img
-                src={career.image}
-                alt={career.title}
-                onError={() => setImgError(true)}
-                referrerPolicy="no-referrer"
-                loading="lazy"
-                className="block w-full h-full object-contain object-center origin-center scale-[1.1]"
-              />
-            ) : IconComponent ? (
-              <div className="flex items-center justify-center p-4">
-                <IconComponent className="w-20 h-20 text-violet-300" />
-              </div>
-            ) : null}
-          </div>
-
-          {/* Title only — centered on webp, slightly higher, not tied to + */}
-          <div
-            className="pointer-events-none absolute z-30 left-1/2 w-[min(240px,calc(100%-56px))]"
-            style={{ bottom: '56px', transform: 'translateX(-50%)' }}
-          >
-            <div
-              className="operava-learn-more-btn pointer-events-none !py-2.5 !px-3 !text-[11px] sm:!text-xs !tracking-wide w-full flex items-center justify-center text-center select-none cursor-default shadow-md min-h-[40px]"
-              aria-hidden="true"
-            >
-              <span className="line-clamp-1 text-center w-full">{positionLabel}</span>
-            </div>
-          </div>
-
-          {/* Circle + — right-bottom, nudged a bit left and up */}
           <button
             type="button"
             aria-label={flipped ? `Hide details for ${career.title}` : `Show details for ${career.title}`}
