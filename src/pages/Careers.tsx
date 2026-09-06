@@ -36,7 +36,8 @@ export default function Careers() {
       code: 'tech',
       title: 'OPERAVA Technology Executive' as CareerPosition,
       shortTitle: 'Technology Executive',
-      image: 'https://res.cloudinary.com/b5i5bwwa/image/upload/OPERAVA_TECH_1000x1350_v3.webp',
+      image:
+        'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788660949/792090637_1483292190495964_5576048200188804631_n.webp',
       summary:
         'For builders, engineers, and technical problem-solvers. Work remotely on international projects in software engineering, web/mobile development, and cloud systems.',
       assignments: [
@@ -60,7 +61,8 @@ export default function Careers() {
       code: 'ops',
       title: 'OPERAVA Business Operations Executive' as CareerPosition,
       shortTitle: 'Business Operations Executive',
-      image: 'https://res.cloudinary.com/b5i5bwwa/image/upload/OPERAVA_OPS_1000x1350_v3.webp',
+      image:
+        'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788660938/Business%20Operations%20Executive%20Cover.jpg',
       summary:
         'For detail-driven operators and business enablers. Work remotely supporting HR, Finance, Recruitment, and business operations for global companies.',
       assignments: [
@@ -84,7 +86,8 @@ export default function Careers() {
       code: 'cx',
       title: 'OPERAVA Customer Experience Executive' as CareerPosition,
       shortTitle: 'Customer Experience Executive',
-      image: 'https://res.cloudinary.com/b5i5bwwa/image/upload/OPERAVA_CX_1000x1350_v3.webp',
+      image:
+        'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788660940/797841464_3350629321810587_364897228139176087_n.jpg',
       summary:
         'For client-focused communicators and service leaders. Work remotely delivering world-class customer support for international brands.',
       assignments: [
@@ -144,7 +147,6 @@ export default function Careers() {
             alt="OPERAVA Global Team"
             className="w-full h-full object-cover"
           />
-          {/* Black overlay at ~30% transparency (70% opacity) */}
           <div className="absolute inset-0 bg-gray-950/70" />
         </div>
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
