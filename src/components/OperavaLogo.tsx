@@ -8,7 +8,7 @@ type OperavaLogoProps = {
   priority?: boolean
 }
 
-/** OPERAVA mark — always displayed on a white background plate. */
+/** OPERAVA twisted mark — always displayed on a white background plate. */
 export default function OperavaLogo({
   size = 40,
   className = '',
