@@ -1,8 +1,4 @@
-import {
-  OPERAVA_LOGO_ALT,
-  OPERAVA_LOGO_DATA_URL,
-} from '../brand/operavaLogoData'
-import { OPERAVA_LOGO_TRANSPARENT_DATA_URL } from '../brand/operavaLogoTransparent'
+import { OPERAVA_LOGO_ALT, OPERAVA_LOGO_DATA_URL } from '../brand/operavaLogoData'
 
 type OperavaLogoProps = {
   size?: number
@@ -15,7 +11,7 @@ type OperavaLogoProps = {
   wave?: boolean
 }
 
-/** OPERAVA twisted mark — white plate by default; transparent + motion for AVA. */
+/** OPERAVA twisted mark — clean square on white (nav/footer). AVA uses AvaVideoAvatar. */
 export default function OperavaLogo({
   size = 40,
   className = '',
@@ -27,7 +23,6 @@ export default function OperavaLogo({
   wave = false,
 }: OperavaLogoProps) {
   const motion = breathe || wave
-  const src = transparent ? OPERAVA_LOGO_TRANSPARENT_DATA_URL : OPERAVA_LOGO_DATA_URL
 
   return (
     <div
@@ -53,7 +48,7 @@ export default function OperavaLogo({
         `}</style>
       )}
       <img
-        src={src}
+        src={OPERAVA_LOGO_DATA_URL}
         alt={alt}
         width={size}
         height={size}
