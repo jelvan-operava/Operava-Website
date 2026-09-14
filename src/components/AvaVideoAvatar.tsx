@@ -14,8 +14,8 @@ const SIZE_MAP = {
 } as const
 
 /**
- * AVA avatar — same OPERAVA twisted mark as the site logo,
- * soft smooth breathing (no video, no edge rings).
+ * AVA avatar — transparent OPERAVA twisted mark,
+ * soft breathe + gentle wave (no plate, no video).
  */
 export default function AvaVideoAvatar({
   size = 'md',
@@ -32,10 +32,16 @@ export default function AvaVideoAvatar({
     >
       <OperavaLogo
         size={px}
+        transparent
         breathe
+        wave
         priority
         alt="AVA"
-        className={showGlow ? 'shadow-[0_0_20px_rgba(109,40,217,0.35)]' : ''}
+        className={
+          showGlow
+            ? 'drop-shadow-[0_0_14px_rgba(109,40,217,0.45)]'
+            : ''
+        }
       />
     </div>
   )
