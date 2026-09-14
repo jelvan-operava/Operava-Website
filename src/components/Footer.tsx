@@ -67,7 +67,6 @@ export default function Footer() {
               <OperavaLogo
                 size={44}
                 className="transition-transform duration-200 group-hover:scale-105"
-                plateClassName="ring-white/20"
               />
               <div className="flex flex-col leading-none">
                 <div className="text-2xl font-black tracking-tight text-white group-hover:text-violet-300 transition-colors">
