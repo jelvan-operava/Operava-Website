@@ -1,45 +1,34 @@
-/** Canonical OPERAVA mark — always rendered on a white background. */
-
-const LOGO_SRC = '/operava-logo.jpg'
-const LOGO_FALLBACK = '/operava-logo.svg'
+import { OPERAVA_LOGO_ALT, OPERAVA_LOGO_DATA_URL } from '../brand/operavaLogoData'
 
 type OperavaLogoProps = {
-  /** Outer box size in px (square). */
   size?: number
   className?: string
-  /** Extra classes on the white plate behind the mark. */
   plateClassName?: string
   alt?: string
   priority?: boolean
 }
 
+/** OPERAVA mark — always displayed on a white background plate. */
 export default function OperavaLogo({
   size = 40,
   className = '',
   plateClassName = '',
-  alt = 'OPERAVA',
+  alt = OPERAVA_LOGO_ALT,
   priority = false,
 }: OperavaLogoProps) {
   return (
     <div
-      className={`relative shrink-0 overflow-hidden bg-white flex items-center justify-center ${plateClassName} ${className}`}
+      className={`relative shrink-0 overflow-hidden bg-white rounded-xl flex items-center justify-center ring-1 ring-black/5 ${plateClassName} ${className}`}
       style={{ width: size, height: size }}
-      aria-hidden={alt ? undefined : true}
     >
       <img
-        src={LOGO_SRC}
+        src={OPERAVA_LOGO_DATA_URL}
         alt={alt}
         width={size}
         height={size}
         className="h-full w-full object-contain pointer-events-none select-none"
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
-        onError={(e) => {
-          const el = e.currentTarget
-          if (el.src.includes('operava-logo.jpg')) {
-            el.src = LOGO_FALLBACK
-          }
-        }}
       />
     </div>
   )
