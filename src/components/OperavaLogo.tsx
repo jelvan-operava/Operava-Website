@@ -1,8 +1,8 @@
 import {
   OPERAVA_LOGO_ALT,
   OPERAVA_LOGO_DATA_URL,
-  OPERAVA_LOGO_TRANSPARENT_DATA_URL,
 } from '../brand/operavaLogoData'
+import { OPERAVA_LOGO_TRANSPARENT_DATA_URL } from '../brand/operavaLogoTransparent'
 
 type OperavaLogoProps = {
   size?: number
@@ -10,11 +10,8 @@ type OperavaLogoProps = {
   plateClassName?: string
   alt?: string
   priority?: boolean
-  /** Soft scale pulse */
   breathe?: boolean
-  /** Transparent mark (no white plate) — used by AVA */
   transparent?: boolean
-  /** Gentle wave / sway (with breathe) */
   wave?: boolean
 }
 
