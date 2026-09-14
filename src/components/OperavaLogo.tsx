@@ -1,4 +1,8 @@
-import { OPERAVA_LOGO_ALT, OPERAVA_LOGO_DATA_URL } from '../brand/operavaLogoData'
+import {
+  OPERAVA_LOGO_ALT,
+  OPERAVA_LOGO_DATA_URL,
+  OPERAVA_LOGO_TRANSPARENT_DATA_URL,
+} from '../brand/operavaLogoData'
 
 type OperavaLogoProps = {
   size?: number
@@ -6,11 +10,15 @@ type OperavaLogoProps = {
   plateClassName?: string
   alt?: string
   priority?: boolean
-  /** Soft scale pulse (AVA floating button, etc.) */
+  /** Soft scale pulse */
   breathe?: boolean
+  /** Transparent mark (no white plate) — used by AVA */
+  transparent?: boolean
+  /** Gentle wave / sway (with breathe) */
+  wave?: boolean
 }
 
-/** OPERAVA twisted mark — clean square on white, no edge rings or margins. */
+/** OPERAVA twisted mark — white plate by default; transparent + motion for AVA. */
 export default function OperavaLogo({
   size = 40,
   className = '',
@@ -18,32 +26,43 @@ export default function OperavaLogo({
   alt = OPERAVA_LOGO_ALT,
   priority = false,
   breathe = false,
+  transparent = false,
+  wave = false,
 }: OperavaLogoProps) {
+  const motion = breathe || wave
+  const src = transparent ? OPERAVA_LOGO_TRANSPARENT_DATA_URL : OPERAVA_LOGO_DATA_URL
+
   return (
     <div
-      className={`relative shrink-0 overflow-hidden bg-white rounded-lg flex items-center justify-center ${
-        breathe ? 'ava-breathe' : ''
-      } ${plateClassName} ${className}`}
+      className={`relative shrink-0 overflow-hidden flex items-center justify-center ${
+        transparent ? 'bg-transparent' : 'bg-white rounded-lg'
+      } ${motion ? 'ava-logo-motion' : ''} ${plateClassName} ${className}`}
       style={{ width: size, height: size }}
     >
-      {breathe && (
+      {motion && (
         <style>{`
-          @keyframes avaBreathe {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.045); }
+          @keyframes avaLogoMotion {
+            0%   { transform: scale(1) rotate(0deg) translateY(0); }
+            25%  { transform: scale(1.04) rotate(2.2deg) translateY(-1.5px); }
+            50%  { transform: scale(1.06) rotate(0deg) translateY(-2.5px); }
+            75%  { transform: scale(1.04) rotate(-2.2deg) translateY(-1.5px); }
+            100% { transform: scale(1) rotate(0deg) translateY(0); }
           }
-          .ava-breathe {
-            animation: avaBreathe 3.6s ease-in-out infinite;
+          .ava-logo-motion {
+            animation: avaLogoMotion 4.2s ease-in-out infinite;
             will-change: transform;
+            transform-origin: center center;
           }
         `}</style>
       )}
       <img
-        src={OPERAVA_LOGO_DATA_URL}
+        src={src}
         alt={alt}
         width={size}
         height={size}
-        className="h-full w-full object-cover pointer-events-none select-none"
+        className={`h-full w-full pointer-events-none select-none ${
+          transparent ? 'object-contain' : 'object-cover'
+        }`}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
       />
