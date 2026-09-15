@@ -29,7 +29,6 @@ export function resolveSecret(env: FormEnv): string {
   return env.OTP_SECRET || env.RESEND_API_KEY || DEFAULT_OTP_SECRET
 }
 
-/** Safe production check — process.env can be missing on some Workers runtimes. */
 export function isProductionRuntime(): boolean {
   try {
     return typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
@@ -38,7 +37,6 @@ export function isProductionRuntime(): boolean {
   }
 }
 
-/** UTF-8 safe base64url encode (btoa alone breaks on non-Latin1 form payloads). */
 export function b64urlEncode(input: ArrayBuffer | Uint8Array | string): string {
   let bytes: Uint8Array
   if (typeof input === 'string') {
@@ -54,7 +52,6 @@ export function b64urlEncode(input: ArrayBuffer | Uint8Array | string): string {
   return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
 }
 
-/** UTF-8 safe base64url decode. */
 export function b64urlDecode(s: string): string {
   const pad = s.length % 4 === 0 ? '' : '='.repeat(4 - (s.length % 4))
   const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad
@@ -144,10 +141,10 @@ export function clean(value: unknown, max = 4000) {
 
 export function escapeHtml(value: string) {
   return value
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"')
+    .replace(/&/g, '\u0026amp;')
+    .replace(/</g, '\u0026lt;')
+    .replace(/>/g, '\u0026gt;')
+    .replace(/"/g, '\u0026quot;')
 }
 
 export function maskEmail(email: string) {
@@ -257,7 +254,6 @@ function submissionListHtml(
     .join('')}</ul>`
 }
 
-/** Client / services / contact confirmation */
 export function clientConfirmationEmail(opts: {
   name: string
   email: string
@@ -288,7 +284,6 @@ export function clientConfirmationEmail(opts: {
   })
 }
 
-/** Applicant / careers confirmation */
 export function applicantConfirmationEmail(opts: {
   name: string
   email: string
@@ -318,6 +313,29 @@ export function applicantConfirmationEmail(opts: {
     ),
     REFERENCE_ID: escapeHtml(opts.referenceId),
   })
+}
+
+export function staffNotificationEmail(opts: {
+  formType: string
+  referenceId: string
+  email: string
+  submittedAt: string
+  rows: Array<{ label: string; value: string }>
+}): string {
+  const isApplicant = opts.formType === 'CAREERS'
+  const rowsHtml = opts.rows
+    .map(
+      (r) =>
+        `<tr><td style="padding:6px 0;font-size:12px;color:#4B5563;width:140px;vertical-align:top;"><strong>${escapeHtml(r.label)}</strong></td><td style="padding:6px 0;font-size:12px;color:#1F2937;">${escapeHtml(r.value)}</td></tr>`,
+    )
+    .join('')
+  return `<!DOCTYPE html><html><body style="font-family:Arial,Helvetica,sans-serif;color:#1F2937;">
+  <h2 style="color:#0B0F19;">${isApplicant ? 'Application Received' : 'Inquiry Received'}</h2>
+  <p>Reference: <strong>#${escapeHtml(opts.referenceId)}</strong></p>
+  <p>Verified email: <strong>${escapeHtml(opts.email)}</strong><br/>Submitted: ${escapeHtml(opts.submittedAt)}</p>
+  <table role="presentation" cellpadding="0" cellspacing="0">${rowsHtml}</table>
+  <p style="font-size:12px;color:#6B7280;">OPERAVA · www.operavaglobal.com</p>
+</body></html>`
 }
 
 export async function ensureTables(db: D1Database) {
