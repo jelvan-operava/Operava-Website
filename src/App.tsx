@@ -89,7 +89,7 @@ function Layout() {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-white text-gray-900 selection:bg-violet-100 selection:text-violet-800">
+    <div className="min-h-screen flex flex-col justify-between bg-[#FBFBFA] text-gray-900 selection:bg-violet-100 selection:text-violet-800">
       <SmoothScroll />
       <RouteManager />
       <Navigation />
