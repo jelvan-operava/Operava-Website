@@ -82,11 +82,11 @@ export default function Navigation() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 transition-shadow duration-300 ${
-        scrolled ? 'shadow-sm' : 'shadow-xs'
+      className={`fixed top-0 left-0 right-0 z-50 bg-[#FBFBFA]/90 backdrop-blur-md border-b border-stone-200/70 transition-shadow duration-300 ${
+        scrolled ? 'shadow-sm' : 'shadow-none'
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-16 lg:h-18">
+      <nav className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 flex items-center justify-between h-16 lg:h-18">
         <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="OPERAVA Global Solutions — Home">
           <OperavaLogo size={44} priority className="transition-transform duration-200 group-hover:scale-105" />
           <div className="flex flex-col leading-none">
@@ -117,7 +117,7 @@ export default function Navigation() {
                   className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer ${
                     isActive(link.href) || servicesOpen
                       ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-stone-100/80'
                   }`}
                   aria-expanded={servicesOpen}
                   aria-haspopup="true"
@@ -131,7 +131,7 @@ export default function Navigation() {
                 {servicesOpen && (
                   <div
                     id="nav-services-dropdown-menu"
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-84 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 animate-fade-in z-50 divide-y divide-gray-100"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-84 bg-white rounded-2xl shadow-xl border border-stone-100 p-2 animate-fade-in z-50 divide-y divide-stone-100"
                   >
                     <div className="flex flex-col gap-1 p-1">
                       {link.children.map((child) => (
@@ -174,7 +174,7 @@ export default function Navigation() {
                 className={`px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive(link.href)
                     ? 'text-violet-700 bg-violet-50'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-stone-100/80'
                 }`}
               >
                 {link.label}
@@ -206,7 +206,7 @@ export default function Navigation() {
             ref={mobileToggleRef}
             onClick={() => setMobileOpen((o) => !o)}
             type="button"
-            className="p-2 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-xl text-gray-700 hover:bg-stone-100 transition-colors"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
           >
@@ -218,9 +218,9 @@ export default function Navigation() {
       {mobileOpen && (
         <div
           ref={mobileRef}
-          className="lg:hidden bg-white border-t border-gray-100 animate-fade-in shadow-xl max-h-[85vh] overflow-y-auto"
+          className="lg:hidden bg-[#FBFBFA] border-t border-stone-200/80 animate-fade-in shadow-xl max-h-[85vh] overflow-y-auto"
         >
-          <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-1">
+          <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 py-4 flex flex-col gap-1">
             {navLinks.map((link) =>
               link.children ? (
                 <div key={link.href} className="w-full">
@@ -230,7 +230,7 @@ export default function Navigation() {
                     className={`flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors cursor-pointer ${
                       isActive(link.href) || servicesOpen
                         ? 'text-violet-700 bg-violet-50 font-semibold'
-                        : 'text-gray-800 hover:bg-gray-50'
+                        : 'text-gray-800 hover:bg-stone-100/80'
                     }`}
                     aria-expanded={servicesOpen}
                     aria-label={`Toggle ${link.label} submenu`}
@@ -274,7 +274,7 @@ export default function Navigation() {
                   to={link.href}
                   onClick={closeMenus}
                   className={`px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-                    isActive(link.href) ? 'text-violet-700 bg-violet-50 font-semibold' : 'text-gray-800 hover:bg-gray-50'
+                    isActive(link.href) ? 'text-violet-700 bg-violet-50 font-semibold' : 'text-gray-800 hover:bg-stone-100/80'
                   }`}
                 >
                   {link.label}
@@ -282,7 +282,7 @@ export default function Navigation() {
               )
             )}
 
-            <div className="pt-2 flex flex-col gap-3 border-t border-gray-100 mt-2">
+            <div className="pt-2 flex flex-col gap-3 border-t border-stone-200 mt-2">
               <Link
                 to="/contact"
                 onClick={closeMenus}
