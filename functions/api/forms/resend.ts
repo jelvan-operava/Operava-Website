@@ -128,7 +128,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       await sendResend(env, {
         from: 'Operava Notification <notification-noreply@operavaglobal.com>',
         to: [signed.email],
-        subject: 'Operava Notification',
+        subject: 'Verification Code',
         html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
         text: otpEmailText(payloadObj.name || 'there', purposeLabel(signed.formType), code),
       })

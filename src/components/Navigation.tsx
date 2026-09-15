@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ChevronDown, Menu, X, ArrowRight } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
-import LanguageSwitcher from './LanguageSwitcher'
 import OperavaLogo from './OperavaLogo'
 
 export default function Navigation() {
@@ -185,7 +184,6 @@ export default function Navigation() {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
-          <LanguageSwitcher variant="desktop" />
           <Link
             to="/services/it"
             onClick={closeMenus}
@@ -204,7 +202,6 @@ export default function Navigation() {
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
-          <LanguageSwitcher variant="desktop" />
           <button
             ref={mobileToggleRef}
             onClick={() => setMobileOpen((o) => !o)}
@@ -285,11 +282,7 @@ export default function Navigation() {
               )
             )}
 
-            <div className="pt-3 pb-2 border-t border-gray-100 mt-2">
-              <LanguageSwitcher variant="mobile" />
-            </div>
-
-            <div className="pt-2 flex flex-col gap-3">
+            <div className="pt-2 flex flex-col gap-3 border-t border-gray-100 mt-2">
               <Link
                 to="/contact"
                 onClick={closeMenus}

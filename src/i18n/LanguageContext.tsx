@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
+import React, { createContext, useContext, useEffect, useMemo } from 'react'
 import {
   type LanguageCode,
   type LanguageOption,
@@ -16,50 +16,33 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
-const STORAGE_KEY = 'operava_language'
-
+/**
+ * Multi-language UI is disabled site-wide.
+ * The provider remains so existing `useLanguage()` / `t()` call sites keep working,
+ * but language is permanently locked to English.
+ */
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<LanguageCode>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY) as LanguageCode
-      if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
-        return saved
-      }
-      // Check browser navigator language
-      const browserLang = navigator.language.slice(0, 2).toLowerCase()
-      const match = SUPPORTED_LANGUAGES.find((l) => l.code === browserLang)
-      if (match) return match.code
-    } catch {
-      // ignore
-    }
-    return 'en'
-  })
-
-  const setLanguage = (code: LanguageCode) => {
-    setLanguageState(code)
-    try {
-      localStorage.setItem(STORAGE_KEY, code)
-    } catch {
-      // ignore
-    }
-  }
+  const language: LanguageCode = 'en'
 
   const currentLanguage = useMemo(() => {
-    return SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0]
-  }, [language])
+    return SUPPORTED_LANGUAGES.find((l) => l.code === 'en') || SUPPORTED_LANGUAGES[0]
+  }, [])
 
   useEffect(() => {
-    // Update document lang and direction
-    document.documentElement.lang = language
-    document.documentElement.dir = currentLanguage.dir || 'ltr'
-  }, [language, currentLanguage])
+    document.documentElement.lang = 'en'
+    document.documentElement.dir = 'ltr'
+    try {
+      localStorage.removeItem('operava_language')
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  const setLanguage = (_code: LanguageCode) => {
+    // No-op: multi-language feature removed
+  }
 
   const t = (key: string, fallback?: string): string => {
-    const langDict = translations[language]
-    if (langDict && langDict[key]) {
-      return langDict[key]
-    }
-    // Fallback to English
     const enDict = translations.en
     if (enDict && enDict[key]) {
       return enDict[key]
@@ -70,7 +53,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const value = {
     language,
     currentLanguage,
-    supportedLanguages: SUPPORTED_LANGUAGES,
+    supportedLanguages: [currentLanguage],
     setLanguage,
     t,
   }
