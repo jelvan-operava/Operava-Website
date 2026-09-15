@@ -7,7 +7,6 @@ import {
   purposeLabel,
   sendResend,
   resolveSecret,
-  isProductionRuntime,
   issueSignedDraft,
   readSignedDraft,
   type FormEnv,
@@ -15,7 +14,7 @@ import {
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY && isProductionRuntime()) {
+    if (!env.RESEND_API_KEY || String(env.RESEND_API_KEY).trim().length < 8) {
       return json({ error: 'Email delivery is not configured.' }, 503)
     }
     const secret = resolveSecret(env)
@@ -42,6 +41,8 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     } catch {
       payloadObj = {}
     }
+
+    // New code invalidates the previous draft (client must use new draftId)
     const code = generateOtp()
     const codeHash = await hashOtp(secret, code)
     const expiresAt = now + 10 * 60 * 1000
@@ -56,38 +57,30 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       lastSentAt: now,
     })
 
-    if (env.RESEND_API_KEY) {
-      try {
-        await sendResend(env, {
-          from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
-          to: [signed.email],
-          subject: 'Verification Code',
-          html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
-          text: otpEmailText(payloadObj.name || 'there', purposeLabel(signed.formType), code),
-        })
-      } catch (mailErr) {
-        console.error('OTP resend failed', mailErr)
-        const detail = mailErr instanceof Error ? mailErr.message : String(mailErr)
-        return json(
-          {
-            error: 'Unable to resend verification email. Please try again shortly.',
-            detail,
-          },
-          502,
-        )
-      }
-    } else {
-      console.warn('[DEV] RESEND_API_KEY missing. Resent OTP for ' + signed.email + ': ' + code)
+    try {
+      await sendResend(env, {
+        from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
+        to: [signed.email],
+        subject: 'Verification Code',
+        html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
+        text: otpEmailText(payloadObj.name || 'there', purposeLabel(signed.formType), code),
+      })
+    } catch (mailErr) {
+      console.error('OTP resend failed', mailErr instanceof Error ? mailErr.message : 'unknown')
+      return json(
+        {
+          error: 'Unable to resend verification email. Please try again shortly.',
+        },
+        502,
+      )
     }
 
     return json({
       ok: true,
       draftId: newDraftId,
-      ...(!isProductionRuntime() && !env.RESEND_API_KEY ? { devCode: code } : {}),
     })
   } catch (err) {
-    console.error('form resend failed', err)
-    const detail = err instanceof Error ? err.message : String(err)
-    return json({ error: 'Unable to resend the code.', detail }, 500)
+    console.error('form resend failed', err instanceof Error ? err.message : 'unknown')
+    return json({ error: 'Unable to resend the code.' }, 500)
   }
 }
