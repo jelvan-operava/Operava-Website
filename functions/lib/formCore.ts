@@ -27,7 +27,6 @@ export const CLIENT_RESEND_FROM = 'hello@operavaglobal.com'
 export const TALENT_RESEND_FROM = 'talents@operavaglobal.com'
 export const APPLICANT_CONFIRMATION_FROM = 'Operava <noreply@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
-export const DEFAULT_REPLY_TO = 'hello@operavaglobal.com'
 export const DEFAULT_OTP_SECRET = 'operava-form-secret'
 
 export function resolveSecret(env: FormEnv): string {
@@ -41,7 +40,6 @@ export function resolveSecret(env: FormEnv): string {
 /** Prefer treating Cloudflare Pages as production unless explicitly development. */
 export function isProductionRuntime(): boolean {
   try {
-    // Cloudflare Workers / Pages: NODE_ENV is often unset — default to production-safe behavior.
     if (typeof process === 'undefined' || !process?.env) return true
     const nodeEnv = String(process.env.NODE_ENV || '').toLowerCase()
     if (nodeEnv === 'development' || nodeEnv === 'test') return false
@@ -220,7 +218,8 @@ export type SendResendResult = { id: string; status: number }
 
 /**
  * Send via Resend. Returns provider message id on success.
- * Throws on configuration or provider failure. Never logs API key or OTP content.
+ * Does NOT set reply_to unless the caller passes reply_to explicitly
+ * (customer/applicant confirmations and OTP must stay noreply-only).
  */
 export async function sendResend(env: FormEnv, payload: Record<string, unknown>): Promise<SendResendResult> {
   const apiKey = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
@@ -231,12 +230,10 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     (env.RESEND_FROM && String(env.RESEND_FROM).trim()) ||
     DEFAULT_RESEND_FROM
 
-  const body: Record<string, unknown> = {
-    ...payload,
-    from,
-  }
-  if (!body.reply_to) {
-    body.reply_to = DEFAULT_REPLY_TO
+  // Build body without forcing a default reply_to
+  const body: Record<string, unknown> = { ...payload, from }
+  if (body.reply_to === null || body.reply_to === undefined || body.reply_to === '') {
+    delete body.reply_to
   }
 
   const res = await fetch('https://api.resend.com/emails', {
@@ -250,7 +247,6 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
 
   const raw = await res.text().catch(() => '')
   if (!res.ok) {
-    // Server-side only: status + short body snippet (no API key, no OTP)
     console.error('Resend API error', res.status, raw.slice(0, 200))
     throw new Error('EMAIL_SEND_FAILED')
   }
@@ -404,9 +400,11 @@ export function staffNotificationEmail(opts: {
     '<p>Reference: <strong>#' +
     escapeHtml(opts.referenceId) +
     '</strong></p>' +
-    '<p>Verified email: <strong>' +
+    '<p>Reply to this email to contact the ' +
+    (isApplicant ? 'applicant' : 'customer') +
+    ' at <strong>' +
     escapeHtml(opts.email) +
-    '</strong><br/>Submitted: ' +
+    '</strong>.<br/>Submitted: ' +
     escapeHtml(opts.submittedAt) +
     '</p>' +
     '<table role="presentation" cellpadding="0" cellspacing="0">' +
