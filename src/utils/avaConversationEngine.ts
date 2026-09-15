@@ -1,5 +1,5 @@
 /**
- * Authoritative Conversation Engine for AVA (OPERAVA Worker AI)
+ * Authoritative Conversation Engine for AVA (OPERAVA assistant)
  * Controlled knowledge only — human-like answers with meaning, process, examples.
  */
 
@@ -36,7 +36,7 @@ export function generateAvaHumanResponse(rawQuery: string): AvaDirectResponse {
     q.includes('what can you do') || q.includes('help me with')
   ) {
     return {
-      text: "I'm AVA — OPERAVA Global Solutions' business Worker AI. I only use our controlled company knowledge (not the open web).\n\nI can explain, in practical terms:\n• **IT & software** — custom software, web/mobile, SaaS, systems, programming, consulting, integration, databases: what each means, typical process, and examples.\n• **BPO & workforce** — customer service, tech support, help desk, back-office, data and document work, virtual assistance.\n• **How we engage** — one professional, one dedicated team, or multiple teams; Discover → Design → Build → Launch → Operate → Optimize.\n• **Company basics** — Philippine SEC/BIR corporation, remote-first global delivery.\n• **Careers** — tracks and hiring steps (applications go through Careers/Apply).\n\nAsk about any service and I'll break down meaning, process, and examples.",
+      text: "I'm AVA — OPERAVA Global Solutions' assistant. I only use our controlled company knowledge (not the open web).\n\nI can explain, in practical terms:\n• **IT & software** — custom software, web/mobile, SaaS, systems, programming, consulting, integration, databases: what each means, typical process, and examples.\n• **BPO & workforce** — customer service, tech support, help desk, back-office, data and document work, virtual assistance.\n• **How we engage** — one professional, one dedicated team, or multiple teams; Discover → Design → Build → Launch → Operate → Optimize.\n• **Company basics** — Philippine SEC/BIR corporation, remote-first global delivery.\n• **Careers** — tracks and hiring steps (applications go through Careers/Apply).\n\nAsk about any service and I'll break down meaning, process, and examples.",
     }
   }
 
