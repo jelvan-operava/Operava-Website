@@ -53,14 +53,14 @@ export default function Footer() {
 
   return (
     <>
-      <section className="bg-white border-t border-gray-200 py-12 lg:py-14">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <section className="bg-[#FBFBFA] border-t border-stone-200/80 py-12 lg:py-14">
+        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <EmailDirectoryCarousel />
         </div>
       </section>
 
       <footer className="bg-gray-950 text-white border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-16 pb-8">
+        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 pt-16 pb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 group mb-5 inline-flex" aria-label="OPERAVA Global Solutions — Home">
