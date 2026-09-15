@@ -7,7 +7,6 @@ import {
   makeReference,
   sendResend,
   resolveSecret,
-  isProductionRuntime,
   readSignedDraft,
   type FormEnv,
 } from '../../lib/formCore'
@@ -46,7 +45,7 @@ function payloadRows(payload: Record<string, unknown>): Array<{ label: string; v
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY && isProductionRuntime()) {
+    if (!env.RESEND_API_KEY || String(env.RESEND_API_KEY).trim().length < 8) {
       return json({ error: 'Email delivery is not configured.' }, 503)
     }
     const secret = resolveSecret(env)
@@ -86,7 +85,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       try {
         await ensureTables(env.SUBMISSIONS_DB)
         await env.SUBMISSIONS_DB.prepare(
-          'INSERT INTO form_submissions (reference_id, form_type, name, email, payload, verification_status, status, resume_key, created_at, verified_at) VALUES (?, ?, ?, ?, ?, \'VERIFIED\', \'VERIFIED\', ?, ?, ?)',
+          "INSERT INTO form_submissions (reference_id, form_type, name, email, payload, verification_status, status, resume_key, created_at, verified_at) VALUES (?, ?, ?, ?, ?, 'VERIFIED', 'VERIFIED', ?, ?, ?)",
         )
           .bind(referenceId, formType, name, email, signed.payload, String(payload.resumeKey || ''), nowIso, nowIso)
           .run()
@@ -134,36 +133,30 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     const bccList = [bccEmail].filter((addr) => addr && addr.toLowerCase() !== email.toLowerCase())
 
-    if (env.RESEND_API_KEY) {
-      try {
-        await sendResend(env, {
-          from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
-          to: [email],
-          bcc: bccList.length ? bccList : undefined,
-          subject,
-          html,
-          text,
-        })
-      } catch (mailErr) {
-        console.error('confirmation email failed', mailErr)
-        return json({
-          ok: true,
-          referenceId,
-          formType,
-          name,
-          emailWarning: 'Submission recorded; confirmation email could not be delivered right now.',
-        })
-      }
-    } else if (!isProductionRuntime()) {
-      console.warn('[DEV MODE] RESEND_API_KEY not configured. Skipping confirmation email delivery in dev mode.')
-    } else {
-      return json({ error: 'Email delivery is not configured.' }, 503)
+    try {
+      await sendResend(env, {
+        from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
+        to: [email],
+        bcc: bccList.length ? bccList : undefined,
+        subject,
+        html,
+        text,
+      })
+    } catch (mailErr) {
+      console.error('confirmation email failed', mailErr instanceof Error ? mailErr.message : 'unknown')
+      // Code already verified — do not fail the user; submission is accepted
+      return json({
+        ok: true,
+        referenceId,
+        formType,
+        name,
+        emailWarning: 'Submission recorded; confirmation email could not be delivered right now.',
+      })
     }
 
     return json({ ok: true, referenceId, formType, name })
   } catch (err) {
-    console.error('verify failed', err)
-    const detail = err instanceof Error ? err.message : String(err)
-    return json({ error: 'Unable to verify this code.', detail }, 500)
+    console.error('verify failed', err instanceof Error ? err.message : 'unknown')
+    return json({ error: 'Unable to verify this code.' }, 500)
   }
 }
