@@ -133,7 +133,6 @@ export default function CareerCard({
         className={`operava-flip-inner${flipped ? ' is-flipped' : ''}`}
         style={{ cursor: 'default' }}
       >
-        {/* FRONT — full cover image only + circle + */}
         <div
           className="operava-flip-face operava-flip-face-front relative h-full overflow-hidden rounded-[20px]"
           aria-hidden={flipped}
@@ -188,7 +187,7 @@ export default function CareerCard({
                   {positionLabel}
                 </h3>
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-200/90 mt-0.5">
-                  100% Remote
+                  {career.location || 'Open role'}
                 </p>
               </div>
               <button
@@ -212,7 +211,7 @@ export default function CareerCard({
               {career.assignments && career.assignments.length > 0 && (
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-violet-200/90 mb-1.5">
-                    Core Remote Assignments
+                    Core Assignments
                   </p>
                   <ul className="space-y-1">
                     {career.assignments.map((item, i) => (
@@ -251,7 +250,7 @@ export default function CareerCard({
                 }}
                 className="operava-learn-more-btn !py-2 !px-3 !text-[10px] !tracking-wide flex-1 flex items-center justify-center"
               >
-                <span className="line-clamp-1">Apply Remotely — {positionLabel}</span>
+                <span className="line-clamp-1">Apply — {positionLabel}</span>
               </button>
               <button
                 type="button"
