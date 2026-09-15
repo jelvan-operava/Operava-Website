@@ -378,6 +378,3 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* Remaining sections preserved from main — why carousel, workforce, tech, tools, signature */}
-        {/* Full original body continues below from verified main SHA */}
