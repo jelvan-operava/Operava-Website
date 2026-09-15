@@ -16,7 +16,6 @@ export interface FormEnv {
   TALENT_INBOX?: string
 }
 
-/** Prefer verified domain sender from wrangler vars (notification@operavaglobal.com). */
 export const DEFAULT_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
 export const OTP_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
 export const NOTIFICATION_NOREPLY_FROM = 'OPERAVA <notification@operavaglobal.com>'
@@ -38,7 +37,6 @@ export function isProductionRuntime(): boolean {
   }
 }
 
-/** UTF-8 safe base64url (avoids btoa Latin-1 crashes and Workers spread limits). */
 export function b64urlEncode(input: ArrayBuffer | Uint8Array | string): string {
   let bytes: Uint8Array
   if (typeof input === 'string') bytes = new TextEncoder().encode(input)
@@ -96,14 +94,15 @@ export async function issueSignedDraft(
   })
   const payload = b64urlEncode(body)
   const sig = await hmacSign(secret, payload)
-  return `s1.${payload}.${sig}`
+  return 's1.' + payload + '.' + sig
 }
 
 export async function readSignedDraft(secret: string, draftId: string) {
   if (!draftId || !draftId.startsWith('s1.')) return null
   const parts = draftId.split('.')
   if (parts.length !== 3) return null
-  const [, payload, sig] = parts
+  const payload = parts[1]
+  const sig = parts[2]
   const expected = await hmacSign(secret, payload)
   if (sig !== expected) return null
   try {
@@ -149,12 +148,12 @@ export function escapeHtml(value: string) {
 export function maskEmail(email: string) {
   const [user, domain] = email.split('@')
   if (!user || !domain) return email
-  return `${user.slice(0, 1)}***@${domain}`
+  return user.slice(0, 1) + '***@' + domain
 }
 
 export function makeReference(type: FormType) {
   const n = crypto.getRandomValues(new Uint32Array(1))[0] % 90000000
-  return `OPERAVA-${type.slice(0, 3)}-${String(10000000 + n).slice(0, 8)}`
+  return 'OPERAVA-' + type.slice(0, 3) + '-' + String(10000000 + n).slice(0, 8)
 }
 
 export function generateOtp() {
@@ -168,7 +167,8 @@ export function generateOtp() {
 }
 
 export async function hashOtp(secret: string, code: string) {
-  const data = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${secret}\0${code}`))
+  const material = secret + String.fromCharCode(0) + code
+  const data = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(material))
   const bytes = new Uint8Array(data)
   let hex = ''
   for (let i = 0; i < bytes.length; i++) {
@@ -178,10 +178,11 @@ export async function hashOtp(secret: string, code: string) {
 }
 
 export function renderEmailTemplate(template: string, replacements: Record<string, string>): string {
-  return Object.entries(replacements).reduce(
-    (html, [key, value]) => html.split(`{{${key}}}`).join(value),
-    template,
-  )
+  let html = template
+  for (const key of Object.keys(replacements)) {
+    html = html.split('{{' + key + '}}').join(replacements[key])
+  }
+  return html
 }
 
 export function otpEmailHtml(_name: string, purpose: string, code: string) {
@@ -192,7 +193,13 @@ export function otpEmailHtml(_name: string, purpose: string, code: string) {
 }
 
 export function otpEmailText(_name: string, purpose: string, code: string) {
-  return `Your verification code for ${purpose} is: ${code}\n\nThis code expires in 10 minutes.\n\nDo not share this code. If you did not request it, ignore this email.\nOPERAVA · www.operavaglobal.com`
+  return (
+    'Your verification code for ' +
+    purpose +
+    ' is: ' +
+    code +
+    '\n\nThis code expires in 10 minutes.\n\nDo not share this code. If you did not request it, ignore this email.\nOPERAVA · www.operavaglobal.com'
+  )
 }
 
 export async function sendResend(env: FormEnv, payload: Record<string, unknown>) {
@@ -205,24 +212,17 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     DEFAULT_RESEND_FROM
 
   const body = { ...payload, from }
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 15000)
-  try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    })
-    if (!res.ok) {
-      const errText = await res.text().catch(() => '')
-      throw new Error(`Resend failed ${res.status}: ${errText.slice(0, 400)}`)
-    }
-  } finally {
-    clearTimeout(timer)
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + apiKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '')
+    throw new Error('Resend failed ' + res.status + ': ' + errText.slice(0, 400))
   }
 }
 
@@ -259,12 +259,21 @@ function submissionListHtml(
       .filter(([_, value]) => Boolean(value && value.trim() && value !== 'undefined')),
     ['Reference Number', referenceId],
   ]
-  return `<ul style="margin:8px 0 14px 0;padding-left:18px;font-size:12px;line-height:1.55;color:#1F2937;">${values
-    .map(
-      ([label, value]) =>
-        `<li style="margin-bottom:4px;font-size:12px;line-height:1.55;"><strong style="color:#0B0F19;">${escapeHtml(label)}:</strong> ${escapeHtml(value)}</li>`,
-    )
-    .join('')}</ul>`
+  return (
+    '<ul style="margin:8px 0 14px 0;padding-left:18px;font-size:12px;line-height:1.55;color:#1F2937;">' +
+    values
+      .map(function (pair) {
+        return (
+          '<li style="margin-bottom:4px;font-size:12px;line-height:1.55;"><strong style="color:#0B0F19;">' +
+          escapeHtml(pair[0]) +
+          ':</strong> ' +
+          escapeHtml(pair[1]) +
+          '</li>'
+        )
+      })
+      .join('') +
+    '</ul>'
+  )
 }
 
 export function clientConfirmationEmail(opts: {
@@ -337,47 +346,68 @@ export function staffNotificationEmail(opts: {
 }): string {
   const isApplicant = opts.formType === 'CAREERS'
   const rowsHtml = opts.rows
-    .map(
-      (r) =>
-        `<tr><td style="padding:6px 0;font-size:12px;color:#4B5563;width:140px;vertical-align:top;"><strong>${escapeHtml(r.label)}</strong></td><td style="padding:6px 0;font-size:12px;color:#1F2937;">${escapeHtml(r.value)}</td></tr>`,
-    )
+    .map(function (r) {
+      return (
+        '<tr><td style="padding:6px 0;font-size:12px;color:#4B5563;width:140px;vertical-align:top;"><strong>' +
+        escapeHtml(r.label) +
+        '</strong></td><td style="padding:6px 0;font-size:12px;color:#1F2937;">' +
+        escapeHtml(r.value) +
+        '</td></tr>'
+      )
+    })
     .join('')
-  return `<!DOCTYPE html><html><body style="font-family:Arial,Helvetica,sans-serif;color:#1F2937;">
-  <h2 style="color:#0B0F19;">${isApplicant ? 'Application Received' : 'Inquiry Received'}</h2>
-  <p>Reference: <strong>#${escapeHtml(opts.referenceId)}</strong></p>
-  <p>Verified email: <strong>${escapeHtml(opts.email)}</strong><br/>Submitted: ${escapeHtml(opts.submittedAt)}</p>
-  <table role="presentation" cellpadding="0" cellspacing="0">${rowsHtml}</table>
-  <p style="font-size:12px;color:#6B7280;">OPERAVA · www.operavaglobal.com</p>
-</body></html>`
+  return (
+    '<!DOCTYPE html><html><body style="font-family:Arial,Helvetica,sans-serif;color:#1F2937;">' +
+    '<h2 style="color:#0B0F19;">' +
+    (isApplicant ? 'Application Received' : 'Inquiry Received') +
+    '</h2>' +
+    '<p>Reference: <strong>#' +
+    escapeHtml(opts.referenceId) +
+    '</strong></p>' +
+    '<p>Verified email: <strong>' +
+    escapeHtml(opts.email) +
+    '</strong><br/>Submitted: ' +
+    escapeHtml(opts.submittedAt) +
+    '</p>' +
+    '<table role="presentation" cellpadding="0" cellspacing="0">' +
+    rowsHtml +
+    '</table>' +
+    '<p style="font-size:12px;color:#6B7280;">OPERAVA · www.operavaglobal.com</p>' +
+    '</body></html>'
+  )
 }
 
 export async function ensureTables(db: D1Database) {
   await db.batch([
-    db.prepare(`CREATE TABLE IF NOT EXISTS form_submissions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      reference_id TEXT NOT NULL,
-      form_type TEXT NOT NULL,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL,
-      payload TEXT NOT NULL,
-      verification_status TEXT NOT NULL,
-      status TEXT NOT NULL,
-      resume_key TEXT,
-      created_at TEXT NOT NULL,
-      verified_at TEXT
-    )`),
-    db.prepare(`CREATE TABLE IF NOT EXISTS form_otps (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT NOT NULL,
-      form_type TEXT NOT NULL,
-      draft_id TEXT NOT NULL,
-      code_hash TEXT NOT NULL,
-      payload TEXT NOT NULL,
-      expires_at INTEGER NOT NULL,
-      attempts INTEGER NOT NULL DEFAULT 0,
-      resends INTEGER NOT NULL DEFAULT 0,
-      last_sent_at INTEGER NOT NULL,
-      consumed INTEGER NOT NULL DEFAULT 0
-    )`),
+    db.prepare(
+      'CREATE TABLE IF NOT EXISTS form_submissions (' +
+        'id INTEGER PRIMARY KEY AUTOINCREMENT,' +
+        'reference_id TEXT NOT NULL,' +
+        'form_type TEXT NOT NULL,' +
+        'name TEXT NOT NULL,' +
+        'email TEXT NOT NULL,' +
+        'payload TEXT NOT NULL,' +
+        'verification_status TEXT NOT NULL,' +
+        'status TEXT NOT NULL,' +
+        'resume_key TEXT,' +
+        'created_at TEXT NOT NULL,' +
+        'verified_at TEXT'
+        + ')',
+    ),
+    db.prepare(
+      'CREATE TABLE IF NOT EXISTS form_otps (' +
+        'id INTEGER PRIMARY KEY AUTOINCREMENT,' +
+        'email TEXT NOT NULL,' +
+        'form_type TEXT NOT NULL,' +
+        'draft_id TEXT NOT NULL,' +
+        'code_hash TEXT NOT NULL,' +
+        'payload TEXT NOT NULL,' +
+        'expires_at INTEGER NOT NULL,' +
+        'attempts INTEGER NOT NULL DEFAULT 0,' +
+        'resends INTEGER NOT NULL DEFAULT 0,' +
+        'last_sent_at INTEGER NOT NULL,' +
+        'consumed INTEGER NOT NULL DEFAULT 0'
+        + ')',
+    ),
   ])
 }
