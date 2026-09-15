@@ -1,7 +1,6 @@
 /**
- * Authoritative Conversation Engine for AVA (OPERAVA Virtual Intelligence Assistant)
- * Formulated directly from /create/ knowledge base and company profile files.
- * Provides rich, direct, human-like answers without redirects.
+ * Authoritative Conversation Engine for AVA (OPERAVA Worker AI)
+ * Controlled knowledge only — human-like answers with meaning, process, examples.
  */
 
 export interface AvaDirectResponse {
@@ -16,518 +15,151 @@ export function generateAvaHumanResponse(rawQuery: string): AvaDirectResponse {
   const query = rawQuery.trim()
   const q = query.toLowerCase()
 
-  // 1. GREETINGS & CASUAL CONVERSATION
   if (
-    q === 'hi' ||
-    q === 'hello' ||
-    q === 'hey' ||
-    q === 'good day' ||
-    q === 'good morning' ||
-    q === 'good afternoon' ||
-    q === 'good evening' ||
-    q.startsWith('hi ') ||
-    q.startsWith('hello ') ||
-    q.startsWith('hey ')
+    q === 'hi' || q === 'hello' || q === 'hey' || q === 'good day' ||
+    q === 'good morning' || q === 'good afternoon' || q === 'good evening' ||
+    q.startsWith('hi ') || q.startsWith('hello ') || q.startsWith('hey ')
   ) {
     return {
-      text: "Hello! I'm AVA, your virtual intelligence assistant at OPERAVA Global Solutions.\n\nI can answer any questions directly about our IT and software development services, BPO and customer operations, company registration and background, remote workforce solutions, career opportunities, or how to get started.\n\nHow can I help you today?",
+      text: "Hello — I'm AVA, OPERAVA's business assistant.\n\nI can walk you through what we offer, what each service means, how delivery works, and practical examples — from software and cloud work to customer operations and dedicated teams.\n\nWhat are you exploring today: technology, operations support, workforce, or careers?",
     }
   }
 
-  // 2. CASUAL CHECK-IN
   if (q.includes('how are you') || q.includes('how are things') || q.includes('how are u')) {
     return {
-      text: "I'm doing well, thank you for asking! I'm ready to answer any questions you have about OPERAVA's services, delivery models, corporate background, or career opportunities.\n\nWhat would you like to explore?",
+      text: "I'm doing well — thank you for asking. Ready when you are.\n\nI can explain OPERAVA services in plain language: what they cover, how we typically deliver them, and examples that fit startups through enterprises. What would you like to dig into?",
     }
   }
 
-  // 3. IDENTITY & CAPABILITIES
   if (
-    q.includes('who are you') ||
-    q.includes('what are you') ||
-    q.includes('what is your name') ||
-    q.includes('what can you do') ||
-    q.includes('help me with')
+    q.includes('who are you') || q.includes('what are you') || q.includes('what is your name') ||
+    q.includes('what can you do') || q.includes('help me with')
   ) {
     return {
-      text: "I'm AVA, the virtual intelligence assistant for OPERAVA Global Solutions.\n\nI can assist you with:\n• IT & Software Services: Custom software, web & mobile apps, SaaS platforms, IT systems, programming, IT consulting, systems integration, and database services.\n• BPO & Workforce Operations: Customer service, technical support, help desk, back-office operations, data processing, data entry, document processing, and virtual assistance.\n• Company Background & Compliance: Corporate registration (SEC Corporation), tax registration (BIR), Philippine-based, operating remotely and globally.\n• Engagement Models: Flexible scaling from one professional to dedicated or multiple teams.\n• Careers & Hiring: Open positions, remote benefits, talent development, and application steps.",
+      text: "I'm AVA — OPERAVA Global Solutions' business Worker AI. I only use our controlled company knowledge (not the open web).\n\nI can explain, in practical terms:\n• **IT & software** — custom software, web/mobile, SaaS, systems, programming, consulting, integration, databases: what each means, typical process, and examples.\n• **BPO & workforce** — customer service, tech support, help desk, back-office, data and document work, virtual assistance.\n• **How we engage** — one professional, one dedicated team, or multiple teams; Discover → Design → Build → Launch → Operate → Optimize.\n• **Company basics** — Philippine SEC/BIR corporation, remote-first global delivery.\n• **Careers** — tracks and hiring steps (applications go through Careers/Apply).\n\nAsk about any service and I'll break down meaning, process, and examples.",
     }
   }
 
-  // 4. THANK YOU / APPRECIATION
   if (q.includes('thank you') || q.includes('thanks') || q.includes('appreciate it')) {
+    return { text: "You're very welcome. Ask anytime if you want more detail on a service, process, or example." }
+  }
+
+  if (q.includes('sec') || q.includes('corporation') || q.includes('legit') || q.includes('legitimate') || q.includes('legal entity')) {
     return {
-      text: "You're very welcome! Please feel free to ask anytime if you have more questions about OPERAVA.",
+      text: "OPERAVA Global Solutions is organized in the Philippines as a Corporation and is registered with the Philippine Securities and Exchange Commission (SEC). SEC registration establishes the legal corporate framework. It is not a blanket license for every regulated activity — where extra permits are required, OPERAVA complies before offering that activity.",
     }
   }
 
-  // 5. CORPORATE REGISTRATION & SEC (SECURITIES AND EXCHANGE COMMISSION)
-  if (
-    q.includes('sec') ||
-    q.includes('sec registered') ||
-    q.includes('corporation') ||
-    q.includes('corporate registration') ||
-    q.includes('legal registration') ||
-    q.includes('legal entity') ||
-    q.includes('legit') ||
-    q.includes('legitimate')
-  ) {
-    if (q.includes('license for everything') || q.includes('blanket') || q.includes('all services')) {
-      return {
-        text: "No. SEC registration establishes the corporation and its legal corporate framework. It is not a blanket license for every regulated activity.\n\nWhere a specific service or regulated activity requires additional permits, licenses, or authorizations, OPERAVA complies with all applicable requirements before providing that activity.",
-      }
-    }
+  if (q.includes('bir') || q.includes('tax') || q.includes('taxpayer')) {
     return {
-      text: "Yes. OPERAVA Global Solutions is organized in the Philippines as a Corporation and is registered with the Philippine Securities and Exchange Commission (SEC).\n\nSEC registration establishes the legal corporate framework for our business. For any specialized, regulated activities that require specific additional permits, OPERAVA complies with applicable regulatory requirements before offering them.",
+      text: "Yes. OPERAVA is a Philippine business registered with the Bureau of Internal Revenue (BIR) and maintains applicable taxpayer registration and tax compliance responsibilities.",
     }
   }
 
-  // 6. TAX REGISTRATION & BIR (BUREAU OF INTERNAL REVENUE)
-  if (
-    q.includes('bir') ||
-    q.includes('tax') ||
-    q.includes('taxpayer') ||
-    q.includes('bureau of internal revenue') ||
-    q.includes('tax compliance')
-  ) {
+  if (q.includes('where are you') || q.includes('headquarter') || q.includes('location') || q.includes('pagudpud') || q.includes('ilocos') || q.includes('address')) {
     return {
-      text: "Yes. OPERAVA Global Solutions is a Philippine business registered with the Bureau of Internal Revenue (BIR) and maintains its applicable Philippine taxpayer registration and tax compliance responsibilities.",
+      text: "OPERAVA is Philippine-based, operating remotely and globally. Our initial office is in Pagudpud, Ilocos Norte 2919, Philippines, with delivery supporting clients across North America, APAC, and Europe.",
     }
   }
 
-  // 7. LOCATION, INITIAL OFFICE, & OPERATING MODEL
-  if (
-    q.includes('where are you') ||
-    q.includes('headquarter') ||
-    q.includes('office location') ||
-    q.includes('where is operava') ||
-    q.includes('where are you located') ||
-    q.includes('pagudpud') ||
-    q.includes('ilocos') ||
-    q.includes('location') ||
-    q.includes('address')
-  ) {
+  if (q.includes('about') || q.includes('what is operava') || q.includes('what does operava') || q.includes('mission') || q.includes('motto')) {
     return {
-      text: "OPERAVA Global Solutions is Philippine-based, operating remotely and globally.\n\nOur initial office is in Pagudpud, Ilocos Norte 2919, Philippines, delivering IT, workforce, and BPO solutions to clients worldwide across North America, APAC, and Europe.",
+      text: "OPERAVA Global Solutions is a Philippine-based technology, workforce, and BPO company — SEC and BIR registered, remote-first, serving clients globally.\n\n**Motto:** We Operate in Advance.\n**Principle:** Make work and services accessible — anytime, anywhere.\n\nWe connect four pieces:\n• **Businesses** that need flexible capacity\n• **Technology** — software, cloud, integrations, automation\n• **Talent** — skilled people for technical and operational work\n• **Process** — structured workflows for consistent outcomes\n\nAsk about any IT or BPO service and I can explain meaning, typical process, and examples from our controlled knowledge.",
     }
   }
 
-  // 8. ABOUT OPERAVA / COMPANY OVERVIEW / MISSION / MOTTO
-  if (
-    q.includes('about') ||
-    q.includes('operava') ||
-    q.includes('company overview') ||
-    q.includes('mission') ||
-    q.includes('vision') ||
-    q.includes('motto') ||
-    q.includes('philosophy') ||
-    q.includes('what does operava do') ||
-    q.includes('what is operava')
-  ) {
+  if (q.includes('delivery model') || q.includes('one professional') || q.includes('dedicated team') || q.includes('multiple teams') || q.includes('how many people') || q.includes('team size')) {
     return {
-      text: "OPERAVA Global Solutions is a Philippine-based technology, workforce, and Business Process Outsourcing company.\n\nOur core motto is **\"Operating in Advance.\"** and our foundational principle is to **\"MAKE WORK AND SERVICES ACCESSIBLE — ANYTIME, ANYWHERE.\"**\n\nWe connect four essential components:\n• Businesses: Organizations seeking flexible, high-quality operational and technology support.\n• Technology: Digital platforms, custom software, cloud environments, integrations, and automation.\n• Talent: Skilled professionals providing technical capability, domain expertise, and human judgment.\n• Process: Structured, repeatable workflows designed for quality, consistency, and scale.",
-    }
-  }
-
-  // 9. DELIVERY MODELS & TEAM SIZES (1 PROFESSIONAL, DEDICATED TEAM, MULTIPLE TEAMS)
-  if (
-    q.includes('delivery model') ||
-    q.includes('how many people') ||
-    q.includes('team size') ||
-    q.includes('one professional') ||
-    q.includes('dedicated team') ||
-    q.includes('multiple teams') ||
-    q.includes('small business') ||
-    q.includes('startup') ||
-    q.includes('enterprise') ||
-    q.includes('scale')
-  ) {
-    return {
-      text: "OPERAVA provides three flexible delivery models based on your business requirements:\n\n1. One Professional (Small Businesses & Startups): Engage one dedicated specialist for a defined role or workload without hiring an entire department.\n2. One Dedicated Team (Growing Businesses & SMEs): A focused team supporting expanding customer volume, development, administration, or operational processes.\n3. Multiple Teams (Established Organizations & Enterprises): Multiple specialized teams across different functions, products, regions, or workflows with operational governance.\n\nOur philosophy is simple: you should not have to build more internal capacity than your business actually needs.",
+      text: "We engage in three flexible ways:\n\n1. **One Professional** — startups and small businesses; one specialist for a defined role.\n2. **One Dedicated Team** — growing SMEs; a focused team on a shared area.\n3. **Multiple Teams** — enterprises; multi-function or multi-region with governance.\n\n**Process:** Discover → Design → Build → Launch → Operate → Optimize.\n\nYou should not have to build more internal capacity than the business actually needs.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 10. WHY REMOTE OPERATIONS & REMOTE WORK QUALITY
-  if (
-    q.includes('why remote') ||
-    q.includes('remote model') ||
-    q.includes('remote quality') ||
-    q.includes('quality of remote') ||
-    q.includes('lower quality') ||
-    q.includes('work from home')
-  ) {
+  if (q.includes('hiring process') || q.includes('how to apply') || q.includes('application process') || (q.includes('how') && q.includes('interview'))) {
     return {
-      text: "Remote work does not mean lower quality. At OPERAVA, quality depends on the people, processes, technology, management, communication, and standards used to operate.\n\nOur remote-first model provides key advantages:\n• For Businesses: Access to a broader talent pool, flexible staffing, scalable operational capacity, and continuity without physical office constraints.\n• For Professionals: Flexible opportunities beyond immediate geographic limits, eliminated commutes, and international project exposure.",
-    }
-  }
-
-  // 11. TALENT POOL, INCLUSIVE RECRUITMENT & SCHOLARSHIPS
-  if (
-    q.includes('talent pool') ||
-    q.includes('where do you get talent') ||
-    q.includes('scholarship') ||
-    q.includes('students') ||
-    q.includes('mothers') ||
-    q.includes('caregivers') ||
-    q.includes('early career') ||
-    q.includes('training') ||
-    q.includes('mentorship')
-  ) {
-    return {
-      text: "OPERAVA's talent pool is primarily built from the Philippines, with global recruitment when specialized skills, language capabilities, or domain expertise are required.\n\nWe are committed to accessible employment and talent development:\n• Opportunities for skilled professionals, early-career talent, working students, and mothers & caregivers seeking flexible remote work.\n• Merit-based scholarship opportunities, skills development, training support, and mentorship initiatives as our organization expands.",
+      text: "Hiring is structured and skills-focused:\n\n1. Application review\n2. Initial screening\n3. Practical skills assessment\n4. Technical / lead interview\n5. Offer and onboarding\n\nApplications go through Careers or Apply on the site (email verification). I don't collect full applications in chat.",
       inquiryCard: { type: 'career' },
     }
   }
 
-  // 12. HIRING PROCESS & INTERVIEW STAGES
-  if (
-    (q.includes('how') && (q.includes('apply') || q.includes('hire') || q.includes('interview'))) ||
-    q.includes('application process') ||
-    q.includes('hiring process') ||
-    q.includes('recruitment process') ||
-    q.includes('interview process') ||
-    q.includes('hiring stage') ||
-    q.includes('how to apply')
-  ) {
+  if (q.includes('career') || q.includes('job') || q.includes('hiring') || q.includes('vacanc') || q.includes('opening')) {
     return {
-      text: "Our recruitment process is structured, transparent, and focused on genuine skills:\n\n1. Application Review: Evaluation of background, qualifications, and relevant experience.\n2. Initial Screening: Introductory conversation to discuss expectations, role requirements, and schedule.\n3. Practical Skills Assessment: Role-specific technical challenge or task-based evaluation.\n4. Technical & Lead Interview: In-depth interview with team leads or hiring managers.\n5. Offer & Onboarding: Final alignment, employment offer, and structured onboarding.\n\nWould you like to express interest or apply for an open position?",
+      text: "Remote tracks include:\n• **IT & software** — developers, engineers, QA, systems, database roles\n• **BPO & operations** — customer service, technical support, help desk, data and document work, virtual assistance\n\nBenefits emphasize remote-first flexibility, competitive pay, HMO, learning, and PTO. Use Careers or Apply for formal applications.",
       inquiryCard: { type: 'career' },
     }
   }
 
-  // 13. CAREERS & OPEN POSITIONS
-  if (
-    q.includes('career') ||
-    q.includes('job') ||
-    q.includes('opening') ||
-    q.includes('hiring') ||
-    q.includes('vacanc') ||
-    q.includes('perk') ||
-    q.includes('benefit') ||
-    q.includes('salary')
-  ) {
+  if (q.includes('software development') || q.includes('custom software') || q.includes('software engineer')) {
     return {
-      text: "We offer remote career opportunities across technology and business process operations:\n\n• IT & Software Roles: Software Developers, Web & Mobile Developers, SaaS Engineers, Systems Developers, Database Specialists, and QA Engineers.\n• BPO & Operations Roles: Customer Service Representatives, Technical Support Specialists, Help Desk Analysts, Back-Office Associates, Data Processing Specialists, Data Entry Clerks, and Virtual Assistants.\n\nBenefits include remote-first flexibility, competitive compensation, HMO coverage, professional development, and modern digital tooling.",
-      inquiryCard: { type: 'career' },
-    }
-  }
-
-  // 14. IT SERVICE 01: SOFTWARE DEVELOPMENT
-  if (
-    q.includes('software development') ||
-    q.includes('custom software') ||
-    q.includes('software engineer') ||
-    q.includes('custom app') ||
-    q.includes('enterprise app')
-  ) {
-    return {
-      text: "OPERAVA's **Software Development** services deliver custom software solutions designed around your workflows, users, and long-term scaling:\n\n• Custom business applications and internal operational platforms\n• Workflow systems and automated customer portals\n• Application modernization, feature enhancement, and maintenance\n• Clean architecture, thorough testing, and scalable database integrations\n\nWhether you need one dedicated software developer or a full engineering squad, we adapt to your roadmap.",
+      text: "**Software Development** means building software around how your business actually works — not generic templates.\n\n**What it covers**\n• Custom business apps, internal tools, workflow systems, customer portals\n• Modernization, feature work, and ongoing maintenance\n\n**Typical process**\nDiscover requirements → Design architecture → Build & test → Launch → Operate & improve\n\n**Examples**\nInternal ops platforms, automation apps, enterprise workflow systems, portal upgrades.\n\nYou can start with one developer or a full squad. For a scoped project, use Request a Quote.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 15. IT SERVICE 02: WEB & MOBILE APPLICATION DEVELOPMENT
-  if (
-    q.includes('web development') ||
-    q.includes('mobile app') ||
-    q.includes('website') ||
-    q.includes('pwa') ||
-    q.includes('ios') ||
-    q.includes('android') ||
-    q.includes('react')
-  ) {
+  if (q.includes('web development') || q.includes('mobile app') || q.includes('website') || q.includes('pwa')) {
     return {
-      text: "Our **Web & Mobile Application Development** practice builds modern digital experiences engineered for speed, usability, security, and scale:\n\n• Corporate websites and interactive web applications\n• Customer portals, e-commerce platforms, and booking systems\n• Cross-platform iOS & Android mobile applications and PWAs\n• API, payment, database, CRM, and authentication integrations\n\nYour digital products are where customers experience your business; we build them for reliability.",
+      text: "**Web & Mobile Application Development** builds digital experiences for speed, usability, and scale.\n\n**What it covers**\nCorporate sites, web apps, customer portals, e-commerce, booking platforms, iOS/Android and PWAs.\n\n**Process**\nUX scope → UI → development → QA → deploy, with API, payment, and CRM integrations where needed.\n\nYour digital products are where customers experience your business.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 16. IT SERVICE 03: SAAS & PLATFORM DEVELOPMENT
-  if (
-    q.includes('saas') ||
-    q.includes('platform development') ||
-    q.includes('multi-tenant') ||
-    q.includes('subscription') ||
-    q.includes('digital platform')
-  ) {
+  if (q.includes('saas') || q.includes('platform development') || q.includes('subscription')) {
     return {
-      text: "Our **SaaS & Platform Development** services design and engineer multi-user software products built for recurring operations:\n\n• Scalable multi-tenant SaaS architecture\n• User access, role-based permissions, and subscription management\n• Custom business portals, marketplaces, and workflow engines\n• Cloud-native database structures, automated deployments, and API connectivity",
+      text: "**SaaS & Platform Development** builds multi-user products for recurring operations.\n\n**Examples**\nMulti-tenant SaaS, subscription systems, business portals, marketplaces, workflow engines.\n\n**What matters**\nAccounts, permissions, data models, cloud architecture, and continuous performance — designed to scale with customers.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 17. IT SERVICE 04: IT SYSTEMS DEVELOPMENT
-  if (
-    q.includes('it systems') ||
-    q.includes('business systems') ||
-    q.includes('hr system') ||
-    q.includes('crm system') ||
-    q.includes('erp system') ||
-    q.includes('approval system')
-  ) {
+  if (q.includes('customer service') || q.includes('customer support') || q.includes('chat support') || q.includes('call center') || q.includes('customer care')) {
     return {
-      text: "Our **IT Systems Development** services create centralized business solutions that connect operational functions and automate workflows:\n\n• HR & workforce management systems\n• Custom CRM and ERP-related operational tools\n• Internal workflow, approval, and document dispatch systems\n• Management reporting, performance dashboards, and process automation",
+      text: "**Customer Service** means your customers experience your brand — without being limited by internal capacity.\n\n**What it covers**\n• Voice, email, and live chat\n• Orders, tracking, refunds, account care, onboarding\n• Escalations following your scripts and rules\n\n**How it works**\nWe align on channels, hours, scripts, and escalation paths, then staff one dedicated agent or a full team (including 24/7 where scoped). Agents work to your knowledge base and quality standards.\n\n**Examples**\nChat for e-commerce, voice for SaaS, email for account issues. Use Request a Quote for a scoped engagement.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 18. IT SERVICE 05: COMPUTER PROGRAMMING
-  if (
-    q.includes('computer programming') ||
-    q.includes('programmer') ||
-    q.includes('coding') ||
-    q.includes('api development') ||
-    q.includes('backend development') ||
-    q.includes('frontend development')
-  ) {
+  if (q.includes('technical support') || q.includes('help desk') || q.includes('it support')) {
     return {
-      text: "OPERAVA provides professional **Computer Programming** across modern development stacks:\n\n• Front-end, back-end, and full-stack engineering\n• REST & GraphQL API creation and integration\n• Automation scripting, data connectors, and algorithm implementation\n• Bug fixing, feature enhancements, code refactoring, and maintenance\n\nYou can engage one dedicated programmer or expand into a dedicated development squad.",
+      text: "**Technical Support / Help Desk** handles product and user issues with defined escalation.\n\n**What it covers**\nTicket intake, categorization, basic troubleshooting, product/SaaS support, documentation, and routing to specialists.\n\n**Process**\nDefined tiers (as scoped) so front-line support resolves what it can and escalates complex work to engineering — without replacing engineers.\n\n**Examples**\nSaaS user assistance, application support tickets, internal employee help desk.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 19. IT SERVICE 06: IT CONSULTING
-  if (
-    q.includes('it consulting') ||
-    q.includes('technology consulting') ||
-    q.includes('digital transformation') ||
-    q.includes('technology assessment') ||
-    q.includes('it strategy')
-  ) {
+  if (q.includes('database') || q.includes('sql') || q.includes('data migration') || q.includes('dba')) {
     return {
-      text: "Our **IT Consulting** services provide strategic technology guidance aligned with practical business execution:\n\n• Technology infrastructure and software assessments\n• Digital transformation roadmaps and modernization strategies\n• Architecture design, integration planning, and automation reviews\n• Tool selection, workflow evaluation, and implementation planning\n\nWe evaluate whether to improve, integrate, modernize, or replace systems for maximum operational value.",
+      text: "**Database Services** cover the data tier lifecycle.\n\n**What it covers**\nDesign, administration, SQL development, optimization, migration, monitoring, and backups.\n\n**Process**\nAssess environment → design or improve schema → implement changes → validate → monitor.\n\nYour data underpins digital operations and decisions.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 20. IT SERVICE 07: SYSTEMS INTEGRATION
-  if (
-    q.includes('systems integration') ||
-    q.includes('integration') ||
-    q.includes('connect systems') ||
-    q.includes('api integration') ||
-    q.includes('legacy system')
-  ) {
+  if (q.includes('integration') || q.includes('api integration') || q.includes('connect systems')) {
     return {
-      text: "Our **Systems Integration** practice connects disparate applications, databases, cloud tools, APIs, and business software:\n\n• API and webhook integrations between web tools, CRMs, and ERPs\n• Payment gateway, billing, and accounting platform connectivity\n• Application-to-application data syncing and workflow automation\n• Legacy system integration with modern cloud applications",
+      text: "**Systems Integration** connects apps, databases, APIs, and cloud tools so work flows instead of duplicating.\n\n**Examples**\nCRM/ERP links, payment gateways, SaaS connectors, webhook automation, legacy-to-cloud bridges.\n\n**Process**\nMap systems and data → design interfaces → implement and test → monitor.\n\nDisconnected systems create friction; integration creates flow.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 21. IT SERVICE 08: DATABASE SERVICES
-  if (
-    q.includes('database') ||
-    q.includes('sql') ||
-    q.includes('data migration') ||
-    q.includes('database administration') ||
-    q.includes('dba')
-  ) {
+  if (q.includes('bpo') || q.includes('back-office') || q.includes('data entry') || q.includes('data processing') || q.includes('virtual assistant') || q.includes('document processing')) {
     return {
-      text: "OPERAVA's **Database Services** cover the full lifecycle of your data tier:\n\n• Relational (SQL) and non-relational database design and architecture\n• Database administration, query optimization, and performance tuning\n• Data migration planning, extraction, validation, and transfer\n• Backup strategies, replication, maintenance, and monitoring",
+      text: "**BPO & operational services** extend capacity without building full internal departments.\n\n**Examples**\n• Back-office administration and coordination\n• Data processing and data entry with quality checks\n• Document intake, classification, and filing\n• Virtual assistance (calendar, email, research, coordination)\n\n**How we engage**\nOne professional, one dedicated team, or multiple teams — following your procedures and quality standards.\n\nAsk about a specific function and I'll explain meaning, process, and examples.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 22. CLOUD & DIGITAL INFRASTRUCTURE
-  if (
-    q.includes('cloud') ||
-    q.includes('infrastructure') ||
-    q.includes('hosting') ||
-    q.includes('devops') ||
-    q.includes('server') ||
-    q.includes('aws') ||
-    q.includes('azure') ||
-    q.includes('gcp')
-  ) {
+  if (q.includes('cloud') || q.includes('devops') || q.includes('hosting') || q.includes('aws') || q.includes('azure') || q.includes('gcp')) {
     return {
-      text: "OPERAVA supports **Cloud & Digital Infrastructure** that enables modern remote operations:\n\n• Cloud application deployment and environment setup\n• Cloud migration support, infrastructure planning, and hosting environments\n• Systems administration, continuous monitoring, and maintenance\n• Backup, disaster recovery, and operational continuity configurations",
+      text: "**Cloud & infrastructure** support modern remote operations.\n\n**What it covers**\nDeployment, environment setup, migration support, monitoring, backups, and continuity configurations across major clouds where scoped.\n\n**Process**\nPlan environment → deploy/migrate → harden and monitor → operate continuously.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 23. BPO SERVICE 01: CUSTOMER SERVICE
-  if (
-    q.includes('customer service') ||
-    q.includes('customer support') ||
-    q.includes('chat support') ||
-    q.includes('email support') ||
-    q.includes('voice support') ||
-    q.includes('call center') ||
-    q.includes('customer care')
-  ) {
+  if (q.includes('it service') || q.includes('software service') || q.includes('what services') || q.includes('list of services')) {
     return {
-      text: "Our **Customer Service** BPO operations deliver reliable customer-facing assistance across all digital and voice channels:\n\n• Live chat, email, and voice customer support\n• Order management, tracking, refunds, and account inquiries\n• Customer care, onboarding, and customer success workflows\n• Escalation handling following your approved procedures and scripts\n\nYou can engage one dedicated customer service agent or deploy a 24/7 multi-tiered team.",
+      text: "OPERAVA services fall into two connected areas:\n\n**IT & software**\nSoftware development, web & mobile, SaaS platforms, IT systems, programming, IT consulting, systems integration, database services.\n\n**BPO & workforce**\nCustomer service, technical support, help desk, back-office, data processing, data entry, document processing, virtual assistance.\n\n**Engagement**\nOne professional → one dedicated team → multiple teams.\n**Operating model**\nDiscover → Design → Build → Launch → Operate → Optimize.\n\nAsk about any single service for meaning, process, and examples.",
       inquiryCard: { type: 'consultation' },
     }
   }
 
-  // 24. BPO SERVICE 02: TECHNICAL SUPPORT
-  if (
-    q.includes('technical support') ||
-    q.includes('tech support') ||
-    q.includes('product support') ||
-    q.includes('troubleshooting') ||
-    q.includes('tier 1') ||
-    q.includes('tier 2')
-  ) {
-    return {
-      text: "Our **Technical Support** teams provide structured product and technical assistance:\n\n• SaaS, software, and application troubleshooting\n• User account, configuration, and technical ticket resolution\n• Issue triage, reproduction, documentation, and engineering escalation\n• Multichannel support through help desks, ticketing systems, and chat",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 25. BPO SERVICE 03: HELP DESK
-  if (
-    q.includes('help desk') ||
-    q.includes('service desk') ||
-    q.includes('ticketing') ||
-    q.includes('ticket intake') ||
-    q.includes('internal it support')
-  ) {
-    return {
-      text: "OPERAVA's **Help Desk** operations deliver structured front-line support for internal employees or external users:\n\n• Ticket intake, categorization, and prioritization\n• First-contact resolution for common IT and software inquiries\n• Incident routing and escalation management\n• Continuous status updates and service level agreement (SLA) tracking",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 26. BPO SERVICE 04: BACK-OFFICE OPERATIONS
-  if (
-    q.includes('back office') ||
-    q.includes('back-office') ||
-    q.includes('order processing') ||
-    q.includes('billing support') ||
-    q.includes('claims') ||
-    q.includes('administrative operations')
-  ) {
-    return {
-      text: "Our **Back-Office Operations** support essential process-driven business functions:\n\n• Order verification, fulfillment processing, and logistics coordination\n• Billing support, invoice processing, and account reconciliation\n• Claims processing, records administration, and document review\n• Scheduled operational reporting, research, and data verification",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 27. BPO SERVICE 05: DATA PROCESSING
-  if (
-    q.includes('data processing') ||
-    q.includes('data classification') ||
-    q.includes('data validation') ||
-    q.includes('data reconciliation') ||
-    q.includes('data formatting')
-  ) {
-    return {
-      text: "OPERAVA provides structured **Data Processing** services to turn raw information into clean, actionable business data:\n\n• Data collection, organization, and normalization\n• Validation against predefined business rules and formats\n• Information classification, tagging, and category mapping\n• Data reconciliation, formatting, and quality assurance workflows",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 28. BPO SERVICE 06: DATA ENTRY
-  if (
-    q.includes('data entry') ||
-    q.includes('data encoder') ||
-    q.includes('spreadsheet') ||
-    q.includes('catalog entry') ||
-    q.includes('crm updates')
-  ) {
-    return {
-      text: "Our **Data Entry** services provide high-accuracy, disciplined entry across systems and databases:\n\n• Spreadsheet, ERP, CRM, and portal data entry\n• Product catalog creation, updates, and eCommerce SKU maintenance\n• Paper/digital form transcription and record verification\n• Standardized review procedures to maintain consistent data accuracy",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 29. BPO SERVICE 07: DOCUMENT PROCESSING
-  if (
-    q.includes('document processing') ||
-    q.includes('document indexing') ||
-    q.includes('data extraction') ||
-    q.includes('records management') ||
-    q.includes('ocr')
-  ) {
-    return {
-      text: "Our **Document Processing** solutions organize, digitize, and extract vital information from business documents:\n\n• Document intake, sorting, and classification\n• Metadata tagging, indexing, and digital filing\n• Key data extraction from forms, invoices, contracts, and receipts\n• Verification, record organization, and archive maintenance",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 30. BPO SERVICE 08: VIRTUAL ASSISTANCE
-  if (
-    q.includes('virtual assistant') ||
-    q.includes('va') ||
-    q.includes('executive assistant') ||
-    q.includes('administrative assistant') ||
-    q.includes('scheduling') ||
-    q.includes('email management')
-  ) {
-    return {
-      text: "OPERAVA's **Virtual Assistance** services provide dedicated remote support for executives, teams, and growing businesses:\n\n• Executive and administrative support, calendar and schedule management\n• Email correspondence, triage, and customer communication\n• Market research, data compilation, and presentation preparation\n• CRM updates, appointment coordination, and project support\n\nYou can engage one dedicated virtual assistant or a coordinated team of assistants.",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 31. GENERAL IT SERVICES LIST
-  if (q.includes('it service') || q.includes('technology service') || q.includes('it offerings')) {
-    return {
-      text: "OPERAVA offers 8 primary IT and Technology service areas:\n\n01. Software Development\n02. Web & Mobile Application Development\n03. SaaS & Platform Development\n04. IT Systems Development\n05. Computer Programming\n06. IT Consulting\n07. Systems Integration\n08. Database Services\n+ Cloud & Digital Infrastructure\n\nWhich technology area can I explain in more detail for you?",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 32. GENERAL BPO SERVICES LIST
-  if (q.includes('bpo service') || q.includes('bpo offerings') || q.includes('outsourcing service') || q.includes('workforce service')) {
-    return {
-      text: "OPERAVA offers 8 primary BPO and Workforce Operations service areas:\n\n01. Customer Service\n02. Technical Support\n03. Help Desk\n04. Back-Office Operations\n05. Data Processing\n06. Data Entry\n07. Document Processing\n08. Virtual Assistance\n\nWhich operations area would you like to know more about?",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 33. SECURITY, DATA PRIVACY & CONFIDENTIALITY
-  if (
-    q.includes('security') ||
-    q.includes('confidentiality') ||
-    q.includes('privacy') ||
-    q.includes('data protection') ||
-    q.includes('nda')
-  ) {
-    return {
-      text: "OPERAVA treats client security, privacy, and confidentiality as fundamental:\n\n• We implement appropriate contractual, technical, administrative, and access-control measures tailored to each engagement.\n• Non-disclosure agreements (NDAs) and role-based access governance.\n• Compliance with the Philippine Data Privacy Act (DPA) and international privacy principles.\n• Secure infrastructure and communication protocols for all distributed workflows.",
-    }
-  }
-
-  // 34. INDUSTRIES SERVED
-  if (
-    q.includes('industry') ||
-    q.includes('sector') ||
-    q.includes('fintech') ||
-    q.includes('ecommerce') ||
-    q.includes('healthcare') ||
-    q.includes('logistics') ||
-    q.includes('real estate')
-  ) {
-    return {
-      text: "OPERAVA supports organizations across diverse industries:\n\n• Information Technology, SaaS, and Digital Platforms\n• E-Commerce, Retail, and Logistics\n• Financial Services, Insurance, and Professional Services\n• Healthcare Administration and Telecommunications\n• Real Estate, Hospitality, and EdTech\n• Startups, SMEs, and Enterprise Organizations",
-    }
-  }
-
-  // 35. CONSULTATION / PRICING / HOW TO ENGAGE
-  if (
-    q.includes('how to start') ||
-    q.includes('pricing') ||
-    q.includes('cost') ||
-    q.includes('quote') ||
-    q.includes('proposal') ||
-    q.includes('get started') ||
-    q.includes('contact') ||
-    q.includes('hire') ||
-    q.includes('consultation')
-  ) {
-    return {
-      text: "Getting started with OPERAVA is straightforward:\n\n1. Requirement Discovery: We discuss your technical, operational, or staffing needs.\n2. Solution & Delivery Scoping: We outline the appropriate delivery model (one professional, a dedicated team, or multiple teams) and service scope.\n3. Transparent Proposal: We provide clear, customized pricing and service parameters.\n4. Seamless Launch: Rapid onboarding, workflow alignment, and continuous delivery.\n\nWould you like to share your project details so our team can prepare a proposal?",
-      inquiryCard: { type: 'consultation' },
-    }
-  }
-
-  // 36. NATURAL INTELLIGENT FALLBACK
   return {
-    text: `I understand you're asking about "${query}".\n\nOPERAVA Global Solutions provides IT services (Software Development, Web & Mobile Apps, SaaS Platforms, IT Systems, Programming, IT Consulting, Systems Integration, Database Services, and Cloud Infrastructure) and BPO operations (Customer Service, Technical Support, Help Desk, Back-Office Operations, Data Processing, Data Entry, Document Processing, and Virtual Assistance).\n\nCould you let me know if you are interested in a specific service, learning more about our corporate background, or discussing a new project?`,
-    inquiryCard: { type: 'consultation' },
+    text: "I can help with OPERAVA's technology, BPO, workforce, company background, engagement models, or careers — using only our controlled knowledge.\n\nTry asking about a specific service (for example software development or customer service), how we deliver (one professional vs teams), or whether you are exploring as a client or applying for a role.\n\nFormal quotes: Request a Quote. Applications: Careers / Apply.",
   }
 }
