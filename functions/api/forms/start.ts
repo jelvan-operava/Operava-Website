@@ -33,7 +33,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       return json({ error: 'Invalid request body.' }, 400)
     }
 
-    // Honeypot
     if (clean(body.website, 80)) {
       return json({ ok: true, draftId: 'filtered', maskedEmail: 'hidden' })
     }
@@ -119,7 +118,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
           {
             error:
               'Unable to send verification email. Please try again in a moment, or contact hello@operavaglobal.com if this continues.',
-            ...(!isProductionRuntime() ? { detail } : {}),
+            detail,
           },
           502,
         )
@@ -138,12 +137,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
   } catch (err) {
     console.error('form start failed', err)
     const detail = err instanceof Error ? err.message : String(err)
-    return json(
-      {
-        error: 'Unable to start verification.',
-        ...(!isProductionRuntime() ? { detail } : {}),
-      },
-      500,
-    )
+    return json({ error: 'Unable to start verification.', detail }, 500)
   }
 }
