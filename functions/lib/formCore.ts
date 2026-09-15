@@ -18,8 +18,7 @@ export interface FormEnv {
 
 /**
  * Resend from format: "Display Name <email@verified-domain.com>"
- * @see https://resend.com/docs/api-reference/emails/send-email
- * Domain operavaglobal.com must be verified in Resend. No mailbox creation required.
+ * Domain operavaglobal.com must be verified in Resend.
  */
 export const DEFAULT_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
 export const OTP_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
@@ -32,12 +31,21 @@ export const DEFAULT_REPLY_TO = 'hello@operavaglobal.com'
 export const DEFAULT_OTP_SECRET = 'operava-form-secret'
 
 export function resolveSecret(env: FormEnv): string {
-  return (env.OTP_SECRET && String(env.OTP_SECRET)) || (env.RESEND_API_KEY && String(env.RESEND_API_KEY)) || DEFAULT_OTP_SECRET
+  const otp = env.OTP_SECRET && String(env.OTP_SECRET).trim()
+  if (otp && otp.length >= 16) return otp
+  const resend = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
+  if (resend && resend.length >= 16) return resend
+  return DEFAULT_OTP_SECRET
 }
 
+/** Prefer treating Cloudflare Pages as production unless explicitly development. */
 export function isProductionRuntime(): boolean {
   try {
-    return typeof process !== 'undefined' && process?.env?.NODE_ENV === 'production'
+    // Cloudflare Workers / Pages: NODE_ENV is often unset — default to production-safe behavior.
+    if (typeof process === 'undefined' || !process?.env) return true
+    const nodeEnv = String(process.env.NODE_ENV || '').toLowerCase()
+    if (nodeEnv === 'development' || nodeEnv === 'test') return false
+    return true
   } catch {
     return true
   }
@@ -208,8 +216,14 @@ export function otpEmailText(_name: string, purpose: string, code: string) {
   )
 }
 
-export async function sendResend(env: FormEnv, payload: Record<string, unknown>) {
-  const apiKey = env.RESEND_API_KEY
+export type SendResendResult = { id: string; status: number }
+
+/**
+ * Send via Resend. Returns provider message id on success.
+ * Throws on configuration or provider failure. Never logs API key or OTP content.
+ */
+export async function sendResend(env: FormEnv, payload: Record<string, unknown>): Promise<SendResendResult> {
+  const apiKey = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
 
   const from =
@@ -217,7 +231,6 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     (env.RESEND_FROM && String(env.RESEND_FROM).trim()) ||
     DEFAULT_RESEND_FROM
 
-  // Resend docs: from must be on a verified domain; reply_to is optional but recommended for noreply
   const body: Record<string, unknown> = {
     ...payload,
     from,
@@ -234,10 +247,23 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     },
     body: JSON.stringify(body),
   })
+
+  const raw = await res.text().catch(() => '')
   if (!res.ok) {
-    const errText = await res.text().catch(() => '')
-    throw new Error('Resend failed ' + res.status + ': ' + errText.slice(0, 400))
+    // Server-side only: status + short body snippet (no API key, no OTP)
+    console.error('Resend API error', res.status, raw.slice(0, 200))
+    throw new Error('EMAIL_SEND_FAILED')
   }
+
+  let id = ''
+  try {
+    const parsed = JSON.parse(raw) as { id?: string }
+    id = typeof parsed.id === 'string' ? parsed.id : ''
+  } catch {
+    id = ''
+  }
+  if (id) console.info('Resend accepted', id)
+  return { id, status: res.status }
 }
 
 export function inboxFor(type: FormType, env: FormEnv) {
