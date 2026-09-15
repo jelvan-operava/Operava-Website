@@ -21,14 +21,21 @@ body {
   background-image: none !important;
 }
 
-/* Override legacy warm/off-white section backgrounds site-wide */
-.bg-\[\#FBFBFA\],
-.bg-\[\#F7F6F4\],
-.bg-\[\#F3F1EE\],
-.bg-\[\#FBFBFA\]\/90,
-.from-\[\#F7F6F4\],
-.via-\[\#FBFBFA\],
-.to-\[\#FBFBFA\] {
+/* Force pure white over any legacy warm/off-white utilities (class name fragment match) */
+[class*="FBFBFA"],
+[class*="F7F6F4"],
+[class*="F3F1EE"] {
+  background-color: #FFFFFF !important;
+  background-image: none !important;
+}
+
+.bg-\\[\\#FBFBFA\\],
+.bg-\\[\\#F7F6F4\\],
+.bg-\\[\\#F3F1EE\\],
+.bg-\\[\\#FBFBFA\\]\\/90,
+.from-\\[\\#F7F6F4\\],
+.via-\\[\\#FBFBFA\\],
+.to-\\[\\#FBFBFA\\] {
   background-color: #FFFFFF !important;
   background-image: none !important;
 }
