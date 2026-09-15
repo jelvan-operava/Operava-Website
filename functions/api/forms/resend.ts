@@ -7,97 +7,24 @@ import {
   purposeLabel,
   sendResend,
   resolveSecret,
-  OTP_RESEND_FROM,
+  isProductionRuntime,
+  issueSignedDraft,
+  readSignedDraft,
   type FormEnv,
-  type FormType,
 } from '../../lib/formCore'
-
-function b64url(bytes: ArrayBuffer | Uint8Array | string): string {
-  let bin: string
-  if (typeof bytes === 'string') bin = bytes
-  else {
-    const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
-    bin = String.fromCharCode(...arr)
-  }
-  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
-}
-
-function fromB64url(s: string): string {
-  const pad = s.length % 4 === 0 ? '' : '='.repeat(4 - (s.length % 4))
-  const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad
-  return atob(b64)
-}
-
-async function hmacSign(secret: string, payload: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  )
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload))
-  return b64url(sig)
-}
-
-async function readSignedDraft(secret: string, draftId: string) {
-  if (!draftId.startsWith('s1.')) return null
-  const parts = draftId.split('.')
-  if (parts.length !== 3) return null
-  const [, payload, sig] = parts
-  const expected = await hmacSign(secret, payload)
-  if (sig !== expected) return null
-  try {
-    return JSON.parse(fromB64url(payload)) as {
-      email: string
-      formType: FormType
-      payload: string
-      codeHash: string
-      expiresAt: number
-      attempts: number
-      resends: number
-      lastSentAt: number
-    }
-  } catch {
-    return null
-  }
-}
-
-async function issueSignedDraft(
-  secret: string,
-  data: {
-    email: string
-    formType: FormType
-    payload: string
-    codeHash: string
-    expiresAt: number
-    attempts?: number
-    resends?: number
-    lastSentAt?: number
-  },
-): Promise<string> {
-  const body = JSON.stringify({
-    email: data.email,
-    formType: data.formType,
-    payload: data.payload,
-    codeHash: data.codeHash,
-    expiresAt: data.expiresAt,
-    attempts: data.attempts || 0,
-    resends: data.resends || 0,
-    lastSentAt: data.lastSentAt || Date.now(),
-  })
-  const payload = b64url(body)
-  const sig = await hmacSign(secret, payload)
-  return `s1.${payload}.${sig}`
-}
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY && process.env.NODE_ENV === 'production') {
+    if (!env.RESEND_API_KEY && isProductionRuntime()) {
       return json({ error: 'Email delivery is not configured.' }, 503)
     }
     const secret = resolveSecret(env)
-    const body = (await request.json()) as { draftId?: string }
+    let body: { draftId?: string }
+    try {
+      body = (await request.json()) as { draftId?: string }
+    } catch {
+      return json({ error: 'Invalid request body.' }, 400)
+    }
     const draftId = String(body.draftId || '')
     if (!draftId) return json({ error: 'Missing draft.' }, 400)
 
@@ -109,7 +36,12 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
     if (Number(signed.resends) >= 5) return json({ error: 'Resend limit reached.' }, 429)
 
-    const payloadObj = JSON.parse(signed.payload || '{}') as { name?: string }
+    let payloadObj: { name?: string } = {}
+    try {
+      payloadObj = JSON.parse(signed.payload || '{}') as { name?: string }
+    } catch {
+      payloadObj = {}
+    }
     const code = generateOtp()
     const codeHash = await hashOtp(secret, code)
     const expiresAt = now + 10 * 60 * 1000
@@ -125,13 +57,24 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     })
 
     if (env.RESEND_API_KEY) {
-      await sendResend(env, {
-        from: 'Operava Notification <notification-noreply@operavaglobal.com>',
-        to: [signed.email],
-        subject: 'Verification Code',
-        html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
-        text: otpEmailText(payloadObj.name || 'there', purposeLabel(signed.formType), code),
-      })
+      try {
+        await sendResend(env, {
+          from: env.RESEND_FROM || 'Operava Notification <notification-noreply@operavaglobal.com>',
+          to: [signed.email],
+          subject: 'Verification Code',
+          html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
+          text: otpEmailText(payloadObj.name || 'there', purposeLabel(signed.formType), code),
+        })
+      } catch (mailErr) {
+        console.error('OTP resend failed', mailErr)
+        return json(
+          {
+            error:
+              'Unable to resend verification email. Please try again shortly, or contact hello@operavaglobal.com.',
+          },
+          502,
+        )
+      }
     } else {
       console.warn(`[DEV MODE] RESEND_API_KEY not configured. Resent verification code for ${signed.email}: ${code}`)
     }
@@ -139,9 +82,10 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     return json({
       ok: true,
       draftId: newDraftId,
-      ...(process.env.NODE_ENV !== 'production' && !env.RESEND_API_KEY ? { devCode: code } : {}),
+      ...(!isProductionRuntime() && !env.RESEND_API_KEY ? { devCode: code } : {}),
     })
-  } catch {
+  } catch (err) {
+    console.error('form resend failed', err)
     return json({ error: 'Unable to resend the code.' }, 500)
   }
 }
