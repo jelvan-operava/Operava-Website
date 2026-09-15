@@ -1,0 +1,67 @@
+/* OPERAVA LAYOUT DESIGN SYSTEM
+   Full-width structure · warm off-white · consistent type */
+
+:root {
+  --operava-bg: #FBFBFA;
+  --operava-bg-warm: #F7F6F4;
+  --operava-bg-soft: #F3F1EE;
+  --operava-surface: #FFFFFF;
+  --operava-border: rgba(120, 113, 108, 0.14);
+  --operava-shell-max: 100rem;
+  --operava-text-max: 42rem;
+  --operava-section-y: clamp(4.5rem, 6vw, 7rem);
+  --operava-title: clamp(1.65rem, 2.2vw + 0.6rem, 2.75rem);
+  --operava-subtitle: clamp(1rem, 0.4vw + 0.9rem, 1.125rem);
+  --operava-body: clamp(0.9rem, 0.25vw + 0.85rem, 1rem);
+}
+
+body {
+  background-color: var(--operava-bg) !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.035), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(245, 240, 232, 0.45), transparent 50%),
+    radial-gradient(ellipse 50% 30% at 0% 80%, rgba(250, 248, 245, 0.55), transparent 45%);
+  background-attachment: fixed;
+}
+
+.operava-shell {
+  width: 100%;
+  max-width: var(--operava-shell-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+@media (min-width: 640px) {
+  .operava-shell { padding-left: 2rem; padding-right: 2rem; }
+}
+@media (min-width: 1024px) {
+  .operava-shell { padding-left: 3rem; padding-right: 3rem; }
+}
+@media (min-width: 1280px) {
+  .operava-shell { padding-left: 4rem; padding-right: 4rem; }
+}
+
+.operava-section {
+  width: 100%;
+  padding-top: var(--operava-section-y);
+  padding-bottom: var(--operava-section-y);
+}
+
+.operava-title {
+  font-size: var(--operava-title);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: #111827;
+}
+
+.operava-body-text {
+  font-size: var(--operava-body);
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+.operava-prose {
+  max-width: var(--operava-text-max);
+}
