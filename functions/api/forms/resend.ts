@@ -59,7 +59,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     if (env.RESEND_API_KEY) {
       try {
         await sendResend(env, {
-          from: env.RESEND_FROM || 'OPERAVA <notification@operavaglobal.com>',
+          from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
           to: [signed.email],
           subject: 'Verification Code',
           html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),
@@ -77,7 +77,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
         )
       }
     } else {
-      console.warn(`[DEV] RESEND_API_KEY missing. Resent OTP for ${signed.email}: ${code}`)
+      console.warn('[DEV] RESEND_API_KEY missing. Resent OTP for ' + signed.email + ': ' + code)
     }
 
     return json({
