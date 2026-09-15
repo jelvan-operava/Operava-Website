@@ -5,10 +5,6 @@ import {
   hashOtp,
   json,
   maskEmail,
-  otpEmailHtml,
-  otpEmailText,
-  purposeLabel,
-  sendResend,
   resolveSecret,
   isProductionRuntime,
   issueSignedDraft,
@@ -59,67 +55,52 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       return json({ error: 'Message is required.' }, 400)
     }
 
-    const now = Date.now()
-    const code = generateOtp()
-    const codeHash = await hashOtp(secret, code)
-    const payload = JSON.stringify({ ...body, name, email, formType })
-    const expiresAt = now + 10 * 60 * 1000
-
-    const draftId = await issueSignedDraft(secret, {
-      email,
-      formType,
-      payload,
-      codeHash,
-      expiresAt,
-      attempts: 0,
-      resends: 0,
-      lastSentAt: now,
-    })
-
-    // Build email content first so template errors surface clearly
-    let html = ''
-    let text = ''
+    // Step A: OTP generate
+    let code = ''
     try {
-      html = otpEmailHtml(name, purposeLabel(formType), code)
-      text = otpEmailText(name, purposeLabel(formType), code)
-    } catch (tplErr) {
-      const detail = tplErr instanceof Error ? tplErr.message : String(tplErr)
-      return json({ error: 'Unable to build verification email.', detail }, 500)
+      code = generateOtp()
+    } catch (e) {
+      return json({ error: 'stepA generateOtp', detail: String(e) }, 500)
     }
 
-    if (env.RESEND_API_KEY) {
-      try {
-        await sendResend(env, {
-          from: env.RESEND_FROM || 'OPERAVA <notification@operavaglobal.com>',
-          to: [email],
-          subject: 'Verification Code',
-          html,
-          text,
-        })
-      } catch (mailErr) {
-        console.error('OTP email send failed', mailErr)
-        const detail = mailErr instanceof Error ? mailErr.message : String(mailErr)
-        return json(
-          {
-            error:
-              'Unable to send verification email right now. Please try again in a moment, or contact hello@operavaglobal.com.',
-            detail,
-            draftId,
-            maskedEmail: maskEmail(email),
-          },
-          502,
-        )
-      }
-    } else {
-      console.warn('[DEV] RESEND_API_KEY missing. OTP for ' + email + ': ' + code)
+    // Step B: hash
+    let codeHash = ''
+    try {
+      codeHash = await hashOtp(secret, code)
+    } catch (e) {
+      return json({ error: 'stepB hashOtp', detail: String(e) }, 500)
     }
 
+    const payload = JSON.stringify({ ...body, name, email, formType })
+    const expiresAt = Date.now() + 10 * 60 * 1000
+
+    // Step C: signed draft
+    let draftId = ''
+    try {
+      draftId = await issueSignedDraft(secret, {
+        email,
+        formType,
+        payload,
+        codeHash,
+        expiresAt,
+        attempts: 0,
+        resends: 0,
+        lastSentAt: Date.now(),
+      })
+    } catch (e) {
+      return json({ error: 'stepC issueSignedDraft', detail: String(e) }, 500)
+    }
+
+    // Stop here for diagnosis — do not call Resend yet
     return json({
       ok: true,
+      debug: true,
       draftId,
       maskedEmail: maskEmail(email),
-      expiresInSec: 600,
-      ...(!isProductionRuntime() && !env.RESEND_API_KEY ? { devCode: code } : {}),
+      codeLen: code.length,
+      hashLen: codeHash.length,
+      hasResendKey: Boolean(env.RESEND_API_KEY),
+      hasResendFrom: Boolean(env.RESEND_FROM),
     })
   } catch (err) {
     console.error('form start failed', err)
