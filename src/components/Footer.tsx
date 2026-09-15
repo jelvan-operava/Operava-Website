@@ -53,7 +53,7 @@ export default function Footer() {
 
   return (
     <>
-      <section className="bg-[#FBFBFA] border-t border-stone-200/80 py-12 lg:py-14">
+      <section className="bg-white border-t border-gray-200 py-12 lg:py-14">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <EmailDirectoryCarousel />
         </div>
