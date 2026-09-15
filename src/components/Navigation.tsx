@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Menu, X, ArrowRight } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 import OperavaLogo from './OperavaLogo'
 
 export default function Navigation() {
   const { t } = useLanguage()
+  const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [servicesOpen, setServicesOpen] = useState(false)
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
   const location = useLocation()
   const dropdownRef = useRef<HTMLDivElement>(null)
   const mobileRef = useRef<HTMLDivElement>(null)
@@ -49,13 +51,14 @@ export default function Navigation() {
   useEffect(() => {
     setMobileOpen(false)
     setServicesOpen(false)
+    setMobileServicesOpen(false)
   }, [location.pathname])
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as Node
       if (dropdownRef.current && !dropdownRef.current.contains(target)) {
-        setServicesOpen((prev) => (prev ? false : prev))
+        setServicesOpen(false)
       }
       if (
         mobileRef.current &&
@@ -63,7 +66,7 @@ export default function Navigation() {
         mobileToggleRef.current &&
         !mobileToggleRef.current.contains(target)
       ) {
-        setMobileOpen((prev) => (prev ? false : prev))
+        setMobileOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClick)
@@ -78,17 +81,23 @@ export default function Navigation() {
   const closeMenus = () => {
     setMobileOpen(false)
     setServicesOpen(false)
+    setMobileServicesOpen(false)
+  }
+
+  /** Reliable mobile navigation (avoids touch/mousedown race with menu close). */
+  const goTo = (href: string) => {
+    closeMenus()
+    navigate(href)
   }
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-[#FBFBFA]/90 backdrop-blur-md border-b border-stone-200/70 transition-shadow duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/80 transition-shadow duration-300 ${
         scrolled ? 'shadow-sm' : 'shadow-none'
       }`}
     >
-      <nav className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 flex items-center justify-between h-16 lg:h-18">
+      <nav className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 flex items-center justify-between h-16 lg:h-18 bg-white">
         <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="OPERAVA Global Solutions — Home">
-          {/* AVA Cloudinary mark: full alpha, no white square — blends with nav background */}
           <OperavaLogo
             size={44}
             priority
@@ -123,7 +132,7 @@ export default function Navigation() {
                   className={`inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer ${
                     isActive(link.href) || servicesOpen
                       ? 'text-violet-700 bg-violet-50 font-semibold'
-                      : 'text-gray-700 hover:text-gray-900 hover:bg-stone-100/80'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                   aria-expanded={servicesOpen}
                   aria-haspopup="true"
@@ -137,7 +146,7 @@ export default function Navigation() {
                 {servicesOpen && (
                   <div
                     id="nav-services-dropdown-menu"
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-84 bg-white rounded-2xl shadow-xl border border-stone-100 p-2 animate-fade-in z-50 divide-y divide-stone-100"
+                    className="absolute top-full left-1/2 -translate-x-1/2 mt-1.5 w-84 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 animate-fade-in z-50 divide-y divide-gray-100"
                   >
                     <div className="flex flex-col gap-1 p-1">
                       {link.children.map((child) => (
@@ -180,7 +189,7 @@ export default function Navigation() {
                 className={`px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200 ${
                   isActive(link.href)
                     ? 'text-violet-700 bg-violet-50'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-stone-100/80'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 {link.label}
@@ -212,7 +221,7 @@ export default function Navigation() {
             ref={mobileToggleRef}
             onClick={() => setMobileOpen((o) => !o)}
             type="button"
-            className="p-2 rounded-xl text-gray-700 hover:bg-stone-100 transition-colors"
+            className="p-2 rounded-xl text-gray-700 hover:bg-gray-100 transition-colors"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
           >
@@ -224,36 +233,36 @@ export default function Navigation() {
       {mobileOpen && (
         <div
           ref={mobileRef}
-          className="lg:hidden bg-[#FBFBFA] border-t border-stone-200/80 animate-fade-in shadow-xl max-h-[85vh] overflow-y-auto"
+          className="lg:hidden bg-white border-t border-gray-200 animate-fade-in shadow-xl max-h-[85vh] overflow-y-auto"
         >
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 py-4 flex flex-col gap-1">
             {navLinks.map((link) =>
               link.children ? (
                 <div key={link.href} className="w-full">
                   <button
-                    onClick={() => setServicesOpen((o) => !o)}
+                    onClick={() => setMobileServicesOpen((o) => !o)}
                     type="button"
                     className={`flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors cursor-pointer ${
-                      isActive(link.href) || servicesOpen
+                      isActive(link.href) || mobileServicesOpen
                         ? 'text-violet-700 bg-violet-50 font-semibold'
-                        : 'text-gray-800 hover:bg-stone-100/80'
+                        : 'text-gray-800 hover:bg-gray-100'
                     }`}
-                    aria-expanded={servicesOpen}
+                    aria-expanded={mobileServicesOpen}
                     aria-label={`Toggle ${link.label} submenu`}
                   >
                     <span>{link.label}</span>
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-200 ${servicesOpen ? 'rotate-180 text-violet-700' : ''}`}
+                      className={`w-4 h-4 transition-transform duration-200 ${mobileServicesOpen ? 'rotate-180 text-violet-700' : ''}`}
                     />
                   </button>
-                  {servicesOpen && (
+                  {mobileServicesOpen && (
                     <div className="pl-3 pr-1 flex flex-col gap-1 mt-1 mb-1 animate-fade-in">
                       {link.children.map((child) => (
-                        <Link
+                        <button
                           key={child.href}
-                          to={child.href}
-                          onClick={closeMenus}
-                          className={`flex flex-col px-3.5 py-2.5 rounded-xl transition-colors ${
+                          type="button"
+                          onClick={() => goTo(child.href)}
+                          className={`flex flex-col text-left px-3.5 py-2.5 rounded-xl transition-colors w-full ${
                             location.pathname === child.href
                               ? 'bg-violet-50 text-violet-700 font-semibold'
                               : 'text-gray-700 hover:bg-violet-50 hover:text-violet-700'
@@ -261,42 +270,42 @@ export default function Navigation() {
                         >
                           <span className="text-sm font-semibold">{child.label}</span>
                           <span className="text-xs text-gray-500">{child.description}</span>
-                        </Link>
+                        </button>
                       ))}
-                      <Link
-                        to="/services"
-                        onClick={closeMenus}
-                        className="px-3.5 py-2 text-xs font-semibold text-violet-700 hover:text-violet-900 flex items-center justify-between"
+                      <button
+                        type="button"
+                        onClick={() => goTo('/services')}
+                        className="px-3.5 py-2 text-xs font-semibold text-violet-700 hover:text-violet-900 flex items-center justify-between w-full text-left"
                       >
                         <span>{t('nav.exploreServices', 'Explore All Services')}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
-                      </Link>
+                      </button>
                     </div>
                   )}
                 </div>
               ) : (
-                <Link
+                <button
                   key={link.href}
-                  to={link.href}
-                  onClick={closeMenus}
-                  className={`px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-                    isActive(link.href) ? 'text-violet-700 bg-violet-50 font-semibold' : 'text-gray-800 hover:bg-stone-100/80'
+                  type="button"
+                  onClick={() => goTo(link.href)}
+                  className={`px-4 py-3 text-sm font-medium rounded-xl transition-colors text-left w-full ${
+                    isActive(link.href) ? 'text-violet-700 bg-violet-50 font-semibold' : 'text-gray-800 hover:bg-gray-100'
                   }`}
                 >
                   {link.label}
-                </Link>
+                </button>
               )
             )}
 
-            <div className="pt-2 flex flex-col gap-3 border-t border-stone-200 mt-2">
-              <Link
-                to="/contact"
-                onClick={closeMenus}
-                className="flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-violet-700 rounded-xl hover:bg-violet-800 transition-colors shadow-sm"
+            <div className="pt-2 flex flex-col gap-3 border-t border-gray-200 mt-2">
+              <button
+                type="button"
+                onClick={() => goTo('/contact')}
+                className="flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-violet-700 rounded-xl hover:bg-violet-800 transition-colors shadow-sm w-full"
               >
                 <span>{t('nav.talkToUs', 'Talk to Us')}</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </button>
             </div>
           </div>
         </div>
