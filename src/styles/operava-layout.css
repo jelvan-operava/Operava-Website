@@ -1,12 +1,12 @@
 /* OPERAVA LAYOUT DESIGN SYSTEM
-   Full-width structure · warm off-white · consistent type */
+   Full-width structure · pure white · consistent type */
 
 :root {
-  --operava-bg: #FBFBFA;
-  --operava-bg-warm: #F7F6F4;
-  --operava-bg-soft: #F3F1EE;
+  --operava-bg: #FFFFFF;
+  --operava-bg-warm: #FFFFFF;
+  --operava-bg-soft: #FFFFFF;
   --operava-surface: #FFFFFF;
-  --operava-border: rgba(120, 113, 108, 0.14);
+  --operava-border: rgba(0, 0, 0, 0.08);
   --operava-shell-max: 100rem;
   --operava-text-max: 42rem;
   --operava-section-y: clamp(4.5rem, 6vw, 7rem);
@@ -15,13 +15,10 @@
   --operava-body: clamp(0.9rem, 0.25vw + 0.85rem, 1rem);
 }
 
+html,
 body {
-  background-color: var(--operava-bg) !important;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.035), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 50%, rgba(245, 240, 232, 0.45), transparent 50%),
-    radial-gradient(ellipse 50% 30% at 0% 80%, rgba(250, 248, 245, 0.55), transparent 45%);
-  background-attachment: fixed;
+  background-color: #FFFFFF !important;
+  background-image: none !important;
 }
 
 .operava-shell {
