@@ -26,8 +26,8 @@ export default function ITServices() {
   const { t, language } = useLanguage()
 
   return (
-    <main className="bg-[#FBFBFA]">
-      <section className="pt-28 pb-16 lg:pt-36 lg:pb-20 bg-[#FBFBFA] border-b border-stone-100/80">
+    <main className="bg-white">
+      <section className="pt-28 pb-16 lg:pt-36 lg:pb-20 bg-white border-b border-gray-100">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="max-w-3xl">
             <h1 className="text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6">
@@ -40,7 +40,7 @@ export default function ITServices() {
         </div>
       </section>
 
-      <section ref={ref} className="py-16 lg:py-24 bg-[#F7F6F4]">
+      <section ref={ref} className="py-16 lg:py-24 bg-white">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {itServices.map((rawService, i) => {
@@ -61,7 +61,7 @@ export default function ITServices() {
 
       <DraggableMarquee />
 
-      <section className="py-16 lg:py-20 bg-[#F7F6F4]">
+      <section className="py-16 lg:py-20 bg-white">
         <div className="w-full max-w-4xl mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
             {t('cta.title', 'Ready to discuss your technology requirements?')}
