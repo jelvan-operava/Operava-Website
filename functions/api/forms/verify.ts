@@ -86,8 +86,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       try {
         await ensureTables(env.SUBMISSIONS_DB)
         await env.SUBMISSIONS_DB.prepare(
-          `INSERT INTO form_submissions (reference_id, form_type, name, email, payload, verification_status, status, resume_key, created_at, verified_at)
-           VALUES (?, ?, ?, ?, ?, 'VERIFIED', 'VERIFIED', ?, ?, ?)`,
+          'INSERT INTO form_submissions (reference_id, form_type, name, email, payload, verification_status, status, resume_key, created_at, verified_at) VALUES (?, ?, ?, ?, ?, \'VERIFIED\', \'VERIFIED\', ?, ?, ?)',
         )
           .bind(referenceId, formType, name, email, signed.payload, String(payload.resumeKey || ''), nowIso, nowIso)
           .run()
@@ -98,22 +97,36 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     const rows = payloadRows(payload)
     const isCareer = formType === 'CAREERS'
-    const sourceLabel =
-      formType === 'SERVICES'
-        ? 'Services / Request a Quote form'
-        : formType === 'CAREERS'
-          ? 'Careers application form'
-          : 'Contact form'
 
     const subject = isCareer ? 'WE RECEIVED YOUR APPLICATION' : 'WE RECEIVED YOUR INQUIRY'
 
     const html = isCareer
-      ? applicantConfirmationEmail({ name, email, referenceId, sourceLabel, rows })
-      : clientConfirmationEmail({ name, email, referenceId, sourceLabel, rows })
+      ? applicantConfirmationEmail({
+          name,
+          email,
+          referenceId,
+          sourceLabel: isCareer ? 'Careers application form' : 'Services form',
+          rows,
+        })
+      : clientConfirmationEmail({
+          name,
+          email,
+          referenceId,
+          sourceLabel: formType === 'SERVICES' ? 'Services / Request a Quote form' : 'Contact form',
+          rows,
+        })
 
     const text = isCareer
-      ? `CONFIRMATION\n\nHi ${name},\n\nThank you for contacting OPERAVA and for your interest in our opportunities.\n\nWe confirm that we have received your application. Reference: ${referenceId}.\n\nYour application will be reviewed by the appropriate team. If your qualifications match an available position or another suitable opportunity, a member of our Talent Acquisition Team may contact you through your preferred contact method.\n\nRegards,\nTalent Acquisition Team\nOPERAVA Global Solutions\n\nPlease do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.\nwww.operavaglobal.com`
-      : `CONFIRMATION\n\nHi ${name},\n\nThank you for contacting OPERAVA and for your interest in our services and business solutions.\n\nWe confirm that we have received your service inquiry. Reference: ${referenceId}.\n\nYour service inquiry will be reviewed by the appropriate OPERAVA team. A member of our Business Development, Client Support, or relevant service team may contact you to discuss your requirements.\n\nRegards,\nClient Support Team\nOPERAVA Global Solutions\n\nPlease do not reply directly to this automated confirmation. A separate update will be sent by the relevant team for further assistance.\nwww.operavaglobal.com`
+      ? 'CONFIRMATION\n\nHi ' +
+        name +
+        ',\n\nThank you for contacting OPERAVA and for your interest in our opportunities.\n\nWe confirm that we have received your application. Reference: ' +
+        referenceId +
+        '.\n\nYour application will be reviewed by the appropriate team.\n\nRegards,\nTalent Acquisition Team\nOPERAVA Global Solutions\n\nwww.operavaglobal.com'
+      : 'CONFIRMATION\n\nHi ' +
+        name +
+        ',\n\nThank you for contacting OPERAVA and for your interest in our services and business solutions.\n\nWe confirm that we have received your service inquiry. Reference: ' +
+        referenceId +
+        '.\n\nYour service inquiry will be reviewed by the appropriate OPERAVA team.\n\nRegards,\nClient Support Team\nOPERAVA Global Solutions\n\nwww.operavaglobal.com'
 
     const bccEmail = isCareer
       ? env.TALENT_INBOX || 'talents@operavaglobal.com'
@@ -124,7 +137,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     if (env.RESEND_API_KEY) {
       try {
         await sendResend(env, {
-          from: env.RESEND_FROM || 'OPERAVA <notification@operavaglobal.com>',
+          from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
           to: [email],
           bcc: bccList.length ? bccList : undefined,
           subject,
