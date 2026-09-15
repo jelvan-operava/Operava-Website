@@ -18,18 +18,22 @@ const SIZE_MAP = {
 /**
  * AVA avatar — official OPERAVA logo (transparent PNG),
  * soft breathe + gentle wave.
+ * xl is 52px on mobile, 80px from sm+ breakpoints.
  */
 export default function AvaVideoAvatar({
   size = 'md',
   className = '',
   showGlow = false,
 }: AvaVideoAvatarProps) {
+  const isXl = size === 'xl'
   const px = typeof size === 'number' ? size : SIZE_MAP[size] ?? 40
 
   return (
     <div
-      className={`relative shrink-0 select-none pointer-events-none ava-logo-motion ${className}`}
-      style={{ width: px, height: px }}
+      className={`relative shrink-0 select-none pointer-events-none ava-logo-motion ${
+        isXl ? 'w-[52px] h-[52px] sm:w-20 sm:h-20' : ''
+      } ${className}`}
+      style={isXl ? undefined : { width: px, height: px }}
       aria-hidden="true"
     >
       <style>{`
@@ -49,8 +53,8 @@ export default function AvaVideoAvatar({
       <img
         src={OPERAVA_LOGO_CDN}
         alt="AVA"
-        width={px}
-        height={px}
+        width={isXl ? 80 : px}
+        height={isXl ? 80 : px}
         className={`h-full w-full object-contain pointer-events-none select-none bg-transparent ${
           showGlow ? 'drop-shadow-[0_0_14px_rgba(109,40,217,0.45)]' : ''
         }`}
