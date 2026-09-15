@@ -16,13 +16,19 @@ export interface FormEnv {
   TALENT_INBOX?: string
 }
 
-export const DEFAULT_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
-export const OTP_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
-export const NOTIFICATION_NOREPLY_FROM = 'OPERAVA <notification@operavaglobal.com>'
+/**
+ * Resend from format: "Display Name <email@verified-domain.com>"
+ * @see https://resend.com/docs/api-reference/emails/send-email
+ * Domain operavaglobal.com must be verified in Resend. No mailbox creation required.
+ */
+export const DEFAULT_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
+export const OTP_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
+export const NOTIFICATION_NOREPLY_FROM = 'Operava <noreply@operavaglobal.com>'
 export const CLIENT_RESEND_FROM = 'hello@operavaglobal.com'
 export const TALENT_RESEND_FROM = 'talents@operavaglobal.com'
-export const APPLICANT_CONFIRMATION_FROM = 'OPERAVA <notification@operavaglobal.com>'
+export const APPLICANT_CONFIRMATION_FROM = 'Operava <noreply@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
+export const DEFAULT_REPLY_TO = 'hello@operavaglobal.com'
 export const DEFAULT_OTP_SECRET = 'operava-form-secret'
 
 export function resolveSecret(env: FormEnv): string {
@@ -211,7 +217,15 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     (env.RESEND_FROM && String(env.RESEND_FROM).trim()) ||
     DEFAULT_RESEND_FROM
 
-  const body = { ...payload, from }
+  // Resend docs: from must be on a verified domain; reply_to is optional but recommended for noreply
+  const body: Record<string, unknown> = {
+    ...payload,
+    from,
+  }
+  if (!body.reply_to) {
+    body.reply_to = DEFAULT_REPLY_TO
+  }
+
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
