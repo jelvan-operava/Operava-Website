@@ -8,6 +8,7 @@ import {
   sendResend,
   resolveSecret,
   readSignedDraft,
+  staffNotificationEmail,
   type FormEnv,
 } from '../../lib/formCore'
 
@@ -127,34 +128,76 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
         referenceId +
         '.\n\nYour service inquiry will be reviewed by the appropriate OPERAVA team.\n\nRegards,\nClient Support Team\nOPERAVA Global Solutions\n\nwww.operavaglobal.com'
 
-    const bccEmail = isCareer
+    // Staff inbox: CAREERS → talents@ ; SERVICES/CONTACT → hello@
+    const staffInbox = isCareer
       ? env.TALENT_INBOX || 'talents@operavaglobal.com'
       : env.CLIENT_INBOX || 'hello@operavaglobal.com'
 
-    const bccList = [bccEmail].filter((addr) => addr && addr.toLowerCase() !== email.toLowerCase())
+    const staffSubject = isCareer
+      ? 'New application — ' + referenceId
+      : 'New inquiry — ' + referenceId
 
+    const staffHtml = staffNotificationEmail({
+      formType,
+      referenceId,
+      email,
+      submittedAt: nowIso,
+      rows,
+    })
+
+    const staffText =
+      (isCareer ? 'APPLICATION' : 'INQUIRY') +
+      ' received\nReference: ' +
+      referenceId +
+      '\nFrom: ' +
+      name +
+      ' <' +
+      email +
+      '>\n\nReply to this message to contact the ' +
+      (isCareer ? 'applicant' : 'customer') +
+      ' directly.\n'
+
+    let emailWarning: string | undefined
+
+    // 1) Customer / applicant confirmation — FROM noreply only, NO reply_to
     try {
       await sendResend(env, {
         from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
         to: [email],
-        bcc: bccList.length ? bccList : undefined,
         subject,
         html,
         text,
       })
     } catch (mailErr) {
       console.error('confirmation email failed', mailErr instanceof Error ? mailErr.message : 'unknown')
-      // Code already verified — do not fail the user; submission is accepted
-      return json({
-        ok: true,
-        referenceId,
-        formType,
-        name,
-        emailWarning: 'Submission recorded; confirmation email could not be delivered right now.',
-      })
+      emailWarning = 'Submission recorded; confirmation email could not be delivered right now.'
     }
 
-    return json({ ok: true, referenceId, formType, name })
+    // 2) Staff notification — TO talents@ or hello@, reply_to = applicant/customer
+    //    so Reply opens a thread to the recipient, not noreply.
+    try {
+      if (staffInbox.toLowerCase() !== email.toLowerCase()) {
+        await sendResend(env, {
+          from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
+          to: [staffInbox],
+          reply_to: email,
+          subject: staffSubject,
+          html: staffHtml,
+          text: staffText,
+        })
+      }
+    } catch (staffErr) {
+      console.error('staff notification failed', staffErr instanceof Error ? staffErr.message : 'unknown')
+      // Do not fail verification if only staff mail fails
+    }
+
+    return json({
+      ok: true,
+      referenceId,
+      formType,
+      name,
+      ...(emailWarning ? { emailWarning } : {}),
+    })
   } catch (err) {
     console.error('verify failed', err instanceof Error ? err.message : 'unknown')
     return json({ error: 'Unable to verify this code.' }, 500)
