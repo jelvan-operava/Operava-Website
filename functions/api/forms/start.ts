@@ -21,10 +21,15 @@ const TYPES = new Set(['SERVICES', 'CAREERS', 'CONTACT'])
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY) {
-      if (isProductionRuntime()) {
-        return json({ error: 'Email delivery is not configured. Please contact hello@operavaglobal.com.' }, 503)
-      }
+    if (!env.RESEND_API_KEY || String(env.RESEND_API_KEY).trim().length < 8) {
+      console.error('forms/start: RESEND_API_KEY missing')
+      return json(
+        {
+          error:
+            'Email delivery is not configured. Please contact hello@operavaglobal.com.',
+        },
+        503,
+      )
     }
 
     const secret = resolveSecret(env)
@@ -106,30 +111,23 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       }
     }
 
-    if (env.RESEND_API_KEY) {
-      try {
-        // Resend format: "Name <email@verified-domain.com>"
-        await sendResend(env, {
-          from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
-          to: [email],
-          subject: 'Verification Code',
-          html: otpEmailHtml(name, purposeLabel(formType), code),
-          text: otpEmailText(name, purposeLabel(formType), code),
-        })
-      } catch (mailErr) {
-        console.error('OTP email send failed', mailErr)
-        const detail = mailErr instanceof Error ? mailErr.message : String(mailErr)
-        return json(
-          {
-            error:
-              'Unable to send verification email right now. Please try again in a moment, or contact hello@operavaglobal.com.',
-            detail,
-          },
-          502,
-        )
-      }
-    } else {
-      console.warn('[DEV] RESEND_API_KEY missing. OTP for ' + email + ': ' + code)
+    try {
+      await sendResend(env, {
+        from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
+        to: [email],
+        subject: 'Verification Code',
+        html: otpEmailHtml(name, purposeLabel(formType), code),
+        text: otpEmailText(name, purposeLabel(formType), code),
+      })
+    } catch (mailErr) {
+      console.error('OTP email send failed', mailErr instanceof Error ? mailErr.message : 'unknown')
+      return json(
+        {
+          error:
+            'Unable to send verification email right now. Please try again in a moment, or contact hello@operavaglobal.com.',
+        },
+        502,
+      )
     }
 
     return json({
@@ -137,11 +135,10 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       draftId,
       maskedEmail: maskEmail(email),
       expiresInSec: 600,
-      ...(!isProductionRuntime() && !env.RESEND_API_KEY ? { devCode: code } : {}),
+      ...(!isProductionRuntime() ? {} : {}),
     })
   } catch (err) {
-    console.error('form start failed', err)
-    const detail = err instanceof Error ? err.message : String(err)
-    return json({ error: 'Unable to start verification.', detail }, 500)
+    console.error('form start failed', err instanceof Error ? err.message : 'unknown')
+    return json({ error: 'Unable to start verification.' }, 500)
   }
 }
