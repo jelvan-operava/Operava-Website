@@ -135,7 +135,7 @@ function AvaThinkingWaves() {
 }
 
 const WELCOME =
-  "Hello. I'm AVA, OPERAVA's business assistant.\n\nI can discuss our IT, software, BPO, and workforce services, how engagements work, and open career tracks. I do not share internal processes, staff records, pricing formulas, or private client information.\n\nIf you want a quotation, use Request a Quote. If you want to apply, use Careers. For anything else, use Contact."
+  "Hello — I'm AVA, OPERAVA's business Worker AI.\n\nI explain our services in plain language: what they mean, how delivery typically works, and practical examples — for technology, operations, workforce, and careers. I only use OPERAVA's controlled knowledge (not the open web), and I do not share prices, private client data, or internal staff records.\n\nAsk about a service, or say if you are exploring as a client or applying for a role. Formal quotes go through Request a Quote; applications go through Careers."
 
 export default function AvaAssistant() {
   const navigate = useNavigate()
@@ -394,7 +394,7 @@ export default function AvaAssistant() {
                 <span className="text-xs font-bold text-purple-300 uppercase tracking-wider">AVA</span>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               </div>
-              <p className="text-xs text-gray-300 leading-relaxed">Ask about OPERAVA services or careers. Formal requests go through Quote, Careers, or Contact.</p>
+              <p className="text-xs text-gray-300 leading-relaxed">Ask about OPERAVA services or careers — meaning, process, and examples. Formal requests go through Quote, Careers, or Contact.</p>
               <button onClick={handleOpen} className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-purple-300 hover:text-white">
                 <span>Chat with AVA</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -440,7 +440,7 @@ export default function AvaAssistant() {
                   <h3 className="text-sm font-bold text-white tracking-tight">AVA</h3>
                   <span className="px-1.5 py-0.5 rounded-md bg-purple-600/30 border border-purple-500/40 text-[10px] font-semibold text-purple-300">Live</span>
                 </div>
-                <p className="text-[11px] text-gray-400">OPERAVA business assistant</p>
+                <p className="text-[11px] text-gray-400">OPERAVA business Worker AI</p>
               </div>
             </div>
             <div className="flex items-center gap-1 text-gray-400">
@@ -548,7 +548,7 @@ export default function AvaAssistant() {
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Ask AVA about services or careers…"
+                placeholder="Ask about a service, process, or example…"
                 disabled={isThinking || isRouting}
                 className="flex-1 px-3.5 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 disabled:opacity-50"
               />
