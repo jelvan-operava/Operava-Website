@@ -21,11 +21,14 @@ const TYPES = new Set(['SERVICES', 'CAREERS', 'CONTACT'])
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY && isProductionRuntime()) {
-      return json({ error: 'Email delivery is not configured.' }, 503)
+    if (!env.RESEND_API_KEY) {
+      if (isProductionRuntime()) {
+        return json({ error: 'Email delivery is not configured. Please contact hello@operavaglobal.com.' }, 503)
+      }
     }
 
     const secret = resolveSecret(env)
+
     let body: Record<string, unknown>
     try {
       body = (await request.json()) as Record<string, unknown>
@@ -97,15 +100,15 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
         )
           .bind(email, formType, dbDraftId, codeHash, payload, expiresAt, now)
           .run()
-      } catch {
-        console.error('D1 optional path failed; continuing with signed draft')
+      } catch (d1Err) {
+        console.error('D1 optional path failed; continuing with signed draft', d1Err)
       }
     }
 
     if (env.RESEND_API_KEY) {
       try {
         await sendResend(env, {
-          from: env.RESEND_FROM || 'Operava Notification <notification-noreply@operavaglobal.com>',
+          from: env.RESEND_FROM || 'OPERAVA <notification@operavaglobal.com>',
           to: [email],
           subject: 'Verification Code',
           html: otpEmailHtml(name, purposeLabel(formType), code),
@@ -117,14 +120,14 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
         return json(
           {
             error:
-              'Unable to send verification email. Please try again in a moment, or contact hello@operavaglobal.com if this continues.',
+              'Unable to send verification email right now. Please try again in a moment, or contact hello@operavaglobal.com.',
             detail,
           },
           502,
         )
       }
     } else {
-      console.warn(`[DEV MODE] RESEND_API_KEY not configured. Verification code for ${email}: ${code}`)
+      console.warn(`[DEV] RESEND_API_KEY missing. OTP for ${email}: ${code}`)
     }
 
     return json({
