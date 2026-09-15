@@ -6,6 +6,12 @@ export interface OperavaCoverSlide {
   src: string
 }
 
+/**
+ * Four approved hero states only.
+ * Images already contain the people + OPERAVA 3D/ribbon lettering.
+ * OPERAVA is treated as the fixed visual anchor across all states.
+ * Do not generate, redraw, or substitute these assets.
+ */
 export const OPERAVA_COVERS: readonly OperavaCoverSlide[] = [
   {
     id: 'operava-cover-1',
@@ -27,12 +33,11 @@ export const OPERAVA_COVERS: readonly OperavaCoverSlide[] = [
     name: 'Operava Cover 4',
     src: 'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788584250/Operava-cover4.webp',
   },
-  {
-    id: 'operava-cover-5',
-    name: 'Operava Cover 5',
-    src: 'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788584249/Operava-cover5.webp',
-  },
 ] as const
+
+/** Native artboard size shared by all four approved images */
+const HERO_W = 2112
+const HERO_H = 1168
 
 interface OperavaCoverProps {
   className?: string
@@ -44,14 +49,14 @@ export default function OperavaCover({ className = '' }: OperavaCoverProps) {
   const fadeCleanupRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    // Preload all 5 images immediately to prevent any blank frames or loading flash
+    // Preload all states immediately so crossfades never flash empty frames
     OPERAVA_COVERS.forEach((cover) => {
       const img = new Image()
       img.referrerPolicy = 'no-referrer'
       img.src = cover.src
     })
 
-    // Auto-advance every 7 seconds in strictly sequential order
+    // Sequential 1 → 2 → 3 → 4 → 1
     const intervalId = setInterval(() => {
       setCurrentIndex((prevIndex) => {
         const nextIndex = (prevIndex + 1) % OPERAVA_COVERS.length
@@ -60,14 +65,14 @@ export default function OperavaCover({ className = '' }: OperavaCoverProps) {
         if (fadeCleanupRef.current) {
           clearTimeout(fadeCleanupRef.current)
         }
-        // The crossfade duration is ~2.4s. Retire previous slide after transition finishes.
+        // Retire previous layer after the opacity transition finishes
         fadeCleanupRef.current = setTimeout(() => {
           setPreviousIndex(null)
-        }, 2600)
+        }, 800)
 
         return nextIndex
       })
-    }, 7000)
+    }, 5500)
 
     return () => {
       clearInterval(intervalId)
@@ -80,20 +85,15 @@ export default function OperavaCover({ className = '' }: OperavaCoverProps) {
   return (
     <div
       id="operava-cover-container"
-      className={`relative w-full lg:absolute lg:inset-0 lg:w-full lg:h-full overflow-hidden pointer-events-none z-0 ${className}`}
+      className={`relative w-full overflow-hidden bg-white pointer-events-none select-none ${className}`}
+      style={{ aspectRatio: `${HERO_W} / ${HERO_H}` }}
     >
-      {/* Invisible aspect-ratio spacer for mobile and tablet to preserve exact container height with 0 layout shift */}
-      <img
-        src={OPERAVA_COVERS[0].src}
-        alt=""
-        aria-hidden="true"
-        width={2112}
-        height={1168}
-        className="w-full h-auto block invisible pointer-events-none select-none lg:hidden"
-        loading="eager"
-      />
-
-      {/* 5 Seamless Cinematic Crossfade Slides */}
+      {/*
+        Stable stage: every image occupies the exact same visual frame.
+        object-contain + identical native dimensions keep OPERAVA lettering
+        locked in horizontal/vertical position and scale across all states.
+        No scale, zoom, Ken Burns, slide, rotate, or progressive crop.
+      */}
       {OPERAVA_COVERS.map((cover, index) => {
         const isCurrent = index === currentIndex
         const isPrevious = index === previousIndex
@@ -108,27 +108,28 @@ export default function OperavaCover({ className = '' }: OperavaCoverProps) {
             style={{
               zIndex: isCurrent ? 2 : isPrevious ? 1 : 0,
               opacity: isVisible ? 1 : 0,
+              // Previous layer stays fully opaque with no transition so the
+              // incoming layer can crossfade over a stable base.
               transition: isPrevious
                 ? 'none'
-                : 'opacity 2400ms cubic-bezier(0.4, 0, 0.2, 1)',
-              willChange: 'opacity',
+                : 'opacity 700ms cubic-bezier(0.4, 0, 0.2, 1)',
+              willChange: isVisible ? 'opacity' : 'auto',
             }}
           >
             <img
               src={cover.src}
               alt={cover.name}
-              width={2112}
-              height={1168}
-              className="w-full h-full object-contain object-center lg:object-cover lg:object-center block pointer-events-none select-none"
+              width={HERO_W}
+              height={HERO_H}
+              className="block w-full h-full object-contain object-center pointer-events-none select-none"
+              // CRITICAL: no transform, no scale, no animation on the image itself
               style={{
-                transform: isCurrent ? 'scale(1.025)' : 'scale(1.0)',
-                transition: isCurrent
-                  ? 'transform 9000ms cubic-bezier(0.25, 1, 0.5, 1)'
-                  : 'transform 0ms',
-                willChange: 'transform',
+                transform: 'none',
+                transition: 'none',
               }}
               referrerPolicy="no-referrer"
               loading="eager"
+              decoding="async"
             />
           </div>
         )
