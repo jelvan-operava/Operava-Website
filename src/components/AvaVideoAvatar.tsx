@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { OPERAVA_LOGO_DATA_URL } from '../brand/operavaLogoData'
+/** Official OPERAVA mark (Cloudinary) — used for AVA. */
+export const OPERAVA_LOGO_CDN =
+  'https://res.cloudinary.com/b5i5bwwa/image/upload/c_fit,w_256,h_256,f_png,q_auto/Operava%20Logo.png'
 
 interface AvaVideoAvatarProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | number
@@ -14,49 +15,8 @@ const SIZE_MAP = {
   xl: 80,
 } as const
 
-/** Cache transparent data URL derived from white-plate logo (knock out near-white). */
-let cachedTransparent: string | null = null
-
-function buildTransparentLogo(): Promise<string> {
-  if (cachedTransparent) return Promise.resolve(cachedTransparent)
-  return new Promise((resolve) => {
-    const img = new Image()
-    img.onload = () => {
-      const size = 128
-      const canvas = document.createElement('canvas')
-      canvas.width = size
-      canvas.height = size
-      const ctx = canvas.getContext('2d')
-      if (!ctx) {
-        resolve(OPERAVA_LOGO_DATA_URL)
-        return
-      }
-      ctx.clearRect(0, 0, size, size)
-      ctx.drawImage(img, 0, 0, size, size)
-      const imageData = ctx.getImageData(0, 0, size, size)
-      const d = imageData.data
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i]
-        const g = d[i + 1]
-        const b = d[i + 2]
-        // Knock out near-white / light plate so mark sits on transparent
-        if (r > 245 && g > 245 && b > 245) {
-          d[i + 3] = 0
-        } else if (r > 230 && g > 230 && b > 230) {
-          d[i + 3] = Math.min(d[i + 3], 40)
-        }
-      }
-      ctx.putImageData(imageData, 0, 0)
-      cachedTransparent = canvas.toDataURL('image/png')
-      resolve(cachedTransparent)
-    }
-    img.onerror = () => resolve(OPERAVA_LOGO_DATA_URL)
-    img.src = OPERAVA_LOGO_DATA_URL
-  })
-}
-
 /**
- * AVA avatar — transparent OPERAVA twisted mark,
+ * AVA avatar — official OPERAVA logo (transparent PNG),
  * soft breathe + gentle wave.
  */
 export default function AvaVideoAvatar({
@@ -65,17 +25,6 @@ export default function AvaVideoAvatar({
   showGlow = false,
 }: AvaVideoAvatarProps) {
   const px = typeof size === 'number' ? size : SIZE_MAP[size] ?? 40
-  const [src, setSrc] = useState(OPERAVA_LOGO_DATA_URL)
-
-  useEffect(() => {
-    let cancelled = false
-    buildTransparentLogo().then((url) => {
-      if (!cancelled) setSrc(url)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   return (
     <div
@@ -98,7 +47,7 @@ export default function AvaVideoAvatar({
         }
       `}</style>
       <img
-        src={src}
+        src={OPERAVA_LOGO_CDN}
         alt="AVA"
         width={px}
         height={px}
@@ -106,6 +55,7 @@ export default function AvaVideoAvatar({
           showGlow ? 'drop-shadow-[0_0_14px_rgba(109,40,217,0.45)]' : ''
         }`}
         decoding="async"
+        loading="eager"
       />
     </div>
   )
