@@ -11,80 +11,36 @@ import {
   purposeLabel,
   sendResend,
   resolveSecret,
-  OTP_RESEND_FROM,
+  isProductionRuntime,
+  issueSignedDraft,
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
 
 const TYPES = new Set(['SERVICES', 'CAREERS', 'CONTACT'])
 
-function b64url(bytes: ArrayBuffer | Uint8Array | string): string {
-  let bin: string
-  if (typeof bytes === 'string') bin = bytes
-  else {
-    const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
-    bin = String.fromCharCode(...arr)
-  }
-  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
-}
-
-function fromB64url(s: string): string {
-  const pad = s.length % 4 === 0 ? '' : '='.repeat(4 - (s.length % 4))
-  const b64 = s.replace(/-/g, '+').replace(/_/g, '/') + pad
-  return atob(b64)
-}
-
-async function hmacSign(secret: string, payload: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  )
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload))
-  return b64url(sig)
-}
-
-async function issueSignedDraft(
-  secret: string,
-  data: {
-    email: string
-    formType: FormType
-    payload: string
-    codeHash: string
-    expiresAt: number
-    attempts?: number
-    resends?: number
-    lastSentAt?: number
-  },
-): Promise<string> {
-  const body = JSON.stringify({
-    email: data.email,
-    formType: data.formType,
-    payload: data.payload,
-    codeHash: data.codeHash,
-    expiresAt: data.expiresAt,
-    attempts: data.attempts || 0,
-    resends: data.resends || 0,
-    lastSentAt: data.lastSentAt || Date.now(),
-  })
-  const payload = b64url(body)
-  const sig = await hmacSign(secret, payload)
-  return `s1.${payload}.${sig}`
-}
-
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY && process.env.NODE_ENV === 'production') {
+    if (!env.RESEND_API_KEY && isProductionRuntime()) {
       return json({ error: 'Email delivery is not configured.' }, 503)
     }
+
     const secret = resolveSecret(env)
-    const body = (await request.json()) as Record<string, unknown>
-    if (clean(body.website, 80)) return json({ ok: true, draftId: 'filtered', maskedEmail: 'hidden' })
+    let body: Record<string, unknown>
+    try {
+      body = (await request.json()) as Record<string, unknown>
+    } catch {
+      return json({ error: 'Invalid request body.' }, 400)
+    }
+
+    // Honeypot
+    if (clean(body.website, 80)) {
+      return json({ ok: true, draftId: 'filtered', maskedEmail: 'hidden' })
+    }
 
     const formType = clean(body.formType, 20).toUpperCase() as FormType
     if (!TYPES.has(formType)) return json({ error: 'Unknown form type.' }, 400)
+
     const name = clean(body.name, 120)
     const email = clean(body.email, 180).toLowerCase()
     if (name.length < 2) return json({ error: 'Full name is required.' }, 400)
@@ -108,7 +64,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     const payload = JSON.stringify({ ...body, name, email, formType })
     const expiresAt = now + 10 * 60 * 1000
 
-    let draftId = await issueSignedDraft(secret, {
+    const draftId = await issueSignedDraft(secret, {
       email,
       formType,
       payload,
@@ -148,13 +104,26 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
 
     if (env.RESEND_API_KEY) {
-      await sendResend(env, {
-        from: 'Operava Notification <notification-noreply@operavaglobal.com>',
-        to: [email],
-        subject: 'Verification Code',
-        html: otpEmailHtml(name, purposeLabel(formType), code),
-        text: otpEmailText(name, purposeLabel(formType), code),
-      })
+      try {
+        await sendResend(env, {
+          from: env.RESEND_FROM || 'Operava Notification <notification-noreply@operavaglobal.com>',
+          to: [email],
+          subject: 'Verification Code',
+          html: otpEmailHtml(name, purposeLabel(formType), code),
+          text: otpEmailText(name, purposeLabel(formType), code),
+        })
+      } catch (mailErr) {
+        console.error('OTP email send failed', mailErr)
+        const detail = mailErr instanceof Error ? mailErr.message : String(mailErr)
+        return json(
+          {
+            error:
+              'Unable to send verification email. Please try again in a moment, or contact hello@operavaglobal.com if this continues.',
+            ...(!isProductionRuntime() ? { detail } : {}),
+          },
+          502,
+        )
+      }
     } else {
       console.warn(`[DEV MODE] RESEND_API_KEY not configured. Verification code for ${email}: ${code}`)
     }
@@ -164,10 +133,17 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       draftId,
       maskedEmail: maskEmail(email),
       expiresInSec: 600,
-      ...(process.env.NODE_ENV !== 'production' && !env.RESEND_API_KEY ? { devCode: code } : {}),
+      ...(!isProductionRuntime() && !env.RESEND_API_KEY ? { devCode: code } : {}),
     })
   } catch (err) {
     console.error('form start failed', err)
-    return json({ error: 'Unable to start verification.' }, 500)
+    const detail = err instanceof Error ? err.message : String(err)
+    return json(
+      {
+        error: 'Unable to start verification.',
+        ...(!isProductionRuntime() ? { detail } : {}),
+      },
+      500,
+    )
   }
 }
