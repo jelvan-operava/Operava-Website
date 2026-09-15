@@ -89,12 +89,12 @@ function Layout() {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[#FBFBFA] text-gray-900 selection:bg-violet-100 selection:text-violet-800">
+    <div className="min-h-screen flex flex-col justify-between bg-white text-gray-900 selection:bg-violet-100 selection:text-violet-800">
       <SmoothScroll />
       <RouteManager />
       <Navigation />
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden bg-white">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={location.pathname}
@@ -102,7 +102,7 @@ function Layout() {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="w-full flex-1"
+            className="w-full flex-1 bg-white"
           >
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Home />} />
