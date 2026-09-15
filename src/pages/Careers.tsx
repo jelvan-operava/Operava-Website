@@ -202,7 +202,7 @@ export default function Careers() {
   ]
 
   return (
-    <main>
+    <main className="bg-[#FBFBFA]">
       <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 text-white overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
@@ -212,7 +212,7 @@ export default function Careers() {
           />
           <div className="absolute inset-0 bg-gray-950/70" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
+        <div className="relative w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 z-10">
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6">
               Build Your Career. Operate in Advance.
@@ -227,8 +227,8 @@ export default function Careers() {
         </div>
       </section>
 
-      <section className="py-20 lg:py-24 bg-slate-50 border-b border-gray-200/80">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <section className="py-20 lg:py-24 bg-[#F7F6F4] border-b border-stone-200/80">
+        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="max-w-3xl mb-8">
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight mb-4">
               Open Executive Career Tracks
@@ -358,8 +358,8 @@ export default function Careers() {
         </div>
       </section>
 
-      <section className="py-20 bg-gray-50/70 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <section className="py-20 bg-[#F7F6F4] border-b border-stone-200/80">
+        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">Transparent 5-Stage Hiring Journey</h2>
           </div>
@@ -391,79 +391,45 @@ export default function Careers() {
       </section>
 
       <section className="py-20 bg-gray-950 text-white relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Why Work at OPERAVA?</h2>
-            <p className="mt-3 text-sm text-gray-400">
-              Global Clients · Continuous Upskilling & Mentorship · Collaborative Engineering Sprints · Career Growth Path · Performance-Based Growth
-            </p>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Why Work at OPERAVA</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {whyWork.map((item, idx) => {
-              const Icon = item.icon
-              return (
-                <div key={idx} className="p-6 bg-white/5 border border-white/10 rounded-3xl hover:border-violet-500/40 hover:bg-white/10 transition-all duration-200">
-                  <Icon className="w-6 h-6 text-violet-300 mb-3" />
-                  <h3 className="text-base font-bold text-white mb-1.5">{item.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
-                </div>
-              )
-            })}
+            {whyWork.map((item) => (
+              <div key={item.title} className="p-6 rounded-2xl bg-white/5 border border-white/10">
+                <item.icon className="w-6 h-6 text-violet-300 mb-3" />
+                <h3 className="text-base font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="max-w-3xl mb-10">
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Standard Work Requirements</h2>
-            <p className="text-base text-gray-600">Applies to all tracks.</p>
-          </div>
-          <ul className="grid sm:grid-cols-2 gap-4 max-w-4xl">
-            {workRequirements.map((req, i) => (
-              <li key={i} className="flex gap-3 items-start text-sm text-gray-700 leading-relaxed">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-violet-600 shrink-0" />
+      <section className="py-16 bg-[#FBFBFA] border-b border-stone-100/80">
+        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Workspace Requirements</h2>
+          <ul className="grid sm:grid-cols-2 gap-3 max-w-4xl">
+            {workRequirements.map((req) => (
+              <li key={req} className="flex items-start gap-2 text-sm text-gray-600">
+                <ShieldCheck className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />
                 <span>{req}</span>
               </li>
             ))}
           </ul>
-          <div className="mt-8 flex flex-wrap gap-4 text-xs text-gray-500">
-            <span className="inline-flex items-center gap-1.5"><Laptop className="w-3.5 h-3.5" /> Own equipment</span>
-            <span className="inline-flex items-center gap-1.5"><Wifi className="w-3.5 h-3.5" /> 50 Mbps+ internet</span>
-            <span className="inline-flex items-center gap-1.5"><Headphones className="w-3.5 h-3.5" /> Headset & quiet space</span>
-          </div>
         </div>
       </section>
 
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4 tracking-tight">Ready to Apply?</h2>
-          <p className="text-base text-gray-500 mb-8 max-w-xl mx-auto">
-            Choose a track, open the card for qualifications, then submit your application below.
-          </p>
-          <button
-            type="button"
-            onClick={() => handleApply('OPERAVA Technology Executive')}
-            className="inline-flex items-center gap-2 px-8 py-4 text-sm font-bold text-white bg-violet-700 rounded-2xl hover:bg-violet-800 active:scale-95 transition-all shadow-lg shadow-violet-700/25"
-          >
-            <span>Start Application</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      </section>
-
-      <section id="application-form" className="py-20 bg-slate-50 border-t border-gray-200 scroll-mt-20">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8">
-          <div className="mb-8">
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Submit your application</h2>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              Email verification is required. After you verify, Talent and HR receive your application and you get a branded confirmation with a reference number.
-              {selectedRole ? (
-                <span className="block mt-2 font-semibold text-violet-800">Applying for: {selectedRole}</span>
-              ) : null}
+      <section id="application-form" className="py-20 lg:py-24 bg-[#F7F6F4] scroll-mt-20">
+        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
+          <div className="max-w-2xl mb-10">
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight mb-3">Apply now</h2>
+            <p className="text-base text-gray-600">
+              Submit your application for <span className="font-semibold text-gray-900">{selectedRole}</span>. Email verification is required before final submission.
             </p>
           </div>
-          <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6 sm:p-8">
+          <div className="max-w-2xl rounded-2xl border border-gray-200 bg-white shadow-sm p-6 sm:p-8">
             <OperavaIntakeForm key={selectedRole} kind="CAREERS" defaultPosition={selectedRole} />
           </div>
           <p className="mt-4 text-xs text-gray-500">
