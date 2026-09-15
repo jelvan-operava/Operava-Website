@@ -133,7 +133,9 @@ export default function Footer() {
             <p className="text-xs text-gray-600">{t('footer.location', 'Philippines • Global Operations')}</p>
           </div>
           <div className="flex items-center gap-3">
-            <a href="https://pay.operavaglobal.com" target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-gray-400 hover:text-white transition-colors duration-200">SEC Registration Number: 2026080262213-03</a>
+            <span className="text-xs font-medium text-gray-400 select-text">
+              SEC Registration Number: 2026080262213-03
+            </span>
           </div>
         </div>
       </div>
