@@ -108,8 +108,9 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     if (env.RESEND_API_KEY) {
       try {
+        // Resend format: "Name <email@verified-domain.com>"
         await sendResend(env, {
-          from: env.RESEND_FROM || 'OPERAVA <notification@operavaglobal.com>',
+          from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
           to: [email],
           subject: 'Verification Code',
           html: otpEmailHtml(name, purposeLabel(formType), code),
