@@ -88,7 +88,13 @@ export default function Navigation() {
     >
       <nav className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 flex items-center justify-between h-16 lg:h-18">
         <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="OPERAVA Global Solutions — Home">
-          <OperavaLogo size={44} priority className="transition-transform duration-200 group-hover:scale-105" />
+          {/* AVA Cloudinary mark: full alpha, no white square — blends with nav background */}
+          <OperavaLogo
+            size={44}
+            priority
+            transparent
+            className="transition-transform duration-200 group-hover:scale-105"
+          />
           <div className="flex flex-col leading-none">
             <span className="operava-text text-xl sm:text-2xl font-black tracking-tight select-none">
               {t('brand.name', 'OPERAVA')}
