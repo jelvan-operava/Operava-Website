@@ -1,7 +1,6 @@
 import {
   EMAIL_RE,
   clean,
-  ensureTables,
   generateOtp,
   hashOtp,
   json,
@@ -36,7 +35,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       return json({ error: 'Invalid request body.' }, 400)
     }
 
-    // Honeypot
     if (clean(body.website, 80)) {
       return json({ ok: true, draftId: 'filtered', maskedEmail: 'hidden' })
     }
@@ -78,33 +76,15 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       lastSentAt: now,
     })
 
-    // Optional D1 rate-limit / audit path (signed draft is primary)
-    if (env.SUBMISSIONS_DB) {
-      try {
-        await ensureTables(env.SUBMISSIONS_DB)
-        const existing = await env.SUBMISSIONS_DB.prepare(
-          'SELECT last_sent_at FROM form_otps WHERE email = ? AND form_type = ? AND consumed = 0 ORDER BY id DESC LIMIT 1',
-        )
-          .bind(email, formType)
-          .first<{ last_sent_at: number }>()
-        if (existing && now - Number(existing.last_sent_at) < 45000) {
-          return json({ error: 'Please wait before requesting another code.', retryAfterSec: 45 }, 429)
-        }
-        const dbDraftId = crypto.randomUUID()
-        await env.SUBMISSIONS_DB.prepare(
-          'UPDATE form_otps SET consumed = 1 WHERE email = ? AND form_type = ? AND consumed = 0',
-        )
-          .bind(email, formType)
-          .run()
-        await env.SUBMISSIONS_DB.prepare(
-          `INSERT INTO form_otps (email, form_type, draft_id, code_hash, payload, expires_at, attempts, resends, last_sent_at, consumed)
-           VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?, 0)`,
-        )
-          .bind(email, formType, dbDraftId, codeHash, payload, expiresAt, now)
-          .run()
-      } catch (d1Err) {
-        console.error('D1 optional path failed; continuing with signed draft', d1Err)
-      }
+    // Build email content first so template errors surface clearly
+    let html = ''
+    let text = ''
+    try {
+      html = otpEmailHtml(name, purposeLabel(formType), code)
+      text = otpEmailText(name, purposeLabel(formType), code)
+    } catch (tplErr) {
+      const detail = tplErr instanceof Error ? tplErr.message : String(tplErr)
+      return json({ error: 'Unable to build verification email.', detail }, 500)
     }
 
     if (env.RESEND_API_KEY) {
@@ -113,8 +93,8 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
           from: env.RESEND_FROM || 'OPERAVA <notification@operavaglobal.com>',
           to: [email],
           subject: 'Verification Code',
-          html: otpEmailHtml(name, purposeLabel(formType), code),
-          text: otpEmailText(name, purposeLabel(formType), code),
+          html,
+          text,
         })
       } catch (mailErr) {
         console.error('OTP email send failed', mailErr)
@@ -124,12 +104,14 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
             error:
               'Unable to send verification email right now. Please try again in a moment, or contact hello@operavaglobal.com.',
             detail,
+            draftId,
+            maskedEmail: maskEmail(email),
           },
           502,
         )
       }
     } else {
-      console.warn(`[DEV] RESEND_API_KEY missing. OTP for ${email}: ${code}`)
+      console.warn('[DEV] RESEND_API_KEY missing. OTP for ' + email + ': ' + code)
     }
 
     return json({
