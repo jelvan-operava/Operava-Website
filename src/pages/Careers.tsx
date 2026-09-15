@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import {
   ArrowRight,
@@ -9,17 +9,36 @@ import {
   ShieldCheck,
   Home,
   Sparkles,
+  Search,
+  MapPin,
 } from 'lucide-react'
 import OperavaIntakeForm from '../components/forms/OperavaIntakeForm'
 import CareerCard from '../components/CareerCard'
 import { type CareerPosition } from '../data/careersData'
 
+const COUNTRY_OPTIONS = [
+  { value: 'all', label: 'All locations' },
+  { value: 'global', label: 'Global' },
+  { value: 'philippines', label: 'Philippines' },
+  { value: 'united-states', label: 'United States' },
+  { value: 'united-kingdom', label: 'United Kingdom' },
+  { value: 'canada', label: 'Canada' },
+  { value: 'australia', label: 'Australia' },
+  { value: 'singapore', label: 'Singapore' },
+] as const
+
+type CountryValue = (typeof COUNTRY_OPTIONS)[number]['value']
+
 export default function Careers() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [selectedRole, setSelectedRole] = useState<string>(
     searchParams.get('role') || 'OPERAVA Technology Executive'
   )
   const [openCardId, setOpenCardId] = useState<string | null>(null)
+  const [query, setQuery] = useState(searchParams.get('q') || '')
+  const [country, setCountry] = useState<CountryValue>(
+    (searchParams.get('country') as CountryValue) || 'all'
+  )
 
   useEffect(() => {
     const role = searchParams.get('role')
@@ -36,10 +55,12 @@ export default function Careers() {
       code: 'tech',
       title: 'OPERAVA Technology Executive' as CareerPosition,
       shortTitle: 'Technology Executive',
+      countries: ['global', 'philippines', 'united-states', 'united-kingdom', 'canada', 'australia', 'singapore'],
+      locationLabel: 'Global · Remote-friendly',
       image:
         'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788660949/792090637_1483292190495964_5576048200188804631_n.webp',
       summary:
-        'For builders, engineers, and technical problem-solvers. Work remotely on international projects in software engineering, web/mobile development, and cloud systems.',
+        'For builders, engineers, and technical problem-solvers. Work on international projects in software engineering, web/mobile development, and cloud systems.',
       assignments: [
         'Full-Stack Web & Mobile Development',
         'Cloud Infrastructure, DevOps & Systems Architecture (AWS, GCP, Azure)',
@@ -53,7 +74,7 @@ export default function Careers() {
         'Knowledge of Git, REST APIs, databases (MySQL, PostgreSQL, MongoDB) and Agile workflow',
         'Familiarity with cloud (AWS/GCP/Azure) is a strong advantage',
         'Strong problem-solving and English communication skills',
-        'Remote-Ready: Own PC/Laptop, stable internet (50 Mbps+), backup power/internet',
+        'Reliable workspace setup: own PC/Laptop, stable internet (50 Mbps+), backup power/internet',
       ],
     },
     {
@@ -61,15 +82,17 @@ export default function Careers() {
       code: 'ops',
       title: 'OPERAVA Business Operations Executive' as CareerPosition,
       shortTitle: 'Business Operations Executive',
+      countries: ['global', 'philippines', 'united-states', 'united-kingdom', 'canada', 'australia', 'singapore'],
+      locationLabel: 'Global · Remote-friendly',
       image:
         'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788660938/Business%20Operations%20Executive%20Cover.jpg',
       summary:
-        'For detail-driven operators and business enablers. Work remotely supporting HR, Finance, Recruitment, and business operations for global companies.',
+        'For detail-driven operators and business enablers. Support HR, Finance, Recruitment, and business operations for global companies.',
       assignments: [
-        'Remote HR Operations & People Care',
-        'Remote Accounting, Bookkeeping & Financial Reporting',
-        'Remote Talent Acquisition & Sourcing',
-        'Remote Training & Professional Development Coordination',
+        'HR Operations & People Care',
+        'Accounting, Bookkeeping & Financial Reporting',
+        'Talent Acquisition & Sourcing',
+        'Training & Professional Development Coordination',
         'Audited Data Processing & Workflow Administration',
       ],
       qualifications: [
@@ -78,7 +101,7 @@ export default function Careers() {
         'Proficient in Google Workspace / MS Excel, and tools like QuickBooks, Xero, HRIS, or ATS',
         'High attention to detail, data accuracy, and confidentiality',
         'Excellent organizational and English communication skills',
-        'Remote-Ready: Own PC/Laptop, stable internet (50 Mbps+), quiet workspace',
+        'Reliable workspace setup: own PC/Laptop, stable internet (50 Mbps+), quiet workspace',
       ],
     },
     {
@@ -86,27 +109,58 @@ export default function Careers() {
       code: 'cx',
       title: 'OPERAVA Customer Experience Executive' as CareerPosition,
       shortTitle: 'Customer Experience Executive',
+      countries: ['global', 'philippines', 'united-states', 'united-kingdom', 'canada', 'australia', 'singapore'],
+      locationLabel: 'Global · Remote-friendly',
       image:
         'https://res.cloudinary.com/b5i5bwwa/image/upload/v1788660940/797841464_3350629321810587_364897228139176087_n.jpg',
       summary:
-        'For client-focused communicators and service leaders. Work remotely delivering world-class customer support for international brands.',
+        'For client-focused communicators and service leaders. Deliver world-class customer support for international brands.',
       assignments: [
-        'Omnichannel Support (Live Chat, Email & Ticket Resolution) — Remote',
-        'High-Touch Inbound & Outbound Voice Support — Remote',
-        'Technical Helpdesk & Incident Triage (Tier 1 & 2) — Remote',
-        'Customer Success, Onboarding & Client Retention — Remote',
-        'Escalation Management & Quality Assurance — Remote',
+        'Omnichannel Support (Live Chat, Email & Ticket Resolution)',
+        'High-Touch Inbound & Outbound Voice Support',
+        'Technical Helpdesk & Incident Triage (Tier 1 & 2)',
+        'Customer Success, Onboarding & Client Retention',
+        'Escalation Management & Quality Assurance',
       ],
       qualifications: [
         'At least 1 year in customer service, tech support, or client-facing BPO role',
         'Excellent English communication — fluent in chat, email, and phone with neutral accent',
         'Experience with Zendesk, Freshdesk, Intercom, Salesforce, or HubSpot',
         'Customer-centric, patient, and skilled in de-escalation and CSAT improvement',
-        'Willing to work on US / shifting / night schedules from home',
-        'Remote-Ready: Own PC/Laptop, stable internet (50 Mbps+), noise-canceling headset, quiet workspace, backup power',
+        'Willing to work on US / shifting / night schedules where required',
+        'Reliable workspace setup: own PC/Laptop, stable internet (50 Mbps+), noise-canceling headset, quiet workspace, backup power',
       ],
     },
   ]
+
+  const filteredTracks = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return executiveTracks.filter((track) => {
+      const countryOk = country === 'all' || track.countries.includes(country)
+      if (!countryOk) return false
+      if (!q) return true
+      const hay = [
+        track.title,
+        track.shortTitle,
+        track.summary,
+        track.locationLabel,
+        ...(track.assignments || []),
+        ...(track.qualifications || []),
+      ]
+        .join(' ')
+        .toLowerCase()
+      return hay.includes(q)
+    })
+  }, [query, country])
+
+  const syncFiltersToUrl = (nextQ: string, nextCountry: string) => {
+    const params = new URLSearchParams(searchParams)
+    if (nextQ.trim()) params.set('q', nextQ.trim())
+    else params.delete('q')
+    if (nextCountry && nextCountry !== 'all') params.set('country', nextCountry)
+    else params.delete('country')
+    setSearchParams(params, { replace: true })
+  }
 
   const hiringStages = [
     { step: '01', title: 'Initial / AI-Assisted Evaluation', desc: 'Rapid interactive evaluation assessing candidate background, technical literacy, and communication profile.' },
@@ -116,18 +170,18 @@ export default function Careers() {
     { step: '05', title: 'Engagement Documentation', desc: 'Final selection, structured onboarding documentation, hardware provisioning, and project commencement.' },
   ]
 
-  const whyRemote = [
-    { title: '100% Work-From-Home', desc: 'Fully remote roles for Philippine-based talent serving international clients.', icon: Home },
+  const whyWork = [
+    { title: 'Flexible Work Setup', desc: 'Roles designed for distributed teams serving international clients.', icon: Home },
     { title: 'Global Clients', desc: 'Work with organizations across North America, Europe, and Asia-Pacific.', icon: Globe2 },
     { title: 'Continuous Upskilling', desc: 'Mentorship, certifications, and collaborative engineering sprints.', icon: Sparkles },
     { title: 'Career Growth Path', desc: 'Performance-based growth with clear specialization tracks.', icon: ShieldCheck },
   ]
 
-  const remoteRequirements = [
-    'Philippine-based talent, authorized to work remotely',
+  const workRequirements = [
+    'Authorized to work in your stated location',
     'Own equipment: Laptop/Desktop (i5 gen 8+ / M1+, 8GB RAM min), webcam, headset',
     'Stable internet connection (50 Mbps minimum) + backup connection/power',
-    'Quiet, professional home office setup',
+    'Quiet, professional workspace setup',
     'Strong English proficiency (B2–C1 level) and ability to work independently',
     'Willing to undergo assessments and client interviews via video call',
   ]
@@ -137,6 +191,15 @@ export default function Careers() {
     const target = document.getElementById('application-form')
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
+
+  const quickLinks = [
+    { label: 'Technology', q: 'technology', country: 'all' as CountryValue },
+    { label: 'Operations', q: 'operations', country: 'all' as CountryValue },
+    { label: 'Customer Experience', q: 'customer', country: 'all' as CountryValue },
+    { label: 'Philippines', q: '', country: 'philippines' as CountryValue },
+    { label: 'Global', q: '', country: 'global' as CountryValue },
+    { label: 'United States', q: '', country: 'united-states' as CountryValue },
+  ]
 
   return (
     <main>
@@ -151,15 +214,14 @@ export default function Careers() {
         </div>
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 z-10">
           <div className="max-w-3xl">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-300 mb-4">100% Remote · Philippine Talent · Global Clients</p>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight mb-6">
               Build Your Career. Operate in Advance.
             </h1>
             <p className="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-2xl font-normal mb-4">
-              Join a global team powering technology, operations, and business processes for organizations worldwide. All positions are 100% Remote.
+              Join a global team powering technology, operations, and business processes for organizations worldwide.
             </p>
             <p className="text-base text-gray-400 leading-relaxed max-w-2xl">
-              We hire top Filipino talent to work from home for international clients across Technology, Business Operations, and Customer Experience.
+              Explore executive tracks across Technology, Business Operations, and Customer Experience — then filter by location or search by skill.
             </p>
           </div>
         </div>
@@ -167,29 +229,128 @@ export default function Careers() {
 
       <section className="py-20 lg:py-24 bg-slate-50 border-b border-gray-200/80">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="max-w-3xl mb-12">
+          <div className="max-w-3xl mb-8">
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight mb-4">
-              Open Remote Executive Career Tracks
+              Open Executive Career Tracks
             </h2>
             <p className="text-base text-gray-600 leading-relaxed font-normal">
-              Three core remote tracks. Tap the + on a card for core assignments, qualifications, and remote requirements. Final assignments follow verified skills, specialization, assessments, and client needs.
+              Three core tracks. Use search or country filters below. Tap the + on a card for core assignments and qualifications. Final assignments follow verified skills, specialization, assessments, and client needs.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center md:justify-items-stretch">
-            {executiveTracks.map((exec, idx) => (
-              <CareerCard
-                key={exec.id}
-                career={exec}
-                variant="portrait"
-                index={idx}
-                onApply={handleApply}
-                isFlipped={openCardId === exec.id}
-                onFlipChange={(next) => setOpenCardId(next ? exec.id : null)}
+
+          <div className="mb-6 flex flex-col lg:flex-row gap-3 lg:items-center">
+            <div className="relative flex-1 max-w-xl">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => {
+                  const v = e.target.value
+                  setQuery(v)
+                  syncFiltersToUrl(v, country)
+                }}
+                placeholder="Search roles, skills, or keywords…"
+                className="w-full pl-10 pr-4 py-3 text-sm rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 shadow-sm"
+                aria-label="Search career tracks"
               />
-            ))}
+            </div>
+            <div className="relative min-w-[200px]">
+              <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <select
+                value={country}
+                onChange={(e) => {
+                  const v = e.target.value as CountryValue
+                  setCountry(v)
+                  syncFiltersToUrl(query, v)
+                }}
+                className="w-full appearance-none pl-10 pr-8 py-3 text-sm rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 shadow-sm cursor-pointer"
+                aria-label="Filter by country"
+              >
+                {COUNTRY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
+
+          <div className="mb-10 flex flex-wrap gap-2">
+            {quickLinks.map((link) => {
+              const active =
+                (link.q && query.toLowerCase() === link.q) ||
+                (!link.q && country === link.country)
+              return (
+                <button
+                  key={link.label}
+                  type="button"
+                  onClick={() => {
+                    setQuery(link.q)
+                    setCountry(link.country)
+                    syncFiltersToUrl(link.q, link.country)
+                  }}
+                  className={`px-3.5 py-1.5 text-xs font-semibold rounded-full border transition-colors ${
+                    active
+                      ? 'bg-violet-700 text-white border-violet-700'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-violet-300 hover:text-violet-700'
+                  }`}
+                >
+                  {link.label}
+                </button>
+              )
+            })}
+            {(query || country !== 'all') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery('')
+                  setCountry('all')
+                  syncFiltersToUrl('', 'all')
+                }}
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-full border border-gray-200 text-gray-500 hover:text-gray-800 hover:border-gray-300 bg-white"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+
+          {filteredTracks.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
+              <p className="text-sm font-semibold text-gray-900 mb-1">No tracks match your filters</p>
+              <p className="text-sm text-gray-500 mb-4">Try another country or clear the search.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery('')
+                  setCountry('all')
+                  syncFiltersToUrl('', 'all')
+                }}
+                className="text-sm font-semibold text-violet-700 hover:text-violet-900"
+              >
+                Show all tracks
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center md:justify-items-stretch">
+              {filteredTracks.map((exec, idx) => (
+                <CareerCard
+                  key={exec.id}
+                  career={{
+                    ...exec,
+                    location: exec.locationLabel,
+                  }}
+                  variant="portrait"
+                  index={idx}
+                  onApply={handleApply}
+                  isFlipped={openCardId === exec.id}
+                  onFlipChange={(next) => setOpenCardId(next ? exec.id : null)}
+                />
+              ))}
+            </div>
+          )}
+
           <p className="mt-8 text-sm text-gray-500 max-w-3xl">
-            All roles are fully remote. Final assignments are based on verified skills, specialization, assessment results, and client requirements.{' '}
+            Final assignments are based on verified skills, specialization, assessment results, and client requirements.{' '}
             <Link to="/terms#section-5" className="text-violet-700 font-semibold underline">
               See Terms — Section 5
             </Link>
@@ -232,13 +393,13 @@ export default function Careers() {
       <section className="py-20 bg-gray-950 text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Why Work Remotely at OPERAVA?</h2>
+            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Why Work at OPERAVA?</h2>
             <p className="mt-3 text-sm text-gray-400">
-              100% Work-From-Home · Global Clients · Continuous Upskilling & Mentorship · Collaborative Engineering Sprints · Career Growth Path · Performance-Based Growth
+              Global Clients · Continuous Upskilling & Mentorship · Collaborative Engineering Sprints · Career Growth Path · Performance-Based Growth
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {whyRemote.map((item, idx) => {
+            {whyWork.map((item, idx) => {
               const Icon = item.icon
               return (
                 <div key={idx} className="p-6 bg-white/5 border border-white/10 rounded-3xl hover:border-violet-500/40 hover:bg-white/10 transition-all duration-200">
@@ -255,11 +416,11 @@ export default function Careers() {
       <section className="py-16 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="max-w-3xl mb-10">
-            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Standard Remote Work Requirements</h2>
+            <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-3">Standard Work Requirements</h2>
             <p className="text-base text-gray-600">Applies to all tracks.</p>
           </div>
           <ul className="grid sm:grid-cols-2 gap-4 max-w-4xl">
-            {remoteRequirements.map((req, i) => (
+            {workRequirements.map((req, i) => (
               <li key={i} className="flex gap-3 items-start text-sm text-gray-700 leading-relaxed">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-violet-600 shrink-0" />
                 <span>{req}</span>
@@ -276,7 +437,7 @@ export default function Careers() {
 
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4 tracking-tight">Ready to Apply Remotely?</h2>
+          <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4 tracking-tight">Ready to Apply?</h2>
           <p className="text-base text-gray-500 mb-8 max-w-xl mx-auto">
             Choose a track, open the card for qualifications, then submit your application below.
           </p>
