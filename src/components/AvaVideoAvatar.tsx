@@ -1,10 +1,11 @@
-/** Official OPERAVA mark (Cloudinary) — used for AVA. */
+/** Official OPERAVA mark (Cloudinary) — used for AVA. Exact transparent PNG, no effects. */
 export const OPERAVA_LOGO_CDN =
   'https://res.cloudinary.com/b5i5bwwa/image/upload/c_fit,w_256,h_256,f_png,q_auto/Operava%20Logo.png'
 
 interface AvaVideoAvatarProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | number
   className?: string
+  /** Ignored — glow/highlight is permanently disabled so the icon stays exact transparent PNG. */
   showGlow?: boolean
 }
 
@@ -16,14 +17,14 @@ const SIZE_MAP = {
 } as const
 
 /**
- * AVA avatar — official OPERAVA logo (transparent PNG),
- * soft breathe + gentle wave.
+ * AVA avatar — official OPERAVA logo exactly as on Cloudinary (transparent PNG).
+ * Soft breathe + gentle wave only. No glow, no drop-shadow, no highlight inside or around.
  * xl is 52px on mobile, 80px from sm+ breakpoints.
  */
 export default function AvaVideoAvatar({
   size = 'md',
   className = '',
-  showGlow = false,
+  showGlow: _showGlow = false,
 }: AvaVideoAvatarProps) {
   const isXl = size === 'xl'
   const px = typeof size === 'number' ? size : SIZE_MAP[size] ?? 40
@@ -55,11 +56,10 @@ export default function AvaVideoAvatar({
         alt="AVA"
         width={isXl ? 80 : px}
         height={isXl ? 80 : px}
-        className={`h-full w-full object-contain pointer-events-none select-none bg-transparent ${
-          showGlow ? 'drop-shadow-[0_0_14px_rgba(109,40,217,0.45)]' : ''
-        }`}
+        className="h-full w-full object-contain pointer-events-none select-none bg-transparent"
         decoding="async"
         loading="eager"
+        style={{ background: 'transparent', boxShadow: 'none', filter: 'none' }}
       />
     </div>
   )
