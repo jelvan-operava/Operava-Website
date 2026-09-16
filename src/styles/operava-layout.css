@@ -29,17 +29,6 @@ body {
   background-image: none !important;
 }
 
-.bg-\\[\\#FBFBFA\\],
-.bg-\\[\\#F7F6F4\\],
-.bg-\\[\\#F3F1EE\\],
-.bg-\\[\\#FBFBFA\\]\\/90,
-.from-\\[\\#F7F6F4\\],
-.via-\\[\\#FBFBFA\\],
-.to-\\[\\#FBFBFA\\] {
-  background-color: #FFFFFF !important;
-  background-image: none !important;
-}
-
 .operava-shell {
   width: 100%;
   max-width: var(--operava-shell-max);
