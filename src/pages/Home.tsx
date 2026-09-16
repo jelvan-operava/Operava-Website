@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, CheckCircle2 } from 'lucide-react'
 import { itServices, bpoServices } from '../data/services'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getLocalizedService } from '../i18n/translations/services'
@@ -44,18 +44,6 @@ const industries = [
   'Enterprise',
 ]
 
-const techCategories = [
-  'Cloud Architecture',
-  'Custom Software',
-  'REST & GraphQL APIs',
-  'SQL & NoSQL Databases',
-  'RPA Automation',
-  'Cybersecurity',
-  'Data Pipelines',
-  'Digital Platforms',
-  'Enterprise Systems Integration',
-]
-
 export default function Home() {
   const { t, language } = useLanguage()
 
@@ -64,13 +52,9 @@ export default function Home() {
   const bpoRef = useIntersection()
   const modelRef = useIntersection()
   const industriesRef = useIntersection()
-  const whyRef = useIntersection()
-  const workforceRef = useIntersection()
-  const techRef = useIntersection()
   const signatureRef = useIntersection()
 
   const [isHomeReady, setIsHomeReady] = useState(false)
-  const [whySlide, setWhySlide] = useState(0)
 
   const operatingModelSteps = [
     {
@@ -111,33 +95,6 @@ export default function Home() {
     },
   ]
 
-  const whyFeaturesList = [
-    {
-      title: t('why.feat1.title', 'Technology-led'),
-      desc: t('why.feat1.desc', 'Modern architecture built strictly around measurable business outcomes.'),
-    },
-    {
-      title: t('why.feat2.title', 'People-powered'),
-      desc: t('why.feat2.desc', 'Highly skilled, certified professionals supporting your critical operations.'),
-    },
-    {
-      title: t('why.feat3.title', 'Elastic & Scalable'),
-      desc: t('why.feat3.desc', 'Flexible staffing and infrastructure that dynamically adjust with demand.'),
-    },
-    {
-      title: t('why.feat4.title', 'Process-driven'),
-      desc: t('why.feat4.desc', 'ISO-aligned workflows designed for consistent precision and security.'),
-    },
-    {
-      title: t('why.feat5.title', 'Global-ready'),
-      desc: t('why.feat5.desc', 'Robust remote infrastructure designed for global enterprises.'),
-    },
-    {
-      title: t('why.feat6.title', 'Client-focused'),
-      desc: t('why.feat6.desc', 'Transparent partnership model with dedicated account managers and clear KPIs.'),
-    },
-  ]
-
   return (
     <>
       <HomeMediaLoader onLoadingComplete={() => setIsHomeReady(true)} />
@@ -147,11 +104,9 @@ export default function Home() {
         </section>
 
         <section ref={trustRef} id="capabilities" className="py-20 lg:py-28 bg-white scroll-mt-20 relative overflow-hidden">
-          <div className="absolute top-1/4 right-0 w-96 h-96 bg-violet-100/30 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-indigo-100/25 rounded-full blur-3xl pointer-events-none" />
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 relative z-10">
             <div className="max-w-3xl mb-16 lg:mb-20">
-              <p className="reveal text-[11px] sm:text-xs font-bold tracking-[0.18em] uppercase text-violet-700 mb-3">
+              <p className="reveal text-[11px] sm:text-xs font-bold tracking-[0.18em] uppercase text-gray-700 mb-3">
                 Automation, Technology, Workforce and Talent Solutions
               </p>
               <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
@@ -161,6 +116,7 @@ export default function Home() {
                 OPERAVA bridges enterprise technology, specialized global talent, and high-precision operational processes into a single unified delivery engine.
               </p>
             </div>
+
             <div className="space-y-16 sm:space-y-20 lg:space-y-24">
               {[
                 {
@@ -218,7 +174,7 @@ export default function Home() {
                     <ul className="space-y-2.5 mb-8">
                       {item.features.map((feat) => (
                         <li key={feat} className="flex items-start gap-2.5 text-sm text-gray-700">
-                          <CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-4 h-4 text-gray-700 shrink-0 mt-0.5" />
                           <span>{feat}</span>
                         </li>
                       ))}
@@ -226,7 +182,7 @@ export default function Home() {
                     <div>
                       <Link
                         to={item.link}
-                        className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-violet-700 text-white font-semibold text-sm hover:bg-violet-800 active:scale-95 transition-all duration-200 group/btn"
+                        className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-gray-900 text-white font-semibold text-sm hover:bg-black active:scale-95 transition-all duration-200 group/btn"
                       >
                         <span>{item.cta}</span>
                         <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1.5 transition-transform" />
@@ -264,10 +220,10 @@ export default function Home() {
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
               <div className="max-w-2xl">
                 <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('section.it.title', 'Technology and operations, connected.')}</h2>
-                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.it.desc', 'Technology solutions that help organizations build digital products, modernize operations, and scale efficiently on cloud and on-premise infrastructure.')}</p>
+                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.it.desc', 'Technology solutions that help organizations build digital products, modernize infrastructure, connect systems and operate securely at scale.')}</p>
               </div>
               <div className="reveal reveal-delay-3 shrink-0">
-                <Link to="/services/it" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-violet-700 bg-white border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors">
+                <Link to="/services/it" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
                   <span>View all IT services</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -286,10 +242,10 @@ export default function Home() {
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
               <div className="max-w-2xl">
                 <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('section.bpo.title', 'Extend your capabilities. Scale your operations.')}</h2>
-                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.bpo.desc', 'Flexible business process services that help organizations extend their core teams with trusted global talent for customer service, backend operations, and specialized workflows.')}</p>
+                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.bpo.desc', 'Flexible business process services that help organizations extend their capacity and accelerate growth.')}</p>
               </div>
               <div className="reveal reveal-delay-3 shrink-0">
-                <Link to="/services/bpo" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-violet-700 bg-white border border-violet-200 rounded-xl hover:bg-violet-50 transition-colors">
+                <Link to="/services/bpo" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
                   <span>View all BPO services</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -331,7 +287,7 @@ export default function Home() {
             </div>
             <div className="reveal reveal-delay-2 flex flex-wrap gap-3">
               {industries.map((name) => (
-                <span key={name} className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-full hover:border-violet-400 hover:bg-violet-50/80 hover:text-violet-700 hover:shadow-sm transition-all duration-200 cursor-default">
+                <span key={name} className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-full hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 cursor-default">
                   {name}
                 </span>
               ))}
@@ -340,6 +296,7 @@ export default function Home() {
         </section>
 
         <ToolsEcosystemMarquee />
+
         <section ref={signatureRef} className="pt-0 pb-6 sm:pb-8 bg-white relative overflow-hidden">
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 w-full flex justify-start items-center relative z-10">
             <div className="reveal flex justify-start items-center bg-transparent max-w-sm sm:max-w-md">
