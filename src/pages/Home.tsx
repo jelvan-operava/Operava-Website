@@ -146,7 +146,7 @@ export default function Home() {
           <OperavaCover />
         </section>
 
-        <section ref={trustRef} id="capabilities" className="py-20 lg:py-28 bg-white border-t border-gray-100 scroll-mt-20 relative overflow-hidden">
+        <section ref={trustRef} id="capabilities" className="py-20 lg:py-28 bg-white scroll-mt-20 relative overflow-hidden">
           <div className="absolute top-1/4 right-0 w-96 h-96 bg-violet-100/30 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-indigo-100/25 rounded-full blur-3xl pointer-events-none" />
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 relative z-10">
@@ -226,7 +226,7 @@ export default function Home() {
                     <div>
                       <Link
                         to={item.link}
-                        className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-violet-700 text-white font-semibold text-sm hover:bg-violet-800 active:scale-95 transition-all duration-200 shadow-md shadow-violet-700/20 group/btn"
+                        className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-violet-700 text-white font-semibold text-sm hover:bg-violet-800 active:scale-95 transition-all durati[...]
                       >
                         <span>{item.cta}</span>
                         <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1.5 transition-transform" />
@@ -264,10 +264,10 @@ export default function Home() {
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
               <div className="max-w-2xl">
                 <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('section.it.title', 'Technology and operations, connected.')}</h2>
-                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.it.desc', 'Technology solutions that help organizations build digital products, modernize infrastructure, connect systems and operate securely at scale.')}</p>
+                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.it.desc', 'Technology solutions that help organizations build digital products, moder[...]
               </div>
               <div className="reveal reveal-delay-3 shrink-0">
-                <Link to="/services/it" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-violet-700 bg-white border border-violet-200 rounded-xl hover:bg-violet-50 hover:border-violet-300 transition-all duration-200 shadow-2xs">
+                <Link to="/services/it" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-violet-700 bg-white border border-violet-200 rounded-xl hover:bg-viole[...]
                   <span>View all IT services</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -285,11 +285,11 @@ export default function Home() {
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
               <div className="max-w-2xl">
-                <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('section.bpo.title', 'Extend your capabilities. Scale your operations.')}</h2>
-                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.bpo.desc', 'Flexible business process services that help organizations extend their capabilities, improve efficiency and scale operations without unnecessary overhead.')}</p>
+                <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('section.bpo.title', 'Extend your capabilities. Scale your operatio[...]
+                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.bpo.desc', 'Flexible business process services that help organizations extend their c[...]
               </div>
               <div className="reveal reveal-delay-3 shrink-0">
-                <Link to="/services/bpo" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-violet-700 bg-white border border-violet-200 rounded-xl hover:bg-violet-50 hover:border-violet-300 transition-all duration-200 shadow-2xs">
+                <Link to="/services/bpo" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-violet-700 bg-white border border-violet-200 rounded-xl hover:bg-viol[...]
                   <span>View all BPO services</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -313,9 +313,9 @@ export default function Home() {
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {operatingModelSteps.map((step, i) => (
-                <div key={step.step} style={{ animationDelay: `${(i % 3) * 0.4}s` }} className={`reveal reveal-delay-${Math.min(i + 1, 5)} group relative bg-transparent flex items-center justify-center transition-all duration-500 hover:scale-[1.02] select-none`}>
+                <div key={step.step} style={{ animationDelay: `${(i % 3) * 0.4}s` }} className={`reveal reveal-delay-${Math.min(i + 1, 5)} group relative bg-transparent flex items-center justify-[...]
                   <div className="relative w-full overflow-hidden bg-transparent">
-                    <img src={step.imageSrc} alt={`${step.step} - ${step.label}: ${step.desc}`} className="w-full h-auto object-contain pointer-events-none select-none transition-transform duration-500 ease-out group-hover:scale-[1.02]" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
+                    <img src={step.imageSrc} alt={`${step.step} - ${step.label}: ${step.desc}`} className="w-full h-auto object-contain pointer-events-none select-none transition-transform durati[...]
                   </div>
                 </div>
               ))}
@@ -326,12 +326,12 @@ export default function Home() {
         <section ref={industriesRef} className="py-20 lg:py-28 bg-white relative">
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
             <div className="max-w-2xl mb-12">
-              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('industries.title', 'Specialized Solutions Across Global Industries')}</h2>
-              <p className="reveal reveal-delay-1 text-base text-gray-500 mt-3">{t('industries.subtitle', 'Tailored technology and operations delivery for the industries that define modern business.')}</p>
+              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('industries.title', 'Specialized Solutions Across Global Industries')[...]
+              <p className="reveal reveal-delay-1 text-base text-gray-500 mt-3">{t('industries.subtitle', 'Tailored technology and operations delivery for the industries that define modern busine[...]
             </div>
             <div className="reveal reveal-delay-2 flex flex-wrap gap-3">
               {industries.map((name) => (
-                <span key={name} className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-full hover:border-violet-400 hover:bg-violet-50/80 hover:text-violet-700 hover:-translate-y-0.5 hover:shadow-sm active:scale-95 transition-all duration-200">{name}</span>
+                <span key={name} className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-full hover:border-violet-400 hover:bg-violet-50/80 hover:text-violet-700 h[...]
               ))}
             </div>
           </div>
@@ -352,7 +352,7 @@ export default function Home() {
                 alt="OPERAVA Signature"
                 width={480}
                 height={133}
-                className="w-full h-auto max-h-[160px] sm:max-h-[200px] object-contain object-left pointer-events-none select-none block mix-blend-multiply transition-transform duration-500 hover:scale-[1.01]"
+                className="w-full h-auto max-h-[160px] sm:max-h-[200px] object-contain object-left pointer-events-none select-none block mix-blend-multiply transition-transform duration-500 hover[...]
                 loading="lazy"
                 decoding="async"
                 referrerPolicy="no-referrer"
