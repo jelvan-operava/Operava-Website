@@ -3,6 +3,44 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Menu, X, ArrowRight } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
 
+/** OPERAVA wordmark — open A (no horizontal bar), solid brand indigo */
+function OperavaWordmark({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      className={`operava-text-svg ${className}`}
+      viewBox="0 0 520 72"
+      width="520"
+      height="72"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <linearGradient id="operavaNavWave" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#2B0B90" />
+          <stop offset="35%" stopColor="#2B0B90" />
+          <stop offset="50%" stopColor="#4A2BB8" />
+          <stop offset="65%" stopColor="#2B0B90" />
+          <stop offset="100%" stopColor="#2B0B90" />
+        </linearGradient>
+      </defs>
+      {/* Geometric ultra-bold OPERAVA; A has no crossbar (open Λ form) */}
+      <text
+        x="0"
+        y="58"
+        fill="url(#operavaNavWave)"
+        fontFamily="'Arial Black', 'Arial Bold', 'Helvetica Neue', Helvetica, Impact, system-ui, sans-serif"
+        fontWeight="900"
+        fontSize="64"
+        letterSpacing="-2.5"
+        textLength="520"
+        lengthAdjust="spacingAndGlyphs"
+      >
+        OPERAVA
+      </text>
+    </svg>
+  )
+}
+
 export default function Navigation() {
   const { t } = useLanguage()
   const navigate = useNavigate()
@@ -83,7 +121,6 @@ export default function Navigation() {
     setMobileServicesOpen(false)
   }
 
-  /** Reliable mobile navigation (avoids touch/mousedown race with menu close). */
   const goTo = (href: string) => {
     closeMenus()
     navigate(href)
@@ -96,10 +133,16 @@ export default function Navigation() {
       }`}
     >
       <nav className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 flex items-center justify-between h-16 lg:h-18 bg-white">
-        <Link to="/" className="flex items-center shrink-0 group" aria-label="OPERAVA Global Solutions — Home">
-          <span className="operava-text text-xl sm:text-2xl font-black tracking-tight select-none transition-transform duration-200 group-hover:scale-[1.03]">
-            {t('brand.name', 'OPERAVA')}
+        <Link
+          to="/"
+          className="flex items-center shrink-0 group"
+          aria-label="OPERAVA Global Solutions — Home"
+        >
+          {/* Expanded on mobile; solid photo indigo; lightWave via CSS on gradient stops */}
+          <span className="block transition-transform duration-200 group-hover:scale-[1.03] leading-none">
+            <OperavaWordmark className="h-7 w-auto sm:h-8 md:h-9 select-none pointer-events-none" />
           </span>
+          <span className="sr-only">{t('brand.name', 'OPERAVA')}</span>
         </Link>
 
         <div className="hidden lg:flex items-center gap-1">
