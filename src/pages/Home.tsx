@@ -106,9 +106,24 @@ export default function Home() {
         <section ref={trustRef} id="capabilities" className="py-20 lg:py-28 bg-white scroll-mt-20 relative overflow-hidden">
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 relative z-10">
             <div className="max-w-3xl mb-16 lg:mb-20">
-              <p className="reveal text-[11px] sm:text-xs font-bold tracking-[0.18em] uppercase text-gray-700 mb-3">
-                Automation, Technology, Workforce and Talent Solutions
-              </p>
+              <div className="reveal mb-4 max-w-xl sm:max-w-2xl">
+                <img
+                  src="https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_1200/title_only_gradient_oneline.png"
+                  srcSet="
+                    https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_640/title_only_gradient_oneline.png 640w,
+                    https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_960/title_only_gradient_oneline.png 960w,
+                    https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_1200/title_only_gradient_oneline.png 1200w
+                  "
+                  sizes="(max-width: 640px) 90vw, 672px"
+                  alt="Automation, Technology, Workforce and Talent Solutions"
+                  width={1200}
+                  height={28}
+                  className="w-full h-auto object-contain object-left pointer-events-none select-none"
+                  loading="eager"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
               <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                 Built for the way modern businesses operate.
               </h2>

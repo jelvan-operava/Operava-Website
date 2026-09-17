@@ -39,9 +39,6 @@ export const OPERAVA_COVERS: readonly OperavaCoverSlide[] = [
 const HERO_W = 2112
 const HERO_H = 1168
 
-const TITLE_SRC =
-  'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_1200/title_only_gradient_oneline.png'
-
 interface OperavaCoverProps {
   className?: string
 }
@@ -58,9 +55,6 @@ export default function OperavaCover({ className = '' }: OperavaCoverProps) {
       img.referrerPolicy = 'no-referrer'
       img.src = cover.src
     })
-    const titleImg = new Image()
-    titleImg.referrerPolicy = 'no-referrer'
-    titleImg.src = TITLE_SRC
 
     // Sequential 1 → 2 → 3 → 4 → 1
     const intervalId = setInterval(() => {
@@ -140,24 +134,6 @@ export default function OperavaCover({ className = '' }: OperavaCoverProps) {
           </div>
         )
       })}
-
-      {/* Gradient title line — fixed bottom-right over hero */}
-      <div
-        className="absolute z-[5] bottom-3 right-3 sm:bottom-5 sm:right-5 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8 xl:bottom-10 xl:right-10 max-w-[72%] sm:max-w-[65%] md:max-w-[58%] lg:max-w-[52%] pointer-events-none select-none"
-        aria-hidden="false"
-      >
-        <img
-          src={TITLE_SRC}
-          alt="Automation, Technology, Workforce and Talent Solutions"
-          width={1200}
-          height={28}
-          className="w-full h-auto object-contain object-right drop-shadow-sm"
-          style={{ transform: 'none' }}
-          referrerPolicy="no-referrer"
-          loading="eager"
-          decoding="async"
-        />
-      </div>
     </div>
   )
 }
