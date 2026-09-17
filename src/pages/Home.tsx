@@ -105,18 +105,10 @@ export default function Home() {
 
         <section ref={trustRef} id="capabilities" className="py-20 lg:py-28 bg-white scroll-mt-20 relative overflow-hidden">
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 relative z-10">
-            <div className="w-full flex justify-center mb-8 lg:mb-10">
-              <img
-                src="/title-automation-gradient.svg"
-                alt="Automation, Technology, Workforce and Talent Solutions"
-                width={1500}
-                height={48}
-                className="reveal w-full max-w-4xl h-auto object-contain pointer-events-none select-none"
-                loading="eager"
-                decoding="async"
-              />
-            </div>
-            <div className="max-w-3xl mx-auto text-center mb-16 lg:mb-20">
+            <div className="max-w-3xl mb-16 lg:mb-20">
+              <p className="reveal text-[11px] sm:text-xs font-bold tracking-[0.18em] uppercase text-gray-700 mb-3">
+                Automation, Technology, Workforce and Talent Solutions
+              </p>
               <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
                 Built for the way modern businesses operate.
               </h2>
