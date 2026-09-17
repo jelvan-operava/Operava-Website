@@ -97,7 +97,7 @@ export default function Navigation() {
     >
       <nav className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 flex items-center justify-between h-16 lg:h-18 bg-white">
         <Link to="/" className="flex items-center shrink-0 group" aria-label="OPERAVA Global Solutions — Home">
-          <span className="operava-text text-xl sm:text-2xl font-black tracking-tight select-none group-hover:text-violet-700 transition-colors">
+          <span className="operava-text text-xl sm:text-2xl font-black tracking-tight select-none transition-transform duration-200 group-hover:scale-[1.03]">
             {t('brand.name', 'OPERAVA')}
           </span>
         </Link>
