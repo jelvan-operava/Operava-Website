@@ -17,29 +17,29 @@ function isMobileViewport() {
 
 /**
  * Fixed OPERAVA GLOBAL SOLUTIONS introduction overlay.
- * Renders only the provided Cloudinary WEBP (mobile or desktop).
- * No added text, logo, buttons inside the art, or website backdrop.
+ * Full white background hides the website until the visitor closes with X.
+ * Cloudinary WEBP only for art; countdown + X are UI chrome outside the artwork.
  */
 export default function OperavaIntroOverlay() {
   const [active, setActive] = useState(true)
   const [entered, setEntered] = useState(false)
   const [exiting, setExiting] = useState(false)
   const [canClose, setCanClose] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useState(8)
   const [src, setSrc] = useState(() => (isMobileViewport() ? MOBILE_SRC : DESKTOP_SRC))
 
   const scrollYRef = useRef(0)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   const mandatoryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const enterRafRef = useRef<number | null>(null)
-  const visibleAtRef = useRef<number | null>(null)
-  const remainingMsRef = useRef(MANDATORY_MS)
+  const startAtRef = useRef<number | null>(null)
 
   const finishClose = useCallback(() => {
     setActive(false)
     document.body.style.overflow = ''
     document.documentElement.style.overflow = ''
-    // Restore scroll position without jumping
     window.scrollTo({ top: scrollYRef.current, behavior: 'instant' as ScrollBehavior })
   }, [])
 
@@ -51,7 +51,7 @@ export default function OperavaIntroOverlay() {
     }, FADE_MS)
   }, [canClose, exiting, finishClose])
 
-  // Lock scroll + body while active
+  // Lock scroll while active
   useEffect(() => {
     if (!active) return
 
@@ -62,49 +62,54 @@ export default function OperavaIntroOverlay() {
     const preventScroll = (e: Event) => {
       e.preventDefault()
     }
-    // Block wheel / touchmove on document while intro is up
     document.addEventListener('wheel', preventScroll, { passive: false })
     document.addEventListener('touchmove', preventScroll, { passive: false })
 
     return () => {
       document.removeEventListener('wheel', preventScroll)
       document.removeEventListener('touchmove', preventScroll)
-      if (!active) {
-        document.body.style.overflow = ''
-        document.documentElement.style.overflow = ''
-      }
     }
   }, [active])
 
-  // Fade-in + start mandatory 8s timer once visible
+  // Fade-in + mandatory 8s timer + live countdown
   useEffect(() => {
     if (!active) return
 
-    // Next frame: trigger enter transition
     enterRafRef.current = requestAnimationFrame(() => {
       setEntered(true)
-      visibleAtRef.current = Date.now()
-      remainingMsRef.current = MANDATORY_MS
+      startAtRef.current = Date.now()
+      setSecondsLeft(8)
+
+      tickIntervalRef.current = setInterval(() => {
+        if (startAtRef.current == null) return
+        const elapsed = Date.now() - startAtRef.current
+        const left = Math.max(0, Math.ceil((MANDATORY_MS - elapsed) / 1000))
+        setSecondsLeft(left)
+      }, 200)
 
       mandatoryTimerRef.current = setTimeout(() => {
+        setSecondsLeft(0)
         setCanClose(true)
+        if (tickIntervalRef.current) {
+          clearInterval(tickIntervalRef.current)
+          tickIntervalRef.current = null
+        }
       }, MANDATORY_MS)
     })
 
     return () => {
       if (enterRafRef.current != null) cancelAnimationFrame(enterRafRef.current)
       if (mandatoryTimerRef.current) clearTimeout(mandatoryTimerRef.current)
+      if (tickIntervalRef.current) clearInterval(tickIntervalRef.current)
     }
   }, [active])
 
-  // Focus close button when it appears
   useEffect(() => {
     if (canClose && !exiting) {
       closeBtnRef.current?.focus({ preventScroll: true })
     }
   }, [canClose, exiting])
 
-  // Escape after 8s only
   useEffect(() => {
     if (!active) return
 
@@ -119,7 +124,6 @@ export default function OperavaIntroOverlay() {
         }
       }
 
-      // Lightweight focus trap while open
       if (e.key === 'Tab' && dialogRef.current) {
         const focusable = dialogRef.current.querySelectorAll<
           HTMLElement
@@ -155,7 +159,6 @@ export default function OperavaIntroOverlay() {
     }
 
     apply()
-    // Prefer modern API; fallback for older browsers
     if (typeof mq.addEventListener === 'function') {
       mq.addEventListener('change', apply)
       return () => mq.removeEventListener('change', apply)
@@ -165,8 +168,8 @@ export default function OperavaIntroOverlay() {
   }, [active])
 
   const onImageError = () => {
-    // Do not permanently block the site
     if (mandatoryTimerRef.current) clearTimeout(mandatoryTimerRef.current)
+    if (tickIntervalRef.current) clearInterval(tickIntervalRef.current)
     finishClose()
   }
 
@@ -179,20 +182,15 @@ export default function OperavaIntroOverlay() {
       role="dialog"
       aria-modal="true"
       aria-label="OPERAVA Global Solutions introduction"
-      className="fixed inset-0 z-[10050] flex items-center justify-center overflow-hidden"
-      style={{
-        // Transparent — website remains fully visible around the WEBP
-        background: 'transparent',
-        pointerEvents: 'auto',
-      }}
-      // Click outside must NOT close
+      className="fixed inset-0 z-[10050] flex flex-col items-center justify-center overflow-hidden bg-white"
+      style={{ pointerEvents: 'auto' }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Invisible full-screen catcher: blocks interaction with site underneath */}
-      <div className="absolute inset-0" aria-hidden="true" style={{ background: 'transparent' }} />
+      {/* Full white stage — website completely hidden until X closes intro */}
+      <div className="absolute inset-0 bg-white" aria-hidden="true" />
 
       <div
-        className="relative z-[1] flex items-center justify-center w-full h-full max-w-full max-h-full p-0"
+        className="relative z-[1] flex flex-col items-center justify-center w-full h-full max-w-full max-h-full px-3 sm:px-6"
         style={{
           opacity: entered && !exiting ? 1 : 0,
           transform: entered && !exiting ? 'scale(1)' : 'scale(0.98)',
@@ -204,11 +202,10 @@ export default function OperavaIntroOverlay() {
           key={src}
           src={src}
           alt="OPERAVA Global Solutions"
-          className="block max-w-full max-h-full w-auto h-auto object-contain pointer-events-none select-none"
+          className="block max-w-full max-h-[calc(100vh-5.5rem)] w-auto h-auto object-contain pointer-events-none select-none"
           style={{
             objectFit: 'contain',
             maxWidth: '100vw',
-            maxHeight: '100vh',
           }}
           draggable={false}
           decoding="async"
@@ -216,16 +213,51 @@ export default function OperavaIntroOverlay() {
           referrerPolicy="no-referrer"
           onError={onImageError}
         />
+
+        {/* Countdown / loading — outside WEBP artwork */}
+        {!canClose && (
+          <div
+            className="mt-5 sm:mt-6 flex flex-col items-center gap-2 text-center"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <div className="flex items-center gap-2.5">
+              <span
+                className="inline-block h-4 w-4 rounded-full border-2 border-violet-200 border-t-violet-600 animate-spin"
+                aria-hidden
+              />
+              <p className="text-sm sm:text-base font-semibold text-gray-800 tracking-tight">
+                Wait for {secondsLeft} second{secondsLeft === 1 ? '' : 's'}
+              </p>
+            </div>
+            <p className="text-xs text-gray-500 font-medium tracking-wide uppercase">Loading</p>
+            {/* Progress bar */}
+            <div className="mt-1 w-40 sm:w-52 h-1 rounded-full bg-gray-100 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-violet-600 transition-[width] duration-200 ease-linear"
+                style={{
+                  width: `${Math.min(100, ((8 - secondsLeft) / 8) * 100)}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {canClose && !exiting && (
+          <p className="mt-5 sm:mt-6 text-xs sm:text-sm text-gray-500 font-medium">
+            Tap × to continue
+          </p>
+        )}
       </div>
 
-      {/* X only after mandatory 8 seconds — separate from WEBP art */}
+      {/* X only after mandatory 8 seconds */}
       {canClose && (
         <button
           ref={closeBtnRef}
           type="button"
           onClick={requestClose}
           aria-label="Close introduction"
-          className="absolute z-[2] top-4 right-4 sm:top-5 sm:right-5 flex items-center justify-center rounded-full bg-white/95 text-gray-900 border border-gray-200/90 shadow-lg hover:bg-white active:scale-95 transition-all duration-300"
+          className="absolute z-[2] top-4 right-4 sm:top-5 sm:right-5 flex items-center justify-center rounded-full bg-white text-gray-900 border border-gray-200 shadow-lg hover:bg-gray-50 active:scale-95 transition-all duration-300"
           style={{
             width: 44,
             height: 44,
