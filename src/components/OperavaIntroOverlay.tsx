@@ -20,8 +20,8 @@ function isMobileViewport() {
 
 /**
  * Fixed OPERAVA GLOBAL SOLUTIONS introduction overlay.
- * Full white background hides the website until the visitor closes with X.
- * Cloudinary WEBP only for art; countdown + X are UI chrome outside the artwork.
+ * WEBP always covers the full device viewport (object-cover).
+ * Countdown + X sit on top of the image — not below it.
  */
 export default function OperavaIntroOverlay() {
   const [active, setActive] = useState(true)
@@ -54,7 +54,6 @@ export default function OperavaIntroOverlay() {
     }, FADE_MS)
   }, [canClose, exiting, finishClose])
 
-  // Lock scroll while active
   useEffect(() => {
     if (!active) return
 
@@ -74,7 +73,6 @@ export default function OperavaIntroOverlay() {
     }
   }, [active])
 
-  // Fade-in + mandatory 8s timer + live countdown
   useEffect(() => {
     if (!active) return
 
@@ -151,7 +149,6 @@ export default function OperavaIntroOverlay() {
     return () => window.removeEventListener('keydown', onKeyDown, true)
   }, [active, canClose, requestClose])
 
-  // Responsive asset swap without restarting the 8s timer
   useEffect(() => {
     if (!active) return
 
@@ -185,18 +182,16 @@ export default function OperavaIntroOverlay() {
       role="dialog"
       aria-modal="true"
       aria-label="OPERAVA Global Solutions introduction"
-      className="fixed inset-0 z-[10050] flex flex-col items-center justify-center overflow-hidden bg-white"
+      className="fixed inset-0 z-[10050] overflow-hidden bg-black"
       style={{ pointerEvents: 'auto' }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Full white stage — website completely hidden until X closes intro */}
-      <div className="absolute inset-0 bg-white" aria-hidden="true" />
-
+      {/* Full-bleed stage: WEBP always covers the entire device */}
       <div
-        className="relative z-[1] flex flex-col items-center justify-center w-full h-full max-w-full max-h-full px-3 sm:px-6"
+        className="absolute inset-0"
         style={{
           opacity: entered && !exiting ? 1 : 0,
-          transform: entered && !exiting ? 'scale(1)' : 'scale(0.98)',
+          transform: entered && !exiting ? 'scale(1)' : 'scale(1.02)',
           transition: `opacity ${FADE_MS}ms cubic-bezier(0.22, 1, 0.36, 1), transform ${FADE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
           willChange: 'opacity, transform',
         }}
@@ -205,10 +200,12 @@ export default function OperavaIntroOverlay() {
           key={src}
           src={src}
           alt="OPERAVA Global Solutions"
-          className="block max-w-full max-h-[calc(100vh-5.5rem)] w-auto h-auto object-contain pointer-events-none select-none"
+          className="absolute inset-0 block w-full h-full object-cover object-center pointer-events-none select-none"
           style={{
-            objectFit: 'contain',
-            maxWidth: '100vw',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
           }}
           draggable={false}
           decoding="async"
@@ -216,49 +213,56 @@ export default function OperavaIntroOverlay() {
           referrerPolicy="no-referrer"
           onError={onImageError}
         />
-
-        {/* Countdown / loading — outside WEBP artwork */}
-        {!canClose && (
-          <div
-            className="mt-5 sm:mt-6 flex flex-col items-center gap-2 text-center"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            <div className="flex items-center gap-2.5">
-              <span
-                className="inline-block h-4 w-4 rounded-full border-2 border-violet-200 border-t-violet-600 animate-spin"
-                aria-hidden
-              />
-              <p className="text-sm sm:text-base font-semibold text-gray-800 tracking-tight">
-                Wait for {secondsLeft} second{secondsLeft === 1 ? '' : 's'}
-              </p>
-            </div>
-            <p className="text-xs text-gray-500 font-medium tracking-wide uppercase">Loading</p>
-            <div className="mt-1 w-40 sm:w-52 h-1 rounded-full bg-gray-100 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-violet-600 transition-[width] duration-200 ease-linear"
-                style={{
-                  width: `${Math.min(100, ((8 - secondsLeft) / 8) * 100)}%`,
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {canClose && !exiting && (
-          <p className="mt-5 sm:mt-6 text-xs sm:text-sm text-gray-500 font-medium">
-            Tap × to continue
-          </p>
-        )}
       </div>
 
+      {/* Countdown / loading — overlaid ON the WEBP (bottom center) */}
+      {!canClose && (
+        <div
+          className="absolute z-[2] left-0 right-0 bottom-8 sm:bottom-10 flex flex-col items-center gap-2 text-center px-4 pointer-events-none"
+          aria-live="polite"
+          aria-atomic="true"
+          style={{
+            opacity: entered && !exiting ? 1 : 0,
+            transition: `opacity ${FADE_MS}ms ease`,
+          }}
+        >
+          <div className="flex items-center gap-2.5 rounded-full bg-black/45 backdrop-blur-sm px-4 py-2">
+            <span
+              className="inline-block h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
+              aria-hidden
+            />
+            <p className="text-sm sm:text-base font-semibold text-white tracking-tight">
+              Wait for {secondsLeft} second{secondsLeft === 1 ? '' : 's'}
+            </p>
+          </div>
+          <p className="text-[10px] sm:text-xs text-white/80 font-medium tracking-wide uppercase">
+            Loading
+          </p>
+          <div className="w-40 sm:w-52 h-1 rounded-full bg-white/25 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-white transition-[width] duration-200 ease-linear"
+              style={{
+                width: `${Math.min(100, ((8 - secondsLeft) / 8) * 100)}%`,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {canClose && !exiting && (
+        <p className="absolute z-[2] left-0 right-0 bottom-8 sm:bottom-10 text-center text-xs sm:text-sm text-white/90 font-medium pointer-events-none">
+          Tap × to continue
+        </p>
+      )}
+
+      {/* X overlaid on the WEBP — top right */}
       {canClose && (
         <button
           ref={closeBtnRef}
           type="button"
           onClick={requestClose}
           aria-label="Close introduction"
-          className="absolute z-[2] top-4 right-4 sm:top-5 sm:right-5 flex items-center justify-center rounded-full bg-white text-gray-900 border border-gray-200 shadow-lg hover:bg-gray-50 active:scale-95 transition-all duration-300"
+          className="absolute z-[3] top-4 right-4 sm:top-5 sm:right-5 flex items-center justify-center rounded-full bg-white/95 text-gray-900 border border-white/80 shadow-lg hover:bg-white active:scale-95 transition-all duration-300"
           style={{
             width: 44,
             height: 44,
