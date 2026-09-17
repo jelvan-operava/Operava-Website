@@ -11,9 +11,11 @@ const DESKTOP_SRC =
 
 const BREAKPOINT_PX = 768
 const MANDATORY_MS = 8000
-const FADE_MS = 420
-/** Match careers card flip feel */
-const FLIP_MS = 720
+const FADE_MS = 480
+/** Slower, premium card flip (careers-inspired but fuller) */
+const FLIP_MS = 1400
+/** White back dissolves to reveal live home */
+const REVEAL_MS = 560
 
 function isMobileViewport() {
   if (typeof window === 'undefined') return false
@@ -22,14 +24,14 @@ function isMobileViewport() {
 
 /**
  * Fixed OPERAVA GLOBAL SOLUTIONS introduction overlay.
- * WEBP covers the full viewport. On X: one-way 3D flip (like careers cards)
- * that reveals the home site behind. Cannot flip back — only a full page refresh
- * shows the intro again.
+ * On X: slow 3D card flip → white card back → dissolve into home.
+ * One-way only; refresh required to see intro again.
  */
 export default function OperavaIntroOverlay() {
   const [active, setActive] = useState(true)
   const [entered, setEntered] = useState(false)
   const [flipping, setFlipping] = useState(false)
+  const [revealing, setRevealing] = useState(false)
   const [canClose, setCanClose] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(8)
   const [src, setSrc] = useState(() => (isMobileViewport() ? MOBILE_SRC : DESKTOP_SRC))
@@ -42,6 +44,7 @@ export default function OperavaIntroOverlay() {
   const enterRafRef = useRef<number | null>(null)
   const startAtRef = useRef<number | null>(null)
   const flipDoneRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const revealDoneRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const finishClose = useCallback(() => {
     setActive(false)
@@ -51,14 +54,21 @@ export default function OperavaIntroOverlay() {
   }, [])
 
   const requestClose = useCallback(() => {
-    if (!canClose || flipping) return
+    if (!canClose || flipping || revealing) return
     setFlipping(true)
-    // One-way flip → home. No reverse.
+
     if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
+    if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
+
+    // Phase 1: rotate to white back of the card
     flipDoneRef.current = setTimeout(() => {
-      finishClose()
+      setRevealing(true)
+      // Phase 2: white face dissolves — home appears from “behind” the card
+      revealDoneRef.current = setTimeout(() => {
+        finishClose()
+      }, REVEAL_MS)
     }, FLIP_MS)
-  }, [canClose, flipping, finishClose])
+  }, [canClose, flipping, revealing, finishClose])
 
   useEffect(() => {
     if (!active) return
@@ -109,14 +119,15 @@ export default function OperavaIntroOverlay() {
       if (mandatoryTimerRef.current) clearTimeout(mandatoryTimerRef.current)
       if (tickIntervalRef.current) clearInterval(tickIntervalRef.current)
       if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
+      if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
     }
   }, [active])
 
   useEffect(() => {
-    if (canClose && !flipping) {
+    if (canClose && !flipping && !revealing) {
       closeBtnRef.current?.focus({ preventScroll: true })
     }
-  }, [canClose, flipping])
+  }, [canClose, flipping, revealing])
 
   useEffect(() => {
     if (!active) return
@@ -182,6 +193,8 @@ export default function OperavaIntroOverlay() {
 
   if (!active) return null
 
+  const busy = flipping || revealing
+
   return (
     <div
       ref={dialogRef}
@@ -191,38 +204,43 @@ export default function OperavaIntroOverlay() {
       aria-label="OPERAVA Global Solutions introduction"
       className="fixed inset-0 z-[10050] overflow-hidden"
       style={{
-        pointerEvents: flipping ? 'none' : 'auto',
-        perspective: '1600px',
-        WebkitPerspective: '1600px',
-        background: flipping ? 'transparent' : 'transparent',
+        pointerEvents: busy ? 'none' : 'auto',
+        perspective: '1800px',
+        WebkitPerspective: '1800px',
+        // Soft white stage under the card so edges never flash the page mid-flip
+        backgroundColor: revealing ? 'transparent' : '#FFFFFF',
+        transition: `background-color ${REVEAL_MS}ms ease`,
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/*
-        Flip card (careers-style):
-        Front = intro WEBP. On X → rotateY(180°) one way.
-        Transparent back + transparent scene → home website is the “back”.
-        Unmount after flip; refresh is the only way to see intro again.
-      */}
       <div
         className="absolute inset-0"
         style={{
           transformStyle: 'preserve-3d',
           WebkitTransformStyle: 'preserve-3d',
-          transform: flipping ? 'rotateY(-180deg)' : 'rotateY(0deg)',
-          transition: `transform ${FLIP_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
-          willChange: 'transform',
+          transform: flipping
+            ? 'rotateY(-180deg) scale(0.985)'
+            : entered
+              ? 'rotateY(0deg) scale(1)'
+              : 'rotateY(0deg) scale(1.02)',
+          transition: flipping
+            ? `transform ${FLIP_MS}ms cubic-bezier(0.45, 0.05, 0.2, 1)`
+            : `transform ${FADE_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${FADE_MS}ms ease`,
+          opacity: entered ? 1 : 0,
+          willChange: 'transform, opacity',
         }}
       >
-        {/* FRONT — intro */}
+        {/* FRONT — intro WEBP */}
         <div
-          className="absolute inset-0 overflow-hidden"
+          className="absolute inset-0 overflow-hidden bg-white"
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(0deg)',
-            opacity: entered ? 1 : 0,
-            transition: entered ? 'none' : `opacity ${FADE_MS}ms ease`,
+            transform: 'rotateY(0deg) translateZ(1px)',
+            boxShadow: flipping
+              ? '0 25px 80px rgba(0,0,0,0.18)'
+              : '0 0 0 transparent',
+            transition: `box-shadow ${FLIP_MS}ms ease`,
           }}
         >
           <img
@@ -243,7 +261,6 @@ export default function OperavaIntroOverlay() {
             onError={onImageError}
           />
 
-          {/* Countdown — on the WEBP */}
           {!canClose && (
             <div
               className="absolute z-[2] left-0 right-0 bottom-8 sm:bottom-10 flex flex-col items-center gap-2 text-center px-4 pointer-events-none"
@@ -273,13 +290,13 @@ export default function OperavaIntroOverlay() {
             </div>
           )}
 
-          {canClose && !flipping && (
+          {canClose && !busy && (
             <p className="absolute z-[2] left-0 right-0 bottom-8 sm:bottom-10 text-center text-xs sm:text-sm text-white/90 font-medium pointer-events-none">
               Tap × to continue
             </p>
           )}
 
-          {canClose && !flipping && (
+          {canClose && !busy && (
             <button
               ref={closeBtnRef}
               type="button"
@@ -298,15 +315,21 @@ export default function OperavaIntroOverlay() {
           )}
         </div>
 
-        {/* BACK — empty / transparent so the live home site is what you “land” on */}
+        {/* BACK — solid white card face (site emerges from here) */}
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 bg-white"
           aria-hidden
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            background: 'transparent',
+            transform: 'rotateY(180deg) translateZ(1px)',
+            opacity: revealing ? 0 : 1,
+            transition: revealing
+              ? `opacity ${REVEAL_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
+              : 'none',
+            boxShadow: flipping
+              ? '0 25px 80px rgba(0,0,0,0.12)'
+              : 'none',
           }}
         />
       </div>
