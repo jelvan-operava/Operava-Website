@@ -8,6 +8,7 @@ import ScrollToTopButton from './components/ScrollToTopButton'
 import SmoothScroll from './components/SmoothScroll'
 import AvaAssistant from './components/AvaAssistant'
 import CookieConsent from './components/CookieConsent'
+import OperavaIntroOverlay from './components/OperavaIntroOverlay'
 import { RouteLoadingProgress } from './components/Skeleton'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -139,6 +140,7 @@ function Layout() {
       <ScrollToTopButton />
       <AvaAssistant />
       <CookieConsent />
+      <OperavaIntroOverlay />
     </div>
   )
 }
