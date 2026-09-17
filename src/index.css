@@ -193,9 +193,7 @@ video {
   100% { stroke-dashoffset: 0; }
 }
 
-/* ── OPERAVA nav wordmark — twist-logo gradient, lightWave L→R ──
-   Colors sampled from brand twist mark: coral/orange → pink → purple → blue.
-   Same left-to-right moving lightWave as before. */
+/* ── OPERAVA nav wordmark — twist-logo gradient, smooth L↔R forever ── */
 .operava-text {
   font-family: 'Arial Black', 'Arial Bold', 'Helvetica Neue', Helvetica, Impact, system-ui, sans-serif;
   font-weight: 900;
@@ -216,12 +214,20 @@ video {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: #7B5CFF;
-  animation: lightWave 9s ease-in-out infinite;
+  animation: lightWave 8s ease-in-out infinite;
 }
 
+/* Smooth left → right → left, indefinite */
 @keyframes lightWave {
-  0% { background-position: 100% 0%; }
-  100% { background-position: 0% 0%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .operava-card-frame {
