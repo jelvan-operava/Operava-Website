@@ -193,28 +193,29 @@ video {
   100% { stroke-dashoffset: 0; }
 }
 
-/* ── OPERAVA nav wordmark — matches attached photo ──
-   Ultra-bold geometric sans, solid photo indigo #2B0B90.
-   lightWave stays but only within same indigo family (no pink/black bands). */
+/* ── OPERAVA nav wordmark — twist-logo gradient, lightWave L→R ──
+   Colors sampled from brand twist mark: coral/orange → pink → purple → blue.
+   Same left-to-right moving lightWave as before. */
 .operava-text {
   font-family: 'Arial Black', 'Arial Bold', 'Helvetica Neue', Helvetica, Impact, system-ui, sans-serif;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: -0.05em;
-  /* Exact sample from brand photo core (~RGB 43,11,144) */
   background: linear-gradient(
     90deg,
-    #2B0B90 0%,
-    #2B0B90 28%,
-    #3A1AA8 50%,
-    #2B0B90 72%,
-    #2B0B90 100%
+    #FF8B4A 0%,
+    #FF6B7A 18%,
+    #FF4DB8 36%,
+    #C44DFF 52%,
+    #7B5CFF 68%,
+    #3B6BFF 84%,
+    #2B8CFF 100%
   );
-  background-size: 280% 100%;
+  background-size: 300% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: #2B0B90;
+  color: #7B5CFF;
   animation: lightWave 9s ease-in-out infinite;
 }
 
