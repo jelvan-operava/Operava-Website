@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, Menu, X, ArrowRight } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageContext'
-import OperavaLogo from './OperavaLogo'
 
 export default function Navigation() {
   const { t } = useLanguage()
@@ -97,18 +96,10 @@ export default function Navigation() {
       }`}
     >
       <nav className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 flex items-center justify-between h-16 lg:h-18 bg-white">
-        <Link to="/" className="flex items-center gap-3 group shrink-0" aria-label="OPERAVA Global Solutions — Home">
-          <OperavaLogo
-            size={44}
-            priority
-            transparent
-            className="transition-transform duration-200 group-hover:scale-105"
-          />
-          <div className="flex flex-col leading-none">
-            <span className="operava-text text-xl sm:text-2xl font-black tracking-tight select-none">
-              {t('brand.name', 'OPERAVA')}
-            </span>
-          </div>
+        <Link to="/" className="flex items-center shrink-0 group" aria-label="OPERAVA Global Solutions — Home">
+          <span className="operava-text text-xl sm:text-2xl font-black tracking-tight select-none group-hover:text-violet-700 transition-colors">
+            {t('brand.name', 'OPERAVA')}
+          </span>
         </Link>
 
         <div className="hidden lg:flex items-center gap-1">

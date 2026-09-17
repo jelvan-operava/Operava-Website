@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../i18n/LanguageContext'
 import EmailDirectoryCarousel from './EmailDirectoryCarousel'
-import OperavaLogo from './OperavaLogo'
 
 export default function Footer() {
   const { t } = useLanguage()
@@ -63,18 +62,12 @@ export default function Footer() {
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 pt-16 pb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-3 group mb-5 inline-flex" aria-label="OPERAVA Global Solutions — Home">
-              <OperavaLogo
-                size={44}
-                className="transition-transform duration-200 group-hover:scale-105"
-              />
-              <div className="flex flex-col leading-none">
-                <div className="text-2xl font-black tracking-tight text-white group-hover:text-violet-300 transition-colors">
-                  {t('brand.name', 'OPERAVA')}
-                </div>
-                <div className="text-[10px] font-semibold tracking-[0.18em] text-violet-400 uppercase mt-0.5">
-                  {t('brand.tagline', 'Global Solutions')}
-                </div>
+            <Link to="/" className="inline-flex flex-col leading-none mb-5 group" aria-label="OPERAVA Global Solutions — Home">
+              <div className="text-2xl font-black tracking-tight text-white group-hover:text-violet-300 transition-colors">
+                {t('brand.name', 'OPERAVA')}
+              </div>
+              <div className="text-[10px] font-semibold tracking-[0.18em] text-violet-400 uppercase mt-0.5">
+                {t('brand.tagline', 'Global Solutions')}
               </div>
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
