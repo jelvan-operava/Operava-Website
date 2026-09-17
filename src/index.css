@@ -210,25 +210,31 @@ video {
   }
 }
 
-/* ── OPERAVA ANIMATED BRAND TEXT ── */
+/* ── OPERAVA ANIMATED BRAND TEXT (nav wordmark style) ──
+   Matches solid indigo OPERAVA logotype: ultra-bold geometric sans,
+   deep brand purple. Keeps lightWave shimmer animation. */
 .operava-text {
-  font-family: 'Arial Black', 'Impact', system-ui, -apple-system, sans-serif;
+  font-family: 'Arial Black', 'Arial Bold', 'Helvetica Neue', Helvetica, Impact, system-ui, sans-serif;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em;
+  font-stretch: condensed;
+  /* Brand indigo from official wordmark (~#3D1F9A) with soft wave highlight */
   background: linear-gradient(
-    90deg, 
-    #000000 0%, 
-    #000000 20%, 
-    #8a2be2 40%, 
-    #ff1493 60%, 
-    #000000 80%, 
-    #000000 100%
+    90deg,
+    #2E1578 0%,
+    #3D1F9A 18%,
+    #3D1F9A 32%,
+    #6B3FD4 48%,
+    #3D1F9A 64%,
+    #3D1F9A 82%,
+    #2E1578 100%
   );
   background-size: 300% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: #3D1F9A; /* fallback if clip unsupported */
   animation: lightWave 9s ease-in-out infinite;
 }
 
