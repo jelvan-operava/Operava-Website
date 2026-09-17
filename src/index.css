@@ -16,7 +16,6 @@
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 
-  /* Slightly smaller type scale site-wide */
   --text-xs: 0.7rem;
   --text-sm: 0.8125rem;
   --text-base: 0.9375rem;
@@ -35,7 +34,7 @@
 
 html {
   scroll-behavior: smooth;
-  font-size: 93.75%; /* 15px root — scales rem-based titles & body */
+  font-size: 93.75%;
 }
 
 [dir="rtl"] {
@@ -53,7 +52,6 @@ body {
   line-height: 1.55;
 }
 
-/* Hide scrollbar by default, show on scroll */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -68,13 +66,11 @@ body {
   background: #9ca3af;
 }
 
-/* Focus styles */
 :focus-visible {
   outline: 2px solid #6D28D9;
   outline-offset: 2px;
 }
 
-/* ── STRICT VIDEO & MEDIA CONTROLS SUPPRESSION ── */
 video::-webkit-media-controls,
 video::-webkit-media-controls-play-button,
 video::-webkit-media-controls-start-playback-button,
@@ -115,7 +111,6 @@ video {
   display: none !important;
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -124,7 +119,6 @@ video {
   }
 }
 
-/* Hanging features physics swing animation */
 @keyframes heavySwing {
   0% { transform: rotate(0deg); }
   25% { transform: rotate(12deg); }
@@ -138,16 +132,9 @@ video {
   animation: heavySwing 3s ease-in-out infinite;
 }
 
-/* Scroll reveal animation */
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
@@ -202,52 +189,40 @@ video {
 }
 
 @keyframes beamRun {
-  0% {
-    stroke-dashoffset: 1000;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
+  0% { stroke-dashoffset: 1000; }
+  100% { stroke-dashoffset: 0; }
 }
 
-/* ── OPERAVA ANIMATED BRAND TEXT (nav wordmark style) ──
-   Matches solid indigo OPERAVA logotype: ultra-bold geometric sans,
-   deep brand purple. Keeps lightWave shimmer animation. */
+/* ── OPERAVA nav wordmark — matches attached photo ──
+   Ultra-bold geometric sans, solid photo indigo #2B0B90.
+   lightWave stays but only within same indigo family (no pink/black bands). */
 .operava-text {
   font-family: 'Arial Black', 'Arial Bold', 'Helvetica Neue', Helvetica, Impact, system-ui, sans-serif;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: -0.045em;
-  font-stretch: condensed;
-  /* Brand indigo from official wordmark (~#3D1F9A) with soft wave highlight */
+  letter-spacing: -0.05em;
+  /* Exact sample from brand photo core (~RGB 43,11,144) */
   background: linear-gradient(
     90deg,
-    #2E1578 0%,
-    #3D1F9A 18%,
-    #3D1F9A 32%,
-    #6B3FD4 48%,
-    #3D1F9A 64%,
-    #3D1F9A 82%,
-    #2E1578 100%
+    #2B0B90 0%,
+    #2B0B90 28%,
+    #3A1AA8 50%,
+    #2B0B90 72%,
+    #2B0B90 100%
   );
-  background-size: 300% 100%;
+  background-size: 280% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  color: #3D1F9A; /* fallback if clip unsupported */
+  color: #2B0B90;
   animation: lightWave 9s ease-in-out infinite;
 }
 
 @keyframes lightWave {
-  0% {
-    background-position: 100% 0%;
-  }
-  100% {
-    background-position: 0% 0%;
-  }
+  0% { background-position: 100% 0%; }
+  100% { background-position: 0% 0%; }
 }
 
-/* ── SERVICE / CAREER PORTRAIT SHELL (Cloudinary only — no purple fill or borders) ── */
 .operava-card-frame {
   position: relative;
   background-color: transparent;
@@ -359,7 +334,6 @@ video {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* ── LANDSCAPE SHELL CARD (Cloudinary only — no purple fill or borders) ── */
 .operava-landscape-card-frame {
   position: relative;
   background-color: transparent;
@@ -419,10 +393,6 @@ video {
   transform: scale(1.06);
 }
 
-/* ── PHYSICAL 3D CARD FLIP (career portrait) ──
-   Outer scene holds exact layout footprint.
-   Inner rotates only rotateY around center — no translate.
-   Both faces absolute, identical size, backface-hidden. */
 .operava-flip-scene {
   position: relative;
   width: 100%;
@@ -467,7 +437,6 @@ video {
   transform: rotateY(180deg);
 }
 
-/* Hover lift must NOT fight the 3D flip transform */
 .operava-flip-face.operava-card-frame:hover {
   transform: none;
 }
@@ -537,20 +506,11 @@ video {
 .reveal-delay-4 { transition-delay: 0.4s; }
 .reveal-delay-5 { transition-delay: 0.5s; }
 
-/* ── SLOW WAVING & FLOATING CARD ANIMATIONS ── */
 @keyframes waveMotion {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-5px) rotate(0.35deg);
-  }
-  50% {
-    transform: translateY(-1px) rotate(-0.25deg);
-  }
-  75% {
-    transform: translateY(-6px) rotate(0.2deg);
-  }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(0.35deg); }
+  50% { transform: translateY(-1px) rotate(-0.25deg); }
+  75% { transform: translateY(-6px) rotate(0.2deg); }
 }
 
 @keyframes gentleBlink {
@@ -565,18 +525,9 @@ video {
 }
 
 @keyframes radarPing {
-  0% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
-  50% {
-    transform: scale(1.25);
-    opacity: 0.4;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.25); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 0.9; }
 }
 
 .animate-wave-motion {
@@ -591,38 +542,17 @@ video {
   animation: radarPing 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-/* ── GLOSSY BLINKING & SPECULAR SHIMMER ── */
 @keyframes glossySweep {
-  0% {
-    transform: translateX(-150%) skewX(-20deg);
-    opacity: 0;
-  }
-  15% {
-    opacity: 0.8;
-  }
-  35% {
-    transform: translateX(250%) skewX(-20deg);
-    opacity: 0.8;
-  }
-  36%, 100% {
-    transform: translateX(250%) skewX(-20deg);
-    opacity: 0;
-  }
+  0% { transform: translateX(-150%) skewX(-20deg); opacity: 0; }
+  15% { opacity: 0.8; }
+  35% { transform: translateX(250%) skewX(-20deg); opacity: 0.8; }
+  36%, 100% { transform: translateX(250%) skewX(-20deg); opacity: 0; }
 }
 
 @keyframes glossyBlinkGlow {
-  0%, 100% {
-    filter: brightness(1);
-    opacity: 0.96;
-  }
-  18% {
-    filter: brightness(1.06) contrast(1.02) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.07));
-    opacity: 1;
-  }
-  36% {
-    filter: brightness(1);
-    opacity: 0.96;
-  }
+  0%, 100% { filter: brightness(1); opacity: 0.96; }
+  18% { filter: brightness(1.06) contrast(1.02) drop-shadow(0 8px 20px rgba(0, 0, 0, 0.07)); opacity: 1; }
+  36% { filter: brightness(1); opacity: 0.96; }
 }
 
 .animate-glossy-sheen {
@@ -633,23 +563,14 @@ video {
   animation: glossyBlinkGlow 5.5s ease-in-out infinite, waveMotion 6s ease-in-out infinite;
 }
 
-/* ── MULTI-DIRECTIONAL MARQUEE ANIMATIONS ── */
 @keyframes marqueeLeft {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 @keyframes marqueeRight {
-  0% {
-    transform: translateX(-50%);
-  }
-  100% {
-    transform: translateX(0);
-  }
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
 }
 
 .animate-marquee-left {
@@ -662,23 +583,14 @@ video {
   will-change: transform;
 }
 
-/* ── REFINED FLOATING & LEVITATION SUITE ── */
 @keyframes floatingGentle {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(0.4deg);
-  }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(0.4deg); }
 }
 
 @keyframes floatingGentleReverse {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(-0.4deg);
-  }
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(-0.4deg); }
 }
 
 @keyframes orbLevitate {
@@ -693,32 +605,15 @@ video {
 }
 
 @keyframes ambientAuraPulse {
-  0%, 100% {
-    opacity: 0.35;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 0.65;
-    transform: scale(1.05);
-  }
+  0%, 100% { opacity: 0.35; transform: scale(0.95); }
+  50% { opacity: 0.65; transform: scale(1.05); }
 }
 
 @keyframes stepSheen {
-  0% {
-    transform: translateX(-120%) skewX(-18deg);
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.6;
-  }
-  40% {
-    transform: translateX(220%) skewX(-18deg);
-    opacity: 0.6;
-  }
-  41%, 100% {
-    transform: translateX(220%) skewX(-18deg);
-    opacity: 0;
-  }
+  0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  20% { opacity: 0.6; }
+  40% { transform: translateX(220%) skewX(-18deg); opacity: 0.6; }
+  41%, 100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
 }
 
 .animate-float-gentle {
