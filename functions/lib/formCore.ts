@@ -2,6 +2,7 @@ import {
   otpEmailTemplate,
   servicesConfirmationTemplate,
   applicationConfirmationTemplate,
+  staffNotificationTemplate,
 } from './emailTemplates'
 
 export type FormType = 'SERVICES' | 'CAREERS' | 'CONTACT'
@@ -37,7 +38,6 @@ export function resolveSecret(env: FormEnv): string {
   return DEFAULT_OTP_SECRET
 }
 
-/** Prefer treating Cloudflare Pages as production unless explicitly development. */
 export function isProductionRuntime(): boolean {
   try {
     if (typeof process === 'undefined' || !process?.env) return true
@@ -216,11 +216,6 @@ export function otpEmailText(_name: string, purpose: string, code: string) {
 
 export type SendResendResult = { id: string; status: number }
 
-/**
- * Send via Resend. Returns provider message id on success.
- * Does NOT set reply_to unless the caller passes reply_to explicitly
- * (customer/applicant confirmations and OTP must stay noreply-only).
- */
 export async function sendResend(env: FormEnv, payload: Record<string, unknown>): Promise<SendResendResult> {
   const apiKey = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
@@ -230,7 +225,6 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     (env.RESEND_FROM && String(env.RESEND_FROM).trim()) ||
     DEFAULT_RESEND_FROM
 
-  // Build body without forcing a default reply_to
   const body: Record<string, unknown> = { ...payload, from }
   if (body.reply_to === null || body.reply_to === undefined || body.reply_to === '') {
     delete body.reply_to
@@ -296,11 +290,11 @@ function submissionListHtml(
     ['Reference Number', referenceId],
   ]
   return (
-    '<ul style="margin:8px 0 14px 0;padding-left:18px;font-size:12px;line-height:1.55;color:#1F2937;">' +
+    '<ul style="margin:8px 0 0 0;padding-left:18px;font-size:15px;line-height:25px;color:#333333;">' +
     values
       .map(function (pair) {
         return (
-          '<li style="margin-bottom:4px;font-size:12px;line-height:1.55;"><strong style="color:#0B0F19;">' +
+          '<li style="margin-bottom:6px;"><strong style="color:#333333;">' +
           escapeHtml(pair[0]) +
           ':</strong> ' +
           escapeHtml(pair[1]) +
@@ -381,38 +375,29 @@ export function staffNotificationEmail(opts: {
   rows: Array<{ label: string; value: string }>
 }): string {
   const isApplicant = opts.formType === 'CAREERS'
-  const rowsHtml = opts.rows
-    .map(function (r) {
-      return (
-        '<tr><td style="padding:6px 0;font-size:12px;color:#4B5563;width:140px;vertical-align:top;"><strong>' +
-        escapeHtml(r.label) +
-        '</strong></td><td style="padding:6px 0;font-size:12px;color:#1F2937;">' +
-        escapeHtml(r.value) +
-        '</td></tr>'
-      )
-    })
-    .join('')
-  return (
-    '<!DOCTYPE html><html><body style="font-family:Arial,Helvetica,sans-serif;color:#1F2937;">' +
-    '<h2 style="color:#0B0F19;">' +
-    (isApplicant ? 'Application Received' : 'Inquiry Received') +
-    '</h2>' +
-    '<p>Reference: <strong>#' +
-    escapeHtml(opts.referenceId) +
-    '</strong></p>' +
-    '<p>Reply to this email to contact the ' +
-    (isApplicant ? 'applicant' : 'customer') +
-    ' at <strong>' +
-    escapeHtml(opts.email) +
-    '</strong>.<br/>Submitted: ' +
-    escapeHtml(opts.submittedAt) +
-    '</p>' +
-    '<table role="presentation" cellpadding="0" cellspacing="0">' +
-    rowsHtml +
-    '</table>' +
-    '<p style="font-size:12px;color:#6B7280;">OPERAVA · www.operavaglobal.com</p>' +
-    '</body></html>'
-  )
+  const rowsHtml =
+    '<ul style="margin:8px 0 0 0;padding-left:18px;font-size:15px;line-height:25px;color:#333333;">' +
+    opts.rows
+      .map(function (r) {
+        return (
+          '<li style="margin-bottom:6px;"><strong>' +
+          escapeHtml(r.label) +
+          ':</strong> ' +
+          escapeHtml(r.value) +
+          '</li>'
+        )
+      })
+      .join('') +
+    '</ul>'
+
+  return renderEmailTemplate(staffNotificationTemplate, {
+    TITLE: escapeHtml(isApplicant ? 'Application Received' : 'Inquiry Received'),
+    REFERENCE_ID: escapeHtml(opts.referenceId),
+    EMAIL: escapeHtml(opts.email),
+    SUBMITTED_AT: escapeHtml(opts.submittedAt),
+    ROWS_HTML: rowsHtml,
+    PARTY_LABEL: escapeHtml(isApplicant ? 'applicant' : 'customer'),
+  })
 }
 
 export async function ensureTables(db: D1Database) {
