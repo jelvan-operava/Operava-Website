@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 
+/** Cache-busted URLs — bump ASSET_V when replacing Cloudinary files at the same public_id */
+const ASSET_V = '20260918a'
+
 const MOBILE_SRC =
-  'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/Intro-mobile-overlay.webp'
+  `https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789682664/Intro-mobile-overlay.webp?v=${ASSET_V}`
 const DESKTOP_SRC =
-  'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/desktop_intro_overlay.webp'
+  `https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/desktop_intro_overlay.webp?v=${ASSET_V}`
 
 const BREAKPOINT_PX = 768
 const MANDATORY_MS = 8000
@@ -231,7 +234,6 @@ export default function OperavaIntroOverlay() {
               </p>
             </div>
             <p className="text-xs text-gray-500 font-medium tracking-wide uppercase">Loading</p>
-            {/* Progress bar */}
             <div className="mt-1 w-40 sm:w-52 h-1 rounded-full bg-gray-100 overflow-hidden">
               <div
                 className="h-full rounded-full bg-violet-600 transition-[width] duration-200 ease-linear"
@@ -250,7 +252,6 @@ export default function OperavaIntroOverlay() {
         )}
       </div>
 
-      {/* X only after mandatory 8 seconds */}
       {canClose && (
         <button
           ref={closeBtnRef}
