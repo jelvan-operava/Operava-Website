@@ -12,6 +12,8 @@ const DESKTOP_SRC =
 const BREAKPOINT_PX = 768
 const MANDATORY_MS = 8000
 const FADE_MS = 420
+/** Match careers card flip feel */
+const FLIP_MS = 720
 
 function isMobileViewport() {
   if (typeof window === 'undefined') return false
@@ -20,13 +22,14 @@ function isMobileViewport() {
 
 /**
  * Fixed OPERAVA GLOBAL SOLUTIONS introduction overlay.
- * WEBP always covers the full device viewport (object-cover).
- * Countdown + X sit on top of the image — not below it.
+ * WEBP covers the full viewport. On X: one-way 3D flip (like careers cards)
+ * that reveals the home site behind. Cannot flip back — only a full page refresh
+ * shows the intro again.
  */
 export default function OperavaIntroOverlay() {
   const [active, setActive] = useState(true)
   const [entered, setEntered] = useState(false)
-  const [exiting, setExiting] = useState(false)
+  const [flipping, setFlipping] = useState(false)
   const [canClose, setCanClose] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(8)
   const [src, setSrc] = useState(() => (isMobileViewport() ? MOBILE_SRC : DESKTOP_SRC))
@@ -38,6 +41,7 @@ export default function OperavaIntroOverlay() {
   const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const enterRafRef = useRef<number | null>(null)
   const startAtRef = useRef<number | null>(null)
+  const flipDoneRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const finishClose = useCallback(() => {
     setActive(false)
@@ -47,12 +51,14 @@ export default function OperavaIntroOverlay() {
   }, [])
 
   const requestClose = useCallback(() => {
-    if (!canClose || exiting) return
-    setExiting(true)
-    window.setTimeout(() => {
+    if (!canClose || flipping) return
+    setFlipping(true)
+    // One-way flip → home. No reverse.
+    if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
+    flipDoneRef.current = setTimeout(() => {
       finishClose()
-    }, FADE_MS)
-  }, [canClose, exiting, finishClose])
+    }, FLIP_MS)
+  }, [canClose, flipping, finishClose])
 
   useEffect(() => {
     if (!active) return
@@ -102,14 +108,15 @@ export default function OperavaIntroOverlay() {
       if (enterRafRef.current != null) cancelAnimationFrame(enterRafRef.current)
       if (mandatoryTimerRef.current) clearTimeout(mandatoryTimerRef.current)
       if (tickIntervalRef.current) clearInterval(tickIntervalRef.current)
+      if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
     }
   }, [active])
 
   useEffect(() => {
-    if (canClose && !exiting) {
+    if (canClose && !flipping) {
       closeBtnRef.current?.focus({ preventScroll: true })
     }
-  }, [canClose, exiting])
+  }, [canClose, flipping])
 
   useEffect(() => {
     if (!active) return
@@ -182,99 +189,127 @@ export default function OperavaIntroOverlay() {
       role="dialog"
       aria-modal="true"
       aria-label="OPERAVA Global Solutions introduction"
-      className="fixed inset-0 z-[10050] overflow-hidden bg-black"
-      style={{ pointerEvents: 'auto' }}
+      className="fixed inset-0 z-[10050] overflow-hidden"
+      style={{
+        pointerEvents: flipping ? 'none' : 'auto',
+        perspective: '1600px',
+        WebkitPerspective: '1600px',
+        background: flipping ? 'transparent' : 'transparent',
+      }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Full-bleed stage: WEBP always covers the entire device */}
+      {/*
+        Flip card (careers-style):
+        Front = intro WEBP. On X → rotateY(180°) one way.
+        Transparent back + transparent scene → home website is the “back”.
+        Unmount after flip; refresh is the only way to see intro again.
+      */}
       <div
         className="absolute inset-0"
         style={{
-          opacity: entered && !exiting ? 1 : 0,
-          transform: entered && !exiting ? 'scale(1)' : 'scale(1.02)',
-          transition: `opacity ${FADE_MS}ms cubic-bezier(0.22, 1, 0.36, 1), transform ${FADE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
-          willChange: 'opacity, transform',
+          transformStyle: 'preserve-3d',
+          WebkitTransformStyle: 'preserve-3d',
+          transform: flipping ? 'rotateY(-180deg)' : 'rotateY(0deg)',
+          transition: `transform ${FLIP_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+          willChange: 'transform',
         }}
       >
-        <img
-          key={src}
-          src={src}
-          alt="OPERAVA Global Solutions"
-          className="absolute inset-0 block w-full h-full object-cover object-center pointer-events-none select-none"
+        {/* FRONT — intro */}
+        <div
+          className="absolute inset-0 overflow-hidden"
           style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(0deg)',
+            opacity: entered ? 1 : 0,
+            transition: entered ? 'none' : `opacity ${FADE_MS}ms ease`,
           }}
-          draggable={false}
-          decoding="async"
-          loading="eager"
-          referrerPolicy="no-referrer"
-          onError={onImageError}
+        >
+          <img
+            key={src}
+            src={src}
+            alt="OPERAVA Global Solutions"
+            className="absolute inset-0 block w-full h-full object-cover object-center pointer-events-none select-none"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+            }}
+            draggable={false}
+            decoding="async"
+            loading="eager"
+            referrerPolicy="no-referrer"
+            onError={onImageError}
+          />
+
+          {/* Countdown — on the WEBP */}
+          {!canClose && (
+            <div
+              className="absolute z-[2] left-0 right-0 bottom-8 sm:bottom-10 flex flex-col items-center gap-2 text-center px-4 pointer-events-none"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <div className="flex items-center gap-2.5 rounded-full bg-black/45 backdrop-blur-sm px-4 py-2">
+                <span
+                  className="inline-block h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                  aria-hidden
+                />
+                <p className="text-sm sm:text-base font-semibold text-white tracking-tight">
+                  Wait for {secondsLeft} second{secondsLeft === 1 ? '' : 's'}
+                </p>
+              </div>
+              <p className="text-[10px] sm:text-xs text-white/80 font-medium tracking-wide uppercase">
+                Loading
+              </p>
+              <div className="w-40 sm:w-52 h-1 rounded-full bg-white/25 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-white transition-[width] duration-200 ease-linear"
+                  style={{
+                    width: `${Math.min(100, ((8 - secondsLeft) / 8) * 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {canClose && !flipping && (
+            <p className="absolute z-[2] left-0 right-0 bottom-8 sm:bottom-10 text-center text-xs sm:text-sm text-white/90 font-medium pointer-events-none">
+              Tap × to continue
+            </p>
+          )}
+
+          {canClose && !flipping && (
+            <button
+              ref={closeBtnRef}
+              type="button"
+              onClick={requestClose}
+              aria-label="Close introduction"
+              className="absolute z-[3] top-4 right-4 sm:top-5 sm:right-5 flex items-center justify-center rounded-full bg-white/95 text-gray-900 border border-white/80 shadow-lg hover:bg-white active:scale-95 transition-all duration-300"
+              style={{
+                width: 44,
+                height: 44,
+                minWidth: 44,
+                minHeight: 44,
+              }}
+            >
+              <X className="w-5 h-5" strokeWidth={2.25} aria-hidden />
+            </button>
+          )}
+        </div>
+
+        {/* BACK — empty / transparent so the live home site is what you “land” on */}
+        <div
+          className="absolute inset-0"
+          aria-hidden
+          style={{
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+            background: 'transparent',
+          }}
         />
       </div>
-
-      {/* Countdown / loading — overlaid ON the WEBP (bottom center) */}
-      {!canClose && (
-        <div
-          className="absolute z-[2] left-0 right-0 bottom-8 sm:bottom-10 flex flex-col items-center gap-2 text-center px-4 pointer-events-none"
-          aria-live="polite"
-          aria-atomic="true"
-          style={{
-            opacity: entered && !exiting ? 1 : 0,
-            transition: `opacity ${FADE_MS}ms ease`,
-          }}
-        >
-          <div className="flex items-center gap-2.5 rounded-full bg-black/45 backdrop-blur-sm px-4 py-2">
-            <span
-              className="inline-block h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin"
-              aria-hidden
-            />
-            <p className="text-sm sm:text-base font-semibold text-white tracking-tight">
-              Wait for {secondsLeft} second{secondsLeft === 1 ? '' : 's'}
-            </p>
-          </div>
-          <p className="text-[10px] sm:text-xs text-white/80 font-medium tracking-wide uppercase">
-            Loading
-          </p>
-          <div className="w-40 sm:w-52 h-1 rounded-full bg-white/25 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-white transition-[width] duration-200 ease-linear"
-              style={{
-                width: `${Math.min(100, ((8 - secondsLeft) / 8) * 100)}%`,
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {canClose && !exiting && (
-        <p className="absolute z-[2] left-0 right-0 bottom-8 sm:bottom-10 text-center text-xs sm:text-sm text-white/90 font-medium pointer-events-none">
-          Tap × to continue
-        </p>
-      )}
-
-      {/* X overlaid on the WEBP — top right */}
-      {canClose && (
-        <button
-          ref={closeBtnRef}
-          type="button"
-          onClick={requestClose}
-          aria-label="Close introduction"
-          className="absolute z-[3] top-4 right-4 sm:top-5 sm:right-5 flex items-center justify-center rounded-full bg-white/95 text-gray-900 border border-white/80 shadow-lg hover:bg-white active:scale-95 transition-all duration-300"
-          style={{
-            width: 44,
-            height: 44,
-            minWidth: 44,
-            minHeight: 44,
-            opacity: exiting ? 0 : 1,
-            transition: `opacity ${FADE_MS}ms ease, transform 150ms ease`,
-          }}
-        >
-          <X className="w-5 h-5" strokeWidth={2.25} aria-hidden />
-        </button>
-      )}
     </div>
   )
 }
