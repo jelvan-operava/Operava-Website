@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Cog, Monitor, Users, UserPlus } from 'lucide-react'
 
-type ServiceId = 'automation' | 'it' | 'workforce' | 'talent'
+export type CarouselServiceId = 'automation' | 'it' | 'workforce' | 'talent'
+type ServiceId = CarouselServiceId
 
 interface ServiceCard {
   id: ServiceId
@@ -170,7 +171,11 @@ function cardTransform(offset: number, mobile: boolean) {
   }
 }
 
-export default function ServicesCarousel3D() {
+interface ServicesCarousel3DProps {
+  onActiveChange?: (id: CarouselServiceId) => void
+}
+
+export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3DProps = {}) {
   const [active, setActive] = useState(0)
   const [contentKey, setContentKey] = useState(0)
   const [mobile, setMobile] = useState(false)
@@ -184,6 +189,10 @@ export default function ServicesCarousel3D() {
   const sectionRef = useRef<HTMLElement>(null)
 
   const activeService = SERVICES[active]
+
+  useEffect(() => {
+    onActiveChange?.(activeService.id)
+  }, [active, activeService.id, onActiveChange])
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)')
