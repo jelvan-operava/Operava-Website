@@ -19,16 +19,20 @@ export interface FormEnv {
 
 /**
  * Resend from format: "Display Name <email@verified-domain.com>"
- * Domain operavaglobal.com must be verified in Resend.
+ * Verified OPERAVA sender on Resend: notification@operavaglobal.com
  */
-export const DEFAULT_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
-export const OTP_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
-export const NOTIFICATION_NOREPLY_FROM = 'Operava <noreply@operavaglobal.com>'
+export const DEFAULT_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
+export const OTP_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
+export const NOTIFICATION_NOREPLY_FROM = 'OPERAVA <notification@operavaglobal.com>'
 export const CLIENT_RESEND_FROM = 'hello@operavaglobal.com'
 export const TALENT_RESEND_FROM = 'talents@operavaglobal.com'
-export const APPLICANT_CONFIRMATION_FROM = 'Operava <noreply@operavaglobal.com>'
+export const APPLICANT_CONFIRMATION_FROM = 'OPERAVA <notification@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
 export const DEFAULT_OTP_SECRET = 'operava-form-secret'
+
+/** Plain email only — Resend rejects display-name formats in to/reply_to. */
+const PLAIN_EMAIL_RE =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
 
 export function resolveSecret(env: FormEnv): string {
   const otp = env.OTP_SECRET && String(env.OTP_SECRET).trim()
@@ -133,8 +137,31 @@ export async function readSignedDraft(secret: string, draftId: string) {
   }
 }
 
-export const EMAIL_RE =
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
+export const EMAIL_RE = PLAIN_EMAIL_RE
+
+/** Extract plain email from "Name <email@x.com>" or return trimmed input. */
+export function extractPlainEmail(value: string): string {
+  const raw = String(value || '').trim()
+  const angle = raw.match(/<([^>]+)>/)
+  if (angle && angle[1]) return angle[1].trim().toLowerCase()
+  return raw.toLowerCase()
+}
+
+/** Ensure Resend-compatible From: "Name <email@domain>". */
+export function normalizeFromAddress(value: string | undefined | null): string {
+  const raw = String(value || '').trim()
+  if (!raw) return DEFAULT_RESEND_FROM
+  const angle = raw.match(/^(.*)<([^>]+)>$/)
+  if (angle) {
+    const name = angle[1].trim().replace(/["<>]/g, '') || 'OPERAVA'
+    const email = angle[2].trim().toLowerCase()
+    if (PLAIN_EMAIL_RE.test(email)) return name + ' <' + email + '>'
+  }
+  if (PLAIN_EMAIL_RE.test(raw.toLowerCase())) {
+    return 'OPERAVA <' + raw.toLowerCase() + '>'
+  }
+  return DEFAULT_RESEND_FROM
+}
 
 export function json(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -216,19 +243,44 @@ export function otpEmailText(_name: string, purpose: string, code: string) {
 
 export type SendResendResult = { id: string; status: number }
 
+/**
+ * Send via Resend with normalized from/to/reply_to to avoid
+ * "The string did not match the expected pattern." validation errors.
+ */
 export async function sendResend(env: FormEnv, payload: Record<string, unknown>): Promise<SendResendResult> {
   const apiKey = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
 
-  const from =
-    (typeof payload.from === 'string' && payload.from.trim()) ||
-    (env.RESEND_FROM && String(env.RESEND_FROM).trim()) ||
-    DEFAULT_RESEND_FROM
+  const from = normalizeFromAddress(
+    (typeof payload.from === 'string' && payload.from) ||
+      (env.RESEND_FROM && String(env.RESEND_FROM)) ||
+      DEFAULT_RESEND_FROM,
+  )
 
-  const body: Record<string, unknown> = { ...payload, from }
-  if (body.reply_to === null || body.reply_to === undefined || body.reply_to === '') {
-    delete body.reply_to
+  // Normalize recipients to plain email strings only
+  let to: string[] = []
+  if (Array.isArray(payload.to)) {
+    to = payload.to.map((v) => extractPlainEmail(String(v))).filter((e) => PLAIN_EMAIL_RE.test(e))
+  } else if (typeof payload.to === 'string') {
+    const e = extractPlainEmail(payload.to)
+    if (PLAIN_EMAIL_RE.test(e)) to = [e]
   }
+  if (to.length === 0) throw new Error('EMAIL_INVALID_TO')
+
+  let replyTo: string | undefined
+  if (typeof payload.reply_to === 'string' && payload.reply_to.trim()) {
+    const e = extractPlainEmail(payload.reply_to)
+    if (PLAIN_EMAIL_RE.test(e)) replyTo = e
+  }
+
+  const body: Record<string, unknown> = {
+    from,
+    to,
+    subject: String(payload.subject || 'OPERAVA'),
+    html: typeof payload.html === 'string' ? payload.html : undefined,
+    text: typeof payload.text === 'string' ? payload.text : undefined,
+  }
+  if (replyTo) body.reply_to = replyTo
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -241,7 +293,14 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
 
   const raw = await res.text().catch(() => '')
   if (!res.ok) {
-    console.error('Resend API error', res.status, raw.slice(0, 200))
+    console.error('Resend API error', res.status, raw.slice(0, 400))
+    // Surface pattern / validation failures distinctly for logs
+    if (/pattern/i.test(raw)) {
+      throw new Error('EMAIL_ADDRESS_PATTERN')
+    }
+    if (/not verified|domain/i.test(raw)) {
+      throw new Error('EMAIL_DOMAIN_NOT_VERIFIED')
+    }
     throw new Error('EMAIL_SEND_FAILED')
   }
 
@@ -262,7 +321,7 @@ export function inboxFor(type: FormType, env: FormEnv) {
 }
 
 export function senderFor(_type: FormType, env: FormEnv) {
-  return env.RESEND_FROM || DEFAULT_RESEND_FROM
+  return normalizeFromAddress(env.RESEND_FROM || DEFAULT_RESEND_FROM)
 }
 
 export function purposeLabel(type: FormType) {
