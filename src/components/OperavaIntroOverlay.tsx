@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 
 /** Cache-busted URLs — bump ASSET_V when replacing Cloudinary files at the same public_id */
-const ASSET_V = '20260918b'
+const ASSET_V = '20260919a'
 
 const MOBILE_SRC =
   `https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789682664/Intro-mobile-overlay.webp?v=${ASSET_V}`
@@ -12,10 +12,10 @@ const DESKTOP_SRC =
 const BREAKPOINT_PX = 768
 const MANDATORY_MS = 8000
 const FADE_MS = 480
-/** Slower, premium card flip */
-const FLIP_MS = 1400
-/** Card fully clears so live home is fully interactive */
-const REVEAL_MS = 420
+/** Premium 3D card flip duration */
+const FLIP_MS = 1100
+/** After flip, fade overlay away so live homepage is fully interactive */
+const REVEAL_MS = 380
 
 function isMobileViewport() {
   if (typeof window === 'undefined') return false
@@ -23,12 +23,12 @@ function isMobileViewport() {
 }
 
 /**
- * Fixed OPERAVA GLOBAL SOLUTIONS introduction overlay.
- * Front = intro WEBP (Cloudinary).
- * Back = transparent — the live homepage is already rendered under the overlay,
- * so the flip reveals the real site (same URL, no route change). After the flip
- * the overlay is removed and the user navigates the homepage in place.
- * Auto-closes (flip) after 8s; X / surface click also flip. One-way only.
+ * OPERAVA introduction overlay.
+ *
+ * Front face  = intro WEBP (mobile or desktop asset by viewport).
+ * Back face   = solid white plate (never the intro image — avoids mirrored blink).
+ * On X / 8s   = card rotates 180° (front → back), then overlay fades out.
+ * Underneath  = live homepage already mounted — user stays on same URL and navigates.
  */
 export default function OperavaIntroOverlay() {
   const [active, setActive] = useState(true)
@@ -57,23 +57,28 @@ export default function OperavaIntroOverlay() {
     window.scrollTo({ top: scrollYRef.current, behavior: 'instant' as ScrollBehavior })
   }, [])
 
-  const requestClose = useCallback(() => {
-    if (flipping || revealing) return
-    if (!canClose) return
-    if (autoCloseFiredRef.current && flipping) return
-    setFlipping(true)
+  const startFlip = useCallback(() => {
+    if (flipping || revealing || autoCloseFiredRef.current) return
     autoCloseFiredRef.current = true
+    setFlipping(true)
 
     if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
     if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
 
+    // Phase 1: full 180° card flip (front → solid back)
     flipDoneRef.current = setTimeout(() => {
       setRevealing(true)
+      // Phase 2: fade overlay out — live homepage underneath is fully visible
       revealDoneRef.current = setTimeout(() => {
         finishClose()
       }, REVEAL_MS)
     }, FLIP_MS)
-  }, [canClose, flipping, revealing, finishClose])
+  }, [flipping, revealing, finishClose])
+
+  const requestClose = useCallback(() => {
+    if (!canClose || flipping || revealing) return
+    startFlip()
+  }, [canClose, flipping, revealing, startFlip])
 
   useEffect(() => {
     if (!active) return
@@ -116,23 +121,10 @@ export default function OperavaIntroOverlay() {
           clearInterval(tickIntervalRef.current)
           tickIntervalRef.current = null
         }
-        // Auto-flip into the live homepage after 8s
-        if (!autoCloseFiredRef.current) {
-          setTimeout(() => {
-            if (!autoCloseFiredRef.current) {
-              setFlipping(true)
-              autoCloseFiredRef.current = true
-              if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
-              if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
-              flipDoneRef.current = setTimeout(() => {
-                setRevealing(true)
-                revealDoneRef.current = setTimeout(() => {
-                  finishClose()
-                }, REVEAL_MS)
-              }, FLIP_MS)
-            }
-          }, 120)
-        }
+        // Auto-flip after 8s → solid back → live homepage
+        setTimeout(() => {
+          if (!autoCloseFiredRef.current) startFlip()
+        }, 80)
       }, MANDATORY_MS)
     })
 
@@ -143,7 +135,7 @@ export default function OperavaIntroOverlay() {
       if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
       if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
     }
-  }, [active, finishClose])
+  }, [active, startFlip])
 
   useEffect(() => {
     if (canClose && !flipping && !revealing) {
@@ -194,6 +186,7 @@ export default function OperavaIntroOverlay() {
 
     const mq = window.matchMedia(`(max-width: ${BREAKPOINT_PX - 1}px)`)
     const apply = () => {
+      // Mobile viewport → mobile intro asset; desktop → desktop asset
       const next = mq.matches ? MOBILE_SRC : DESKTOP_SRC
       setSrc((prev) => (prev === next ? prev : next))
     }
@@ -232,44 +225,45 @@ export default function OperavaIntroOverlay() {
       className="fixed inset-0 z-[10050] overflow-hidden"
       style={{
         pointerEvents: busy ? 'none' : 'auto',
-        perspective: '1800px',
-        WebkitPerspective: '1800px',
-        // Opaque white while intro shows; transparent during flip so the
-        // live homepage under the overlay is the "back" of the card
+        perspective: '1600px',
+        WebkitPerspective: '1600px',
+        // Stay opaque until flip starts so homepage is fully covered;
+        // go transparent during flip so the live site can show around the card edges
         backgroundColor: flipping || revealing ? 'transparent' : '#FFFFFF',
-        transition: flipping
-          ? `background-color ${Math.round(FLIP_MS * 0.35)}ms ease`
-          : `background-color ${REVEAL_MS}ms ease`,
+        opacity: revealing ? 0 : 1,
+        transition: revealing
+          ? `opacity ${REVEAL_MS}ms cubic-bezier(0.22, 1, 0.36, 1), background-color ${REVEAL_MS}ms ease`
+          : `background-color ${Math.round(FLIP_MS * 0.25)}ms ease`,
       }}
       onClick={handleSurfaceClick}
     >
+      {/* 3D card stage */}
       <div
         className="absolute inset-0"
         style={{
           transformStyle: 'preserve-3d',
           WebkitTransformStyle: 'preserve-3d',
           transform: flipping
-            ? 'rotateY(-180deg) scale(0.985)'
+            ? 'rotateY(-180deg) scale(0.98)'
             : entered
               ? 'rotateY(0deg) scale(1)'
               : 'rotateY(0deg) scale(1.02)',
           transition: flipping
             ? `transform ${FLIP_MS}ms cubic-bezier(0.45, 0.05, 0.2, 1)`
-            : `transform ${FADE_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${FADE_MS}ms ease`,
-          opacity: revealing ? 0 : entered ? 1 : 0,
-          willChange: 'transform, opacity',
+            : `transform ${FADE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
+          willChange: 'transform',
         }}
       >
-        {/* FRONT — intro WEBP only */}
+        {/* ───────── FRONT: intro image only ───────── */}
         <div
           className="absolute inset-0 overflow-hidden bg-white"
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(0deg) translateZ(1px)',
+            transform: 'rotateY(0deg) translateZ(2px)',
             boxShadow: flipping
-              ? '0 25px 80px rgba(0,0,0,0.18)'
-              : '0 0 0 transparent',
+              ? '0 28px 80px rgba(15,15,30,0.22)'
+              : 'none',
             transition: `box-shadow ${FLIP_MS}ms ease`,
           }}
         >
@@ -348,27 +342,21 @@ export default function OperavaIntroOverlay() {
           )}
         </div>
 
-        {/*
-          BACK — fully transparent face (not another image).
-          Homepage is already mounted under this overlay; when the card
-          rotates 180°, the live site is what appears on the reverse.
-          No navigation / route change — user stays on the same page and
-          can scroll and navigate the homepage immediately after reveal.
-        */}
+        {/* ───────── BACK: solid plate (NOT the intro image) ─────────
+            Prevents mirrored-front blink. After the flip lands on this face,
+            the whole overlay fades out so the live OPERAVA homepage underneath
+            is what the user sees and navigates. */}
         <div
           className="absolute inset-0"
           aria-hidden
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg) translateZ(1px)',
-            backgroundColor: 'transparent',
-            opacity: revealing ? 0 : 1,
-            transition: revealing
-              ? `opacity ${REVEAL_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
-              : 'none',
+            transform: 'rotateY(180deg) translateZ(2px)',
+            // Solid white so the reverse of the front image never shows
+            backgroundColor: '#FFFFFF',
             boxShadow: flipping
-              ? '0 25px 80px rgba(0,0,0,0.10)'
+              ? '0 28px 80px rgba(15,15,30,0.12)'
               : 'none',
           }}
         />
