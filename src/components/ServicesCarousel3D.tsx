@@ -303,10 +303,10 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
       ref={sectionRef}
       id="services"
       aria-label="OPERAVA Services"
-      className="relative w-full bg-white overflow-hidden py-20 lg:py-28"
+      className="relative w-full bg-white overflow-hidden pt-14 pb-4 sm:pt-16 sm:pb-6 lg:pt-20 lg:pb-8"
       onMouseEnter={pauseAutoplay}
     >
-      <div className="w-full max-w-[90rem] mx-auto px-5 sm:px-8 text-center mb-12 lg:mb-16">
+      <div className="w-full max-w-[90rem] mx-auto px-5 sm:px-8 text-center mb-8 sm:mb-10 lg:mb-12">
         <p className="text-[11px] sm:text-xs font-semibold tracking-[0.22em] uppercase text-gray-400 mb-4">
           OPERAVA / SERVICES
         </p>
@@ -485,7 +485,7 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
         </div>
       </div>
 
-      <div className="w-full max-w-[48rem] mx-auto px-5 sm:px-8 mt-10 lg:mt-12 text-center">
+      <div className="w-full max-w-[48rem] mx-auto px-5 sm:px-8 mt-6 sm:mt-8 lg:mt-8 text-center">
         <div
           key={contentKey}
           className="animate-[fadeUpContent_0.7s_cubic-bezier(0.22,1,0.36,1)_both]"
@@ -520,7 +520,7 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
       </div>
 
       <nav
-        className="mt-10 lg:mt-12 flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-4"
+        className="mt-6 sm:mt-8 lg:mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-4"
         aria-label="Service navigation"
       >
         {SERVICES.map((s, i) => {
