@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
+import { ArrowRight } from 'lucide-react'
 import type { Service } from '../data/services'
 import { useLanguage } from '../i18n/LanguageContext'
 import ServiceAnimatedIcon from './ServiceAnimatedIcon'
@@ -12,6 +13,8 @@ interface ServiceCardProps {
   maxCapabilities?: number
   className?: string
 }
+
+const GRADIENT = 'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)'
 
 export default function ServiceCard({
   service,
@@ -25,24 +28,22 @@ export default function ServiceCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 18 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.45, delay: (index % 4) * 0.08 }}
+      transition={{ duration: 0.4, delay: (index % 4) * 0.06 }}
       id={`service-card-${service.slug}`}
-      className={`operava-card-frame group relative w-full ${className}`}
+      className={`group relative flex flex-col w-full h-full rounded-2xl bg-white border border-[#E8E8EC] overflow-hidden transition-all duration-300 hover:border-violet-200 hover:shadow-[0_20px_40px_rgba(15,15,30,0.08)] ${className}`}
     >
-      {/* Shell Card Graphic Layer */}
-      <img
-        src="https://res.cloudinary.com/b5i5bwwa/image/upload/Operava-contents-card.png"
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0 rounded-[20px]"
-        loading="lazy"
+      {/* Subtle top gradient edge on hover */}
+      <div
+        className="h-[2px] w-full shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ background: GRADIENT }}
+        aria-hidden
       />
 
-      {/* Image Container with Focused Spotlight Glow */}
-      <div className="operava-image-container relative z-10">
+      {/* Image / icon area */}
+      <div className="relative w-full aspect-[16/10] bg-gradient-to-b from-[#FAFAFC] to-white flex items-center justify-center overflow-hidden">
         {service.image && !imgError ? (
           <img
             src={service.image}
@@ -50,52 +51,72 @@ export default function ServiceCard({
             onError={() => setImgError(true)}
             referrerPolicy="no-referrer"
             loading="lazy"
+            className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="relative z-10 flex items-center justify-center p-4">
-            <ServiceAnimatedIcon
-              icon={service.icon}
-              size="lg"
-              interactive={true}
-            />
+          <div className="flex items-center justify-center p-6">
+            <div
+              className="inline-flex h-14 w-14 items-center justify-center rounded-2xl"
+              style={{
+                background:
+                  'linear-gradient(135deg, rgba(255,139,74,0.12), rgba(196,77,255,0.12), rgba(59,107,255,0.12))',
+              }}
+            >
+              <ServiceAnimatedIcon icon={service.icon} size="lg" interactive={true} />
+            </div>
           </div>
         )}
       </div>
 
-      {/* Typography Section */}
-      <div className="relative z-10 w-full flex flex-col items-center flex-1">
-        <h2 className="operava-card-title line-clamp-2 min-h-[3.25rem] flex items-center justify-center">
-          {service.name}
-        </h2>
+      {/* Body */}
+      <div className="relative flex flex-col flex-1 px-5 pb-5 pt-1">
+        <div className="flex items-center gap-2 mb-2">
+          <span
+            className="text-[10px] font-bold tracking-wider"
+            style={{
+              backgroundImage: GRADIENT,
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}
+          >
+            {service.number}
+          </span>
+          <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">
+            {service.category === 'bpo' ? 'Outsourcing' : 'Technology'}
+          </span>
+        </div>
 
-        <p className="operava-card-description line-clamp-3 min-h-[3.75rem]">
+        <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight leading-snug mb-2 line-clamp-2 min-h-[2.5rem]">
+          {service.name}
+        </h3>
+
+        <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4 flex-1">
           {service.shortDescription || service.description}
         </p>
 
-        {/* Optional Capability Badges */}
-        {showCapabilities && service.capabilities && service.capabilities.length > 0 && (
-          <ul className="flex flex-wrap justify-center gap-1.5 mb-5 w-full">
+        {showCapabilities && service.capabilities?.length > 0 && (
+          <ul className="flex flex-wrap gap-1.5 mb-4">
             {service.capabilities.slice(0, maxCapabilities).map((cap) => (
               <li
                 key={cap}
-                className="px-2.5 py-1 text-xs font-medium bg-white/10 text-white/90 rounded-lg border border-white/15 backdrop-blur-xs transition-colors"
+                className="px-2 py-0.5 text-[10px] font-medium text-gray-600 bg-gray-50 border border-gray-100 rounded-md"
               >
-                {cap}
+                {cap.length > 36 ? cap.slice(0, 34) + '…' : cap}
               </li>
             ))}
           </ul>
         )}
-      </div>
 
-      {/* Action Button */}
-      <Link
-        to={`/services/${service.category}/${service.slug}`}
-        id={`btn-explore-${service.slug}`}
-        className="operava-learn-more-btn relative z-10 mt-auto"
-      >
-        <span>{t('common.learnMore', 'Learn More')}</span>
-      </Link>
+        <Link
+          to={`/services/${service.category}/${service.slug}`}
+          id={`btn-explore-${service.slug}`}
+          className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-violet-700 hover:text-violet-900 transition-colors group/link"
+        >
+          <span>{t('common.learnMore', 'Learn More')}</span>
+          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5" />
+        </Link>
+      </div>
     </motion.div>
   )
 }
-
