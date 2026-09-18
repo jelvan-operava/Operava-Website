@@ -13,6 +13,7 @@ import {
   resolveSecret,
   isProductionRuntime,
   issueSignedDraft,
+  senderFor,
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
@@ -83,7 +84,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       lastSentAt: now,
     })
 
-    // Optional D1 rate-limit / audit (signed draft is primary)
     if (env.SUBMISSIONS_DB) {
       try {
         await ensureTables(env.SUBMISSIONS_DB)
@@ -113,14 +113,15 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     try {
       await sendResend(env, {
-        from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
+        from: senderFor(formType, env),
         to: [email],
         subject: 'Verification Code',
         html: otpEmailHtml(name, purposeLabel(formType), code),
         text: otpEmailText(name, purposeLabel(formType), code),
       })
     } catch (mailErr) {
-      console.error('OTP email send failed', mailErr instanceof Error ? mailErr.message : 'unknown')
+      const msg = mailErr instanceof Error ? mailErr.message : 'unknown'
+      console.error('OTP email send failed', msg)
       return json(
         {
           error:

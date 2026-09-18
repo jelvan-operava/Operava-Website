@@ -9,6 +9,7 @@ import {
   resolveSecret,
   issueSignedDraft,
   readSignedDraft,
+  senderFor,
   type FormEnv,
 } from '../../lib/formCore'
 
@@ -42,7 +43,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       payloadObj = {}
     }
 
-    // New code invalidates the previous draft (client must use new draftId)
     const code = generateOtp()
     const codeHash = await hashOtp(secret, code)
     const expiresAt = now + 10 * 60 * 1000
@@ -59,7 +59,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     try {
       await sendResend(env, {
-        from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
+        from: senderFor(signed.formType, env),
         to: [signed.email],
         subject: 'Verification Code',
         html: otpEmailHtml(payloadObj.name || 'there', purposeLabel(signed.formType), code),

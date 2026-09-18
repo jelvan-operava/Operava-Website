@@ -9,6 +9,8 @@ import {
   resolveSecret,
   readSignedDraft,
   staffNotificationEmail,
+  senderFor,
+  extractPlainEmail,
   type FormEnv,
 } from '../../lib/formCore'
 
@@ -77,7 +79,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       payload = {}
     }
     const name = String(payload.name || '')
-    const email = signed.email
+    const email = extractPlainEmail(signed.email)
     const formType = signed.formType
     const referenceId = makeReference(formType)
     const nowIso = new Date().toISOString()
@@ -128,7 +130,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
         referenceId +
         '.\n\nYour service inquiry will be reviewed by the appropriate OPERAVA team.\n\nRegards,\nClient Support Team\nOPERAVA Global Solutions\n\nwww.operavaglobal.com'
 
-    // Staff inbox: CAREERS → talents@ ; SERVICES/CONTACT → hello@
     const staffInbox = isCareer
       ? env.TALENT_INBOX || 'talents@operavaglobal.com'
       : env.CLIENT_INBOX || 'hello@operavaglobal.com'
@@ -158,11 +159,11 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       ' directly.\n'
 
     let emailWarning: string | undefined
+    const from = senderFor(formType, env)
 
-    // 1) Customer / applicant confirmation — FROM noreply only, NO reply_to
     try {
       await sendResend(env, {
-        from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
+        from,
         to: [email],
         subject,
         html,
@@ -173,12 +174,10 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       emailWarning = 'Submission recorded; confirmation email could not be delivered right now.'
     }
 
-    // 2) Staff notification — TO talents@ or hello@, reply_to = applicant/customer
-    //    so Reply opens a thread to the recipient, not noreply.
     try {
       if (staffInbox.toLowerCase() !== email.toLowerCase()) {
         await sendResend(env, {
-          from: env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>',
+          from,
           to: [staffInbox],
           reply_to: email,
           subject: staffSubject,
@@ -188,7 +187,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       }
     } catch (staffErr) {
       console.error('staff notification failed', staffErr instanceof Error ? staffErr.message : 'unknown')
-      // Do not fail verification if only staff mail fails
     }
 
     return json({
