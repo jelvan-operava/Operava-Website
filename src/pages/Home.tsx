@@ -55,16 +55,28 @@ function filterTalent(services: Service[]): Service[] {
   return matched.length >= 3 ? matched : services.slice(0, 8)
 }
 
+/** Single-line section titles: fluid size that fits the viewport width */
+const SECTION_TITLE =
+  'reveal whitespace-nowrap font-bold text-gray-900 tracking-tight leading-none ' +
+  'text-[clamp(1.05rem,3.6vw,2.35rem)]'
+
+const SECTION_TITLE_WHITE =
+  'reveal whitespace-nowrap font-bold tracking-tight leading-none text-white ' +
+  'text-[clamp(1.05rem,3.6vw,2.35rem)]'
+
+const EYEBROW =
+  'text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-2 sm:mb-3'
+
 const SECTION_META: Record<
   CarouselServiceId,
   { eyebrow: string; title: string; desc: string; cta: string; href: string }
 > = {
   automation: {
     eyebrow: 'OPERAVA / AUTOMATION',
-    title: 'Business automation that reduces repetitive work and keeps operations moving.',
+    title: 'Automation that keeps operations moving.',
     desc: 'Business automation that reduces repetitive work, connects systems, and keeps operations moving with less manual intervention.',
-    cta: 'View all technology services',
-    href: '/services/it',
+    cta: 'View all automation services',
+    href: '/services/automation',
   },
   it: {
     eyebrow: 'OPERAVA / INFORMATION TECHNOLOGY',
@@ -75,14 +87,14 @@ const SECTION_META: Record<
   },
   workforce: {
     eyebrow: 'OPERAVA / OUTSOURCING & OFFSHORING',
-    title: 'Outsourcing and offshoring that extend your operational capacity.',
+    title: 'Outsourcing that extends operational capacity.',
     desc: 'Flexible outsourcing and offshoring solutions across customer support, back-office, administration and business operations — built for accuracy, speed and scale.',
     cta: 'View all outsourcing services',
     href: '/services/bpo',
   },
   talent: {
     eyebrow: 'OPERAVA / TALENT SOLUTIONS',
-    title: 'Global talent, sourced and matched to your requirements.',
+    title: 'Global talent matched to your requirements.',
     desc: 'Talent solutions connecting businesses with skilled professionals through sourcing, screening, matching, onboarding and workforce administration.',
     cta: 'Explore careers & talent',
     href: '/careers',
@@ -158,7 +170,6 @@ export default function Home() {
 
         <ServicesCarousel3D onActiveChange={setActiveCategory} />
 
-        {/* Tightly connected under carousel — minimal top padding, especially mobile */}
         <section
           ref={detailRef}
           id="service-details"
@@ -167,13 +178,9 @@ export default function Home() {
         >
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 sm:gap-5 mb-8 lg:mb-10">
-              <div className="max-w-2xl">
-                <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-2 sm:mb-3">
-                  {meta.eyebrow}
-                </p>
-                <h2 className="reveal text-2xl sm:text-3xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-tight">
-                  {meta.title}
-                </h2>
+              <div className="min-w-0 max-w-3xl">
+                <p className={EYEBROW}>{meta.eyebrow}</p>
+                <h2 className={SECTION_TITLE}>{meta.title}</h2>
                 <p className="reveal reveal-delay-1 text-sm sm:text-base text-gray-500 mt-3 sm:mt-4 leading-relaxed">
                   {meta.desc}
                 </p>
@@ -201,15 +208,27 @@ export default function Home() {
 
         <section ref={modelRef} className="py-20 lg:py-28 bg-gray-950 text-white overflow-hidden relative">
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 relative z-10">
-            <div className="max-w-2xl mb-14">
-              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight text-white">{t('model.title', 'The OPERAVA Operating Model')}</h2>
-              <p className="reveal reveal-delay-1 text-sm text-gray-400 mt-2">{t('model.subtitle', 'A structured, agile methodology designed for seamless transition and rapid scaling.')}</p>
+            <div className="mb-14 min-w-0">
+              <h2 className={SECTION_TITLE_WHITE}>
+                {t('model.title', 'The OPERAVA Operating Model')}
+              </h2>
+              <p className="reveal reveal-delay-1 text-sm text-gray-400 mt-3">
+                {t('model.subtitle', 'A structured, agile methodology designed for seamless transition and rapid scaling.')}
+              </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {operatingModelSteps.map((step, i) => (
-                <div key={step.step} style={{ animationDelay: `${(i % 3) * 0.4}s` }} className={`reveal reveal-delay-${Math.min(i + 1, 5)} group relative bg-transparent flex items-center justify-center`}>
+                <div
+                  key={step.step}
+                  style={{ animationDelay: `${(i % 3) * 0.4}s` }}
+                  className={`reveal reveal-delay-${Math.min(i + 1, 5)} group relative bg-transparent flex items-center justify-center`}
+                >
                   <div className="relative w-full overflow-hidden bg-transparent">
-                    <img src={step.imageSrc} alt={`${step.step} - ${step.label}: ${step.desc}`} className="w-full h-auto object-contain pointer-events-none select-none transition-transform duration-300 group-hover:scale-105" />
+                    <img
+                      src={step.imageSrc}
+                      alt={`${step.step} - ${step.label}: ${step.desc}`}
+                      className="w-full h-auto object-contain pointer-events-none select-none transition-transform duration-300 group-hover:scale-105"
+                    />
                   </div>
                 </div>
               ))}
@@ -219,13 +238,20 @@ export default function Home() {
 
         <section ref={industriesRef} className="py-20 lg:py-28 bg-white relative">
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
-            <div className="max-w-2xl mb-12">
-              <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('industries.title', 'Specialized Solutions Across Global Industries')}</h2>
-              <p className="reveal reveal-delay-1 text-base text-gray-500 mt-3">{t('industries.subtitle', 'Tailored technology and operations delivery for the industries that define modern business.')}</p>
+            <div className="mb-12 min-w-0">
+              <h2 className={SECTION_TITLE}>
+                {t('industries.title', 'Solutions Across Global Industries')}
+              </h2>
+              <p className="reveal reveal-delay-1 text-base text-gray-500 mt-3">
+                {t('industries.subtitle', 'Tailored technology and operations delivery for the industries that define modern business.')}
+              </p>
             </div>
             <div className="reveal reveal-delay-2 flex flex-wrap gap-3">
               {industries.map((name) => (
-                <span key={name} className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-full hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 cursor-default">
+                <span
+                  key={name}
+                  className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-full hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 cursor-default"
+                >
                   {name}
                 </span>
               ))}
