@@ -179,29 +179,30 @@ export default function Home() {
 
         <ServicesCarousel3D onActiveChange={setActiveCategory} />
 
+        {/* Tightly connected under carousel — minimal top padding, especially mobile */}
         <section
           ref={detailRef}
           id="service-details"
-          className="py-20 lg:py-28 bg-white relative scroll-mt-20"
+          className="pt-4 pb-14 sm:pt-6 sm:pb-16 lg:pt-8 lg:pb-20 bg-white relative scroll-mt-16"
           key={activeCategory}
         >
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12 lg:mb-14">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 sm:gap-5 mb-8 lg:mb-10">
               <div className="max-w-2xl">
-                <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-3">
+                <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-2 sm:mb-3">
                   {meta.eyebrow}
                 </p>
-                <h2 className="reveal text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-tight">
+                <h2 className="reveal text-2xl sm:text-3xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-tight">
                   {meta.title}
                 </h2>
-                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">
+                <p className="reveal reveal-delay-1 text-sm sm:text-base text-gray-500 mt-3 sm:mt-4 leading-relaxed">
                   {meta.desc}
                 </p>
               </div>
               <div className="reveal reveal-delay-3 shrink-0">
                 <Link
                   to={meta.href}
-                  className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                  className="group inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   <span>{meta.cta}</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -209,7 +210,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
               {detailServices.slice(0, 8).map((s, i) => (
                 <ServiceCard key={`${activeCategory}-${s.id}`} service={getLocalizedService(s, language)} index={i} />
               ))}
