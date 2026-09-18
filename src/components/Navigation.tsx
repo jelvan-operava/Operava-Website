@@ -27,13 +27,13 @@ export default function Navigation() {
           description: t('nav.services.it.desc', 'Software, cloud, infrastructure & data'),
         },
         {
-          label: t('nav.services.bpo', 'Business Process Outsourcing'),
+          label: t('nav.services.bpo', 'Outsourcing / Offshoring'),
           href: '/services/bpo',
           description: t('nav.services.bpo.desc', 'Customer ops, back-office & workforce'),
         },
       ],
     },
-    { label: t('section.services.badge', 'Capabilities'), href: '/#capabilities' },
+    { label: t('section.services.badge', 'Capabilities'), href: '/#services' },
     { label: t('nav.industries', 'Industries'), href: '/industries' },
     { label: t('nav.about', 'About'), href: '/about' },
     { label: t('nav.careers', 'Careers'), href: '/careers' },
@@ -96,7 +96,6 @@ export default function Navigation() {
     >
       <nav className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 flex items-center justify-between h-16 lg:h-18 bg-white">
         <Link to="/" className="flex items-center shrink-0 group" aria-label="OPERAVA Global Solutions — Home">
-          {/* Expanded on mobile; photo indigo via .operava-text; lightWave kept */}
           <span className="operava-text text-2xl sm:text-2xl md:text-3xl font-black tracking-tight select-none transition-transform duration-200 group-hover:scale-[1.03]">
             OPERAVA
           </span>
