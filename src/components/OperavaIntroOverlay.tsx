@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 
 /** Cache-busted URLs — bump ASSET_V when replacing Cloudinary files at the same public_id */
-const ASSET_V = '20260918a'
+const ASSET_V = '20260918b'
 
 const MOBILE_SRC =
   `https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789682664/Intro-mobile-overlay.webp?v=${ASSET_V}`
@@ -12,10 +12,10 @@ const DESKTOP_SRC =
 const BREAKPOINT_PX = 768
 const MANDATORY_MS = 8000
 const FADE_MS = 480
-/** Slower, premium card flip (careers-inspired but fuller) */
+/** Slower, premium card flip */
 const FLIP_MS = 1400
-/** White back dissolves to reveal live home */
-const REVEAL_MS = 560
+/** Card fully clears so live home is fully interactive */
+const REVEAL_MS = 420
 
 function isMobileViewport() {
   if (typeof window === 'undefined') return false
@@ -24,7 +24,9 @@ function isMobileViewport() {
 
 /**
  * Fixed OPERAVA GLOBAL SOLUTIONS introduction overlay.
- * On X: slow 3D card flip → white card back → dissolve into home.
+ * Front = intro WEBP (Cloudinary).
+ * On X: 3D card flip — back face is transparent so the live homepage
+ * (already rendered under the overlay) is what you see on the reverse.
  * One-way only; refresh required to see intro again.
  */
 export default function OperavaIntroOverlay() {
@@ -60,10 +62,10 @@ export default function OperavaIntroOverlay() {
     if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
     if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
 
-    // Phase 1: rotate to white back of the card
+    // Phase 1: rotate — back face is transparent so live home shows on the reverse
     flipDoneRef.current = setTimeout(() => {
       setRevealing(true)
-      // Phase 2: white face dissolves — home appears from “behind” the card
+      // Phase 2: remove overlay completely
       revealDoneRef.current = setTimeout(() => {
         finishClose()
       }, REVEAL_MS)
@@ -207,9 +209,12 @@ export default function OperavaIntroOverlay() {
         pointerEvents: busy ? 'none' : 'auto',
         perspective: '1800px',
         WebkitPerspective: '1800px',
-        // Soft white stage under the card so edges never flash the page mid-flip
-        backgroundColor: revealing ? 'transparent' : '#FFFFFF',
-        transition: `background-color ${REVEAL_MS}ms ease`,
+        // Opaque white only while intro is showing; transparent during flip
+        // so the live homepage (under the overlay) is the "back" of the card
+        backgroundColor: flipping || revealing ? 'transparent' : '#FFFFFF',
+        transition: flipping
+          ? `background-color ${Math.round(FLIP_MS * 0.35)}ms ease`
+          : `background-color ${REVEAL_MS}ms ease`,
       }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -226,11 +231,11 @@ export default function OperavaIntroOverlay() {
           transition: flipping
             ? `transform ${FLIP_MS}ms cubic-bezier(0.45, 0.05, 0.2, 1)`
             : `transform ${FADE_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${FADE_MS}ms ease`,
-          opacity: entered ? 1 : 0,
+          opacity: revealing ? 0 : entered ? 1 : 0,
           willChange: 'transform, opacity',
         }}
       >
-        {/* FRONT — intro WEBP */}
+        {/* FRONT — intro WEBP (Cloudinary) only */}
         <div
           className="absolute inset-0 overflow-hidden bg-white"
           style={{
@@ -315,20 +320,28 @@ export default function OperavaIntroOverlay() {
           )}
         </div>
 
-        {/* BACK — solid white card face (site emerges from here) */}
+        {/*
+          BACK — transparent face (not the intro image).
+          When the card rotates 180°, this face is toward the user and is
+          fully transparent, so the live homepage rendered under the overlay
+          is what appears on the reverse of the flip.
+        */}
         <div
-          className="absolute inset-0 bg-white"
+          className="absolute inset-0"
           aria-hidden
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             transform: 'rotateY(180deg) translateZ(1px)',
+            // No fill — home shows through
+            backgroundColor: 'transparent',
             opacity: revealing ? 0 : 1,
             transition: revealing
               ? `opacity ${REVEAL_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
               : 'none',
+            // Soft depth only while flipping; no solid white plate
             boxShadow: flipping
-              ? '0 25px 80px rgba(0,0,0,0.12)'
+              ? '0 25px 80px rgba(0,0,0,0.10)'
               : 'none',
           }}
         />
