@@ -14,6 +14,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import ITServices from './pages/ITServices'
 import BPOServices from './pages/BPOServices'
+import AutomationServices from './pages/AutomationServices'
 import ServiceDetail from './pages/ServiceDetail'
 import Industries from './pages/Industries'
 import Careers from './pages/Careers'
@@ -111,6 +112,7 @@ function Layout() {
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
+              <Route path="/services/automation" element={<AutomationServices />} />
               <Route path="/services/it" element={<ITServices />} />
               <Route path="/services/bpo" element={<BPOServices />} />
               <Route path="/services/it/:slug" element={<ServiceDetail />} />
