@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight } from 'lucide-react'
 import type { Service } from '../data/services'
+import { automationServices } from '../data/automationServices'
 import { useLanguage } from '../i18n/LanguageContext'
 import ServiceAnimatedIcon from './ServiceAnimatedIcon'
 
@@ -16,6 +17,8 @@ interface ServiceCardProps {
 
 const GRADIENT = 'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)'
 
+const automationSlugSet = new Set(automationServices.map((s) => s.slug))
+
 export default function ServiceCard({
   service,
   index = 0,
@@ -25,6 +28,15 @@ export default function ServiceCard({
 }: ServiceCardProps) {
   const { t } = useLanguage()
   const [imgError, setImgError] = useState(false)
+  const isAutomation = automationSlugSet.has(service.slug)
+  const href = isAutomation
+    ? `/services/automation/${service.slug}`
+    : `/services/${service.category}/${service.slug}`
+  const categoryLabel = isAutomation
+    ? 'Automation'
+    : service.category === 'bpo'
+      ? 'Outsourcing'
+      : 'Technology'
 
   return (
     <motion.div
@@ -35,14 +47,12 @@ export default function ServiceCard({
       id={`service-card-${service.slug}`}
       className={`group relative flex flex-col w-full h-full rounded-2xl bg-white border border-[#E8E8EC] overflow-hidden transition-all duration-300 hover:border-violet-200 hover:shadow-[0_20px_40px_rgba(15,15,30,0.08)] ${className}`}
     >
-      {/* Subtle top gradient edge on hover */}
       <div
         className="h-[2px] w-full shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: GRADIENT }}
         aria-hidden
       />
 
-      {/* Image / icon area */}
       <div className="relative w-full aspect-[16/10] bg-gradient-to-b from-[#FAFAFC] to-white flex items-center justify-center overflow-hidden">
         {service.image && !imgError ? (
           <img
@@ -68,7 +78,6 @@ export default function ServiceCard({
         )}
       </div>
 
-      {/* Body */}
       <div className="relative flex flex-col flex-1 px-5 pb-5 pt-1">
         <div className="flex items-center gap-2 mb-2">
           <span
@@ -83,7 +92,7 @@ export default function ServiceCard({
             {service.number}
           </span>
           <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">
-            {service.category === 'bpo' ? 'Outsourcing' : 'Technology'}
+            {categoryLabel}
           </span>
         </div>
 
@@ -109,7 +118,7 @@ export default function ServiceCard({
         )}
 
         <Link
-          to={`/services/${service.category}/${service.slug}`}
+          to={href}
           id={`btn-explore-${service.slug}`}
           className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-violet-700 hover:text-violet-900 transition-colors group/link"
         >
