@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import { itServices, bpoServices } from '../data/services'
+import { itServices, bpoServices, type Service } from '../data/services'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getLocalizedService } from '../i18n/translations/services'
 import ServiceCard from '../components/ServiceCard'
@@ -9,7 +9,7 @@ import DraggableMarquee from '../components/DraggableMarquee'
 import HomeMediaLoader from '../components/HomeMediaLoader'
 import ToolsEcosystemMarquee from '../components/ToolsEcosystemMarquee'
 import OperavaCover from '../components/OperavaCover'
-import ServicesCarousel3D from '../components/ServicesCarousel3D'
+import ServicesCarousel3D, { type CarouselServiceId } from '../components/ServicesCarousel3D'
 
 function useIntersection(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
@@ -45,16 +45,81 @@ const industries = [
   'Enterprise',
 ]
 
+const AUTOMATION_IT_IDS = new Set([
+  'software-development',
+  'saas-platform-development',
+  'it-systems-development',
+  'computer-programming',
+  'it-consulting',
+  'systems-integration',
+  'database-services',
+  'cloud-digital-infrastructure',
+])
+
+const TALENT_KEYWORDS = /recruit|talent|hr |human|onboard|staffing|sourcing|matching|admin|virtual assist/i
+
+function filterAutomation(services: Service[]): Service[] {
+  const matched = services.filter(
+    (s) =>
+      AUTOMATION_IT_IDS.has(s.id) ||
+      /automat|workflow|integrat|system|program|saas|api|cloud/i.test(
+        s.name + ' ' + s.shortDescription,
+      ),
+  )
+  return matched.length >= 4 ? matched : services.slice(0, 8)
+}
+
+function filterTalent(services: Service[]): Service[] {
+  const matched = services.filter((s) =>
+    TALENT_KEYWORDS.test(s.name + ' ' + s.shortDescription + ' ' + (s.capabilities || []).join(' ')),
+  )
+  return matched.length >= 3 ? matched : services.slice(0, 8)
+}
+
+const SECTION_META: Record<
+  CarouselServiceId,
+  { eyebrow: string; title: string; desc: string; cta: string; href: string }
+> = {
+  automation: {
+    eyebrow: 'OPERAVA / AUTOMATION',
+    title: 'Automation services that connect workflows, systems and people.',
+    desc: 'From AI and RPA to approvals, integrations and workflow platforms — automation solutions built to reduce repetitive work and scale operations.',
+    cta: 'View all technology services',
+    href: '/services/it',
+  },
+  it: {
+    eyebrow: 'OPERAVA / INFORMATION TECHNOLOGY',
+    title: 'Technology and digital systems, connected.',
+    desc: 'Software, cloud, infrastructure and IT services that help organizations build digital products, modernize systems and operate securely at scale.',
+    cta: 'View all IT services',
+    href: '/services/it',
+  },
+  workforce: {
+    eyebrow: 'OPERAVA / OUTSOURCING & OFFSHORING',
+    title: 'Outsourcing and offshoring that extend your operational capacity.',
+    desc: 'Flexible outsourcing and offshoring solutions across customer support, back-office, administration and business operations — built for accuracy, speed and scale.',
+    cta: 'View all outsourcing services',
+    href: '/services/bpo',
+  },
+  talent: {
+    eyebrow: 'OPERAVA / TALENT SOLUTIONS',
+    title: 'Global talent, sourced and matched to your requirements.',
+    desc: 'Talent solutions connecting businesses with skilled professionals through sourcing, screening, matching, onboarding and workforce administration.',
+    cta: 'Explore careers & talent',
+    href: '/careers',
+  },
+}
+
 export default function Home() {
   const { t, language } = useLanguage()
 
-  const itRef = useIntersection()
-  const bpoRef = useIntersection()
+  const detailRef = useIntersection()
   const modelRef = useIntersection()
   const industriesRef = useIntersection()
   const signatureRef = useIntersection()
 
   const [isHomeReady, setIsHomeReady] = useState(false)
+  const [activeCategory, setActiveCategory] = useState<CarouselServiceId>('automation')
 
   const operatingModelSteps = [
     {
@@ -95,6 +160,15 @@ export default function Home() {
     },
   ]
 
+  const detailServices = useMemo(() => {
+    if (activeCategory === 'automation') return filterAutomation(itServices)
+    if (activeCategory === 'it') return itServices
+    if (activeCategory === 'workforce') return bpoServices
+    return filterTalent(bpoServices)
+  }, [activeCategory])
+
+  const meta = SECTION_META[activeCategory]
+
   return (
     <>
       <HomeMediaLoader onLoadingComplete={() => setIsHomeReady(true)} />
@@ -103,48 +177,41 @@ export default function Home() {
           <OperavaCover />
         </section>
 
-        {/* Standalone 3D services showcase */}
-        <ServicesCarousel3D />
+        <ServicesCarousel3D onActiveChange={setActiveCategory} />
 
-        <section ref={itRef} className="py-20 lg:py-28 bg-white relative">
+        <section
+          ref={detailRef}
+          id="service-details"
+          className="py-20 lg:py-28 bg-white relative scroll-mt-20"
+          key={activeCategory}
+        >
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12 lg:mb-14">
               <div className="max-w-2xl">
-                <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('section.it.title', 'Technology and operations, connected.')}</h2>
-                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.it.desc', 'Technology solutions that help organizations build digital products, modernize infrastructure, connect systems and operate securely at scale.')}</p>
+                <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-3">
+                  {meta.eyebrow}
+                </p>
+                <h2 className="reveal text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-tight">
+                  {meta.title}
+                </h2>
+                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">
+                  {meta.desc}
+                </p>
               </div>
               <div className="reveal reveal-delay-3 shrink-0">
-                <Link to="/services/it" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                  <span>View all IT services</span>
+                <Link
+                  to={meta.href}
+                  className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                >
+                  <span>{meta.cta}</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
-              {itServices.slice(0, 8).map((s, i) => (
-                <ServiceCard key={s.id} service={getLocalizedService(s, language)} index={i} />
-              ))}
-            </div>
-          </div>
-        </section>
 
-        <section ref={bpoRef} className="py-20 lg:py-28 bg-white relative">
-          <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
-              <div className="max-w-2xl">
-                <h2 className="reveal text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">{t('section.bpo.title', 'Extend your capabilities. Scale your operations.')}</h2>
-                <p className="reveal reveal-delay-1 text-base text-gray-500 mt-4 leading-relaxed">{t('section.bpo.desc', 'Flexible business process services that help organizations extend their capacity and accelerate growth.')}</p>
-              </div>
-              <div className="reveal reveal-delay-3 shrink-0">
-                <Link to="/services/bpo" className="group inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                  <span>View all BPO services</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
-              {bpoServices.slice(0, 8).map((s, i) => (
-                <ServiceCard key={s.id} service={getLocalizedService(s, language)} index={i} />
+              {detailServices.slice(0, 8).map((s, i) => (
+                <ServiceCard key={`${activeCategory}-${s.id}`} service={getLocalizedService(s, language)} index={i} />
               ))}
             </div>
           </div>
