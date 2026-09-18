@@ -357,10 +357,10 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
             aria-hidden
             className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl opacity-35"
             style={{
-              width: mobile ? 260 : 480,
-              height: mobile ? 260 : 480,
+              width: mobile ? 280 : 520,
+              height: mobile ? 280 : 520,
               background:
-                'radial-gradient(circle, rgba(196,77,255,0.28) 0%, rgba(59,107,255,0.14) 45%, transparent 70%)',
+                'radial-gradient(circle, rgba(255,139,74,0.18) 0%, rgba(255,77,184,0.22) 25%, rgba(196,77,255,0.28) 45%, rgba(59,107,255,0.14) 65%, transparent 78%)',
             }}
           />
 
@@ -403,32 +403,50 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                 }}
               >
                 <div
-                  className="h-full w-full rounded-2xl bg-white border border-[#E8E8EC] flex flex-col text-left overflow-hidden"
+                  className="h-full w-full rounded-2xl flex flex-col text-left overflow-hidden relative"
                   style={{
+                    border: isActive
+                      ? '1.5px solid transparent'
+                      : '1px solid #E8E8EC',
+                    background: isActive
+                      ? 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF) border-box'
+                      : '#ffffff',
+                    backgroundOrigin: isActive ? 'border-box' : undefined,
+                    backgroundClip: isActive ? 'padding-box, border-box' : undefined,
                     boxShadow: isActive
-                      ? '0 32px 72px rgba(15,15,30,0.12), 0 0 0 1px rgba(255,255,255,0.85)'
+                      ? '0 28px 64px rgba(109, 40, 217, 0.18), 0 12px 28px rgba(59, 107, 255, 0.10), 0 0 0 1px rgba(196, 77, 255, 0.12)'
                       : '0 14px 32px rgba(15,15,30,0.07)',
-                    backgroundImage: isActive
-                      ? 'linear-gradient(180deg, #ffffff 0%, #faf9ff 100%)'
-                      : undefined,
+                    transition:
+                      'box-shadow 780ms cubic-bezier(0.22, 1, 0.36, 1), border-color 780ms ease, background 780ms ease',
                   }}
                 >
                   <div
-                    className="h-[2.5px] w-full shrink-0"
+                    className="h-[3px] w-full shrink-0"
                     style={{
                       background: isActive
                         ? 'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)'
                         : 'transparent',
                       opacity: isActive ? 1 : 0,
+                      transition: 'opacity 500ms ease',
                     }}
                   />
-                  <div className="p-5 sm:p-6 lg:p-7 flex flex-col h-full">
+                  {isActive && (
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0"
+                      style={{
+                        background:
+                          'radial-gradient(ellipse 90% 70% at 50% 0%, rgba(196,77,255,0.08) 0%, rgba(59,107,255,0.04) 40%, transparent 70%)',
+                      }}
+                    />
+                  )}
+                  <div className="relative p-5 sm:p-6 lg:p-7 flex flex-col h-full">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                       <span
                         className="text-xs font-bold tracking-wider"
                         style={{
                           backgroundImage: isActive
-                            ? 'linear-gradient(90deg, #FF8B4A, #C44DFF, #3B6BFF)'
+                            ? 'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)'
                             : undefined,
                           WebkitBackgroundClip: isActive ? 'text' : undefined,
                           backgroundClip: isActive ? 'text' : undefined,
@@ -441,22 +459,33 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                         className="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full"
                         style={{
                           background: isActive
-                            ? 'linear-gradient(135deg, rgba(255,139,74,0.12), rgba(196,77,255,0.12), rgba(59,107,255,0.12))'
+                            ? 'linear-gradient(135deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)'
                             : '#F3F4F6',
+                          boxShadow: isActive
+                            ? '0 4px 14px rgba(109, 40, 217, 0.35)'
+                            : 'none',
                         }}
                       >
                         <Icon
                           className="w-4 h-4 sm:w-[18px] sm:h-[18px]"
-                          style={{ color: isActive ? '#6D28D9' : '#6B7280' }}
+                          style={{ color: isActive ? '#ffffff' : '#6B7280' }}
                           strokeWidth={1.75}
                         />
                       </span>
                     </div>
 
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 tracking-tight mb-2">
+                    <h3
+                      className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight mb-2"
+                      style={{
+                        color: isActive ? '#1f1235' : '#111827',
+                      }}
+                    >
                       {service.title}
                     </h3>
-                    <p className="text-[13px] sm:text-sm text-gray-500 leading-relaxed mb-3 sm:mb-4 line-clamp-3">
+                    <p
+                      className="text-[13px] sm:text-sm leading-relaxed mb-3 sm:mb-4 line-clamp-3"
+                      style={{ color: isActive ? '#4b3b6b' : '#6B7280' }}
+                    >
                       {service.description}
                     </p>
 
@@ -465,7 +494,8 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                         {service.capabilities.slice(0, mobile ? 6 : 12).map((cap) => (
                           <div
                             key={cap}
-                            className="flex items-start gap-2 text-[11px] sm:text-xs text-gray-600"
+                            className="flex items-start gap-2 text-[11px] sm:text-xs"
+                            style={{ color: '#4b5563' }}
                           >
                             <span
                               className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0"
@@ -483,10 +513,17 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                       <Link
                         to={service.href}
                         onClick={(e) => e.stopPropagation()}
-                        className="mt-4 sm:mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-violet-700 hover:text-violet-900 transition-colors"
+                        className="mt-4 sm:mt-5 inline-flex items-center gap-1.5 text-sm font-semibold transition-all"
+                        style={{
+                          backgroundImage:
+                            'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)',
+                          WebkitBackgroundClip: 'text',
+                          backgroundClip: 'text',
+                          color: 'transparent',
+                        }}
                       >
                         View services
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <ArrowRight className="w-3.5 h-3.5 text-violet-600" />
                       </Link>
                     )}
                     {!isActive && (
