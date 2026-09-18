@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { itServices, bpoServices, type Service } from '../data/services'
+import { automationServices } from '../data/automationServices'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getLocalizedService } from '../i18n/translations/services'
 import ServiceCard from '../components/ServiceCard'
@@ -45,29 +46,7 @@ const industries = [
   'Enterprise',
 ]
 
-const AUTOMATION_IT_IDS = new Set([
-  'software-development',
-  'saas-platform-development',
-  'it-systems-development',
-  'computer-programming',
-  'it-consulting',
-  'systems-integration',
-  'database-services',
-  'cloud-digital-infrastructure',
-])
-
 const TALENT_KEYWORDS = /recruit|talent|hr |human|onboard|staffing|sourcing|matching|admin|virtual assist/i
-
-function filterAutomation(services: Service[]): Service[] {
-  const matched = services.filter(
-    (s) =>
-      AUTOMATION_IT_IDS.has(s.id) ||
-      /automat|workflow|integrat|system|program|saas|api|cloud/i.test(
-        s.name + ' ' + s.shortDescription,
-      ),
-  )
-  return matched.length >= 4 ? matched : services.slice(0, 8)
-}
 
 function filterTalent(services: Service[]): Service[] {
   const matched = services.filter((s) =>
@@ -82,8 +61,8 @@ const SECTION_META: Record<
 > = {
   automation: {
     eyebrow: 'OPERAVA / AUTOMATION',
-    title: 'Automation services that connect workflows, systems and people.',
-    desc: 'From AI and RPA to approvals, integrations and workflow platforms — automation solutions built to reduce repetitive work and scale operations.',
+    title: 'Business automation that reduces repetitive work and keeps operations moving.',
+    desc: 'Business automation that reduces repetitive work, connects systems, and keeps operations moving with less manual intervention.',
     cta: 'View all technology services',
     href: '/services/it',
   },
@@ -161,7 +140,7 @@ export default function Home() {
   ]
 
   const detailServices = useMemo(() => {
-    if (activeCategory === 'automation') return filterAutomation(itServices)
+    if (activeCategory === 'automation') return automationServices
     if (activeCategory === 'it') return itServices
     if (activeCategory === 'workforce') return bpoServices
     return filterTalent(bpoServices)
@@ -211,7 +190,7 @@ export default function Home() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
-              {detailServices.slice(0, 8).map((s, i) => (
+              {detailServices.slice(0, activeCategory === 'automation' ? 14 : 8).map((s, i) => (
                 <ServiceCard key={`${activeCategory}-${s.id}`} service={getLocalizedService(s, language)} index={i} />
               ))}
             </div>
