@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { itServices, bpoServices } from '../data/services'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getLocalizedService } from '../i18n/translations/services'
@@ -9,6 +9,7 @@ import DraggableMarquee from '../components/DraggableMarquee'
 import HomeMediaLoader from '../components/HomeMediaLoader'
 import ToolsEcosystemMarquee from '../components/ToolsEcosystemMarquee'
 import OperavaCover from '../components/OperavaCover'
+import ServicesCarousel3D from '../components/ServicesCarousel3D'
 
 function useIntersection(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
@@ -47,7 +48,6 @@ const industries = [
 export default function Home() {
   const { t, language } = useLanguage()
 
-  const trustRef = useIntersection()
   const itRef = useIntersection()
   const bpoRef = useIntersection()
   const modelRef = useIntersection()
@@ -103,132 +103,8 @@ export default function Home() {
           <OperavaCover />
         </section>
 
-        <section ref={trustRef} id="capabilities" className="py-20 lg:py-28 bg-white scroll-mt-20 relative overflow-hidden">
-          <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 relative z-10">
-            <div className="max-w-3xl mb-16 lg:mb-20">
-              <div className="reveal mb-4 max-w-xl sm:max-w-2xl">
-                <img
-                  src="https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_1200/title_only_gradient_oneline.png"
-                  srcSet="
-                    https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_640/title_only_gradient_oneline.png 640w,
-                    https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_960/title_only_gradient_oneline.png 960w,
-                    https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto,w_1200/title_only_gradient_oneline.png 1200w
-                  "
-                  sizes="(max-width: 640px) 90vw, 672px"
-                  alt="Automation, Technology, Workforce and Talent Solutions"
-                  width={1200}
-                  height={28}
-                  className="w-full h-auto object-contain object-left pointer-events-none select-none"
-                  loading="eager"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <h2 className="reveal reveal-delay-1 text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                Built for the way modern businesses operate.
-              </h2>
-              <p className="reveal reveal-delay-2 text-base sm:text-lg text-gray-600 mt-4 leading-relaxed">
-                OPERAVA bridges enterprise technology, specialized global talent, and high-precision operational processes into a single unified delivery engine.
-              </p>
-            </div>
-
-            <div className="space-y-16 sm:space-y-20 lg:space-y-24">
-              {[
-                {
-                  number: '01',
-                  title: 'Technology & Software Engineering',
-                  desc: 'Digital platforms, custom cloud applications, API networks and IT infrastructure engineered for resilient global scalability.',
-                  features: [
-                    'Custom software, web applications & mobile platforms',
-                    'Cloud architecture & managed hosting (AWS, Azure, GCP)',
-                    'API integrations, microservices & zero-trust security',
-                  ],
-                  imageBase: 'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto',
-                  imageId: 'Technology.png',
-                  link: '/services/it',
-                  cta: 'Explore IT Services',
-                },
-                {
-                  number: '02',
-                  title: 'Global Dedicated Workforce',
-                  desc: 'Skilled remote professionals and managed teams supporting 24/7 global operations with rigorous SLA governance and seamless team integration.',
-                  features: [
-                    'Vetted Tier-1 engineering, technical & operational talent',
-                    '24/7 follow-the-sun timezone coverage & dedicated managers',
-                    'Frictionless scaling with zero onboarding overhead',
-                  ],
-                  imageBase: 'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto',
-                  imageId: 'Workforce.png',
-                  link: '/careers',
-                  cta: 'Explore Workforce Solutions',
-                },
-                {
-                  number: '03',
-                  title: 'End-to-End Business Processes',
-                  desc: 'Reliable outsourced operations designed for measurable accuracy, speed and scale across customer care, back-office, and specialized workflows.',
-                  features: [
-                    '24/7 omnichannel customer care & live chat resolution',
-                    'Audited data processing, verification & accounting pipelines',
-                    'Continuous SLA monitoring with dual-layer quality audits',
-                  ],
-                  imageBase: 'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto',
-                  imageId: 'BPO.png',
-                  link: '/services/bpo',
-                  cta: 'Explore BPO Services',
-                },
-              ].map((item, i) => (
-                <div
-                  key={item.title}
-                  className={`reveal reveal-delay-${(i % 3) + 1} flex flex-col lg:flex-row items-center gap-8 lg:gap-10 xl:gap-12`}
-                >
-                  <div className="w-full lg:w-[40%] flex flex-col justify-center shrink-0">
-                    <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
-                      {item.title}
-                    </h3>
-                    <p className="text-base text-gray-600 leading-relaxed mb-6 font-normal">{item.desc}</p>
-                    <ul className="space-y-2.5 mb-8">
-                      {item.features.map((feat) => (
-                        <li key={feat} className="flex items-start gap-2.5 text-sm text-gray-700">
-                          <CheckCircle2 className="w-4 h-4 text-gray-700 shrink-0 mt-0.5" />
-                          <span>{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div>
-                      <Link
-                        to={item.link}
-                        className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-gray-900 text-white font-semibold text-sm hover:bg-black active:scale-95 transition-all duration-200 group/btn"
-                      >
-                        <span>{item.cta}</span>
-                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1.5 transition-transform" />
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-[60%] flex items-center justify-end">
-                    <img
-                      src={`${item.imageBase},w_960/${item.imageId}`}
-                      srcSet={`
-                        ${item.imageBase},w_480/${item.imageId} 480w,
-                        ${item.imageBase},w_720/${item.imageId} 720w,
-                        ${item.imageBase},w_960/${item.imageId} 960w,
-                        ${item.imageBase},w_1200/${item.imageId} 1200w,
-                        ${item.imageBase},w_1600/${item.imageId} 1600w
-                      `}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 60vw"
-                      alt={item.title}
-                      width={960}
-                      height={696}
-                      className="w-full h-auto object-contain pointer-events-none select-none"
-                      loading="lazy"
-                      decoding="async"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Standalone 3D services showcase */}
+        <ServicesCarousel3D />
 
         <section ref={itRef} className="py-20 lg:py-28 bg-white relative">
           <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
