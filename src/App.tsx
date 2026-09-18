@@ -21,6 +21,8 @@ import Apply from './pages/Apply'
 import Quote from './pages/Quote'
 import Contact from './pages/Contact'
 import Insights from './pages/Insights'
+import InsightCategory from './pages/InsightCategory'
+import InsightArticle from './pages/InsightArticle'
 import Privacy from './pages/Privacy'
 import Terms from './pages/Terms'
 import RefundPolicy from './pages/RefundPolicy'
@@ -121,6 +123,8 @@ function Layout() {
               <Route path="/request-a-quote" element={<Quote />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/insights" element={<Insights />} />
+              <Route path="/insights/:categorySlug" element={<InsightCategory />} />
+              <Route path="/insights/:categorySlug/:articleSlug" element={<InsightArticle />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/refund-policy" element={<RefundPolicy />} />
