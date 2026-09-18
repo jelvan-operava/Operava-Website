@@ -9,12 +9,6 @@ const MOBILE_SRC =
 const DESKTOP_SRC =
   `https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/desktop_intro_overlay.webp?v=${ASSET_V}`
 
-/** Distinct back-side art (not the intro image) — soft brand field */
-const BACK_DESKTOP =
-  `https://res.cloudinary.com/sdaxzncs/image/upload/f_auto,q_auto/v1786240859/Cover%20Photo.png?v=${ASSET_V}`
-const BACK_MOBILE =
-  `https://res.cloudinary.com/sdaxzncs/image/upload/f_auto,q_auto/v1786240859/Cover%20Photo.png?v=${ASSET_V}`
-
 const BREAKPOINT_PX = 768
 const MANDATORY_MS = 8000
 const FADE_MS = 480
@@ -31,9 +25,10 @@ function isMobileViewport() {
 /**
  * Fixed OPERAVA GLOBAL SOLUTIONS introduction overlay.
  * Front = intro WEBP (Cloudinary).
- * Click overlay surface or X → 3D card flip to a distinct branded back face,
- * then natural reveal into the live homepage.
- * Auto-closes (flip) after 8s. One-way only; refresh required to see intro again.
+ * Back = transparent — the live homepage is already rendered under the overlay,
+ * so the flip reveals the real site (same URL, no route change). After the flip
+ * the overlay is removed and the user navigates the homepage in place.
+ * Auto-closes (flip) after 8s; X / surface click also flip. One-way only.
  */
 export default function OperavaIntroOverlay() {
   const [active, setActive] = useState(true)
@@ -43,9 +38,6 @@ export default function OperavaIntroOverlay() {
   const [canClose, setCanClose] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(8)
   const [src, setSrc] = useState(() => (isMobileViewport() ? MOBILE_SRC : DESKTOP_SRC))
-  const [backSrc, setBackSrc] = useState(() =>
-    isMobileViewport() ? BACK_MOBILE : BACK_DESKTOP,
-  )
 
   const scrollYRef = useRef(0)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
@@ -124,6 +116,7 @@ export default function OperavaIntroOverlay() {
           clearInterval(tickIntervalRef.current)
           tickIntervalRef.current = null
         }
+        // Auto-flip into the live homepage after 8s
         if (!autoCloseFiredRef.current) {
           setTimeout(() => {
             if (!autoCloseFiredRef.current) {
@@ -202,9 +195,7 @@ export default function OperavaIntroOverlay() {
     const mq = window.matchMedia(`(max-width: ${BREAKPOINT_PX - 1}px)`)
     const apply = () => {
       const next = mq.matches ? MOBILE_SRC : DESKTOP_SRC
-      const nextBack = mq.matches ? BACK_MOBILE : BACK_DESKTOP
       setSrc((prev) => (prev === next ? prev : next))
-      setBackSrc((prev) => (prev === nextBack ? prev : nextBack))
     }
 
     apply()
@@ -243,6 +234,8 @@ export default function OperavaIntroOverlay() {
         pointerEvents: busy ? 'none' : 'auto',
         perspective: '1800px',
         WebkitPerspective: '1800px',
+        // Opaque white while intro shows; transparent during flip so the
+        // live homepage under the overlay is the "back" of the card
         backgroundColor: flipping || revealing ? 'transparent' : '#FFFFFF',
         transition: flipping
           ? `background-color ${Math.round(FLIP_MS * 0.35)}ms ease`
@@ -356,54 +349,29 @@ export default function OperavaIntroOverlay() {
         </div>
 
         {/*
-          BACK — distinct brand face (not the intro image).
-          Soft cover + gradient veil + OPERAVA mark so the flip feels intentional.
+          BACK — fully transparent face (not another image).
+          Homepage is already mounted under this overlay; when the card
+          rotates 180°, the live site is what appears on the reverse.
+          No navigation / route change — user stays on the same page and
+          can scroll and navigate the homepage immediately after reveal.
         */}
         <div
-          className="absolute inset-0 overflow-hidden"
+          className="absolute inset-0"
           aria-hidden
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             transform: 'rotateY(180deg) translateZ(1px)',
+            backgroundColor: 'transparent',
             opacity: revealing ? 0 : 1,
             transition: revealing
               ? `opacity ${REVEAL_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
               : 'none',
-            boxShadow: flipping ? '0 25px 80px rgba(0,0,0,0.12)' : 'none',
+            boxShadow: flipping
+              ? '0 25px 80px rgba(0,0,0,0.10)'
+              : 'none',
           }}
-        >
-          <img
-            src={backSrc}
-            alt=""
-            className="absolute inset-0 block w-full h-full object-cover object-center pointer-events-none select-none"
-            draggable={false}
-            decoding="async"
-            loading="eager"
-            referrerPolicy="no-referrer"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(145deg, rgba(109,40,217,0.72) 0%, rgba(59,107,255,0.55) 42%, rgba(255,77,184,0.45) 100%)',
-            }}
-          />
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
-            <p
-              className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white select-none"
-              style={{ letterSpacing: '-0.02em' }}
-            >
-              OPERAVA
-            </p>
-            <p className="mt-3 text-sm sm:text-base text-white/90 font-medium max-w-md leading-relaxed">
-              Technology. Workforce. Talent. Automation.
-            </p>
-            <p className="mt-6 text-[11px] sm:text-xs uppercase tracking-[0.22em] text-white/70">
-              Connecting businesses, technology and global talent
-            </p>
-          </div>
-        </div>
+        />
       </div>
     </div>
   )
