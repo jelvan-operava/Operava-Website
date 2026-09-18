@@ -36,9 +36,15 @@ export default function AutomationServices() {
             <h1 className="text-5xl lg:text-6xl font-black text-gray-900 tracking-tight leading-tight mb-6">
               Automation
             </h1>
-            <p className="text-xl text-gray-500 leading-relaxed">
-              Business automation that reduces repetitive work, connects systems, and keeps operations
-              moving with less manual intervention.
+            <p className="text-xl text-gray-500 leading-relaxed mb-4">
+              Operava helps businesses automate repetitive work, connect disconnected systems, organize
+              information, and build reliable digital processes—designed around the client's actual
+              operations, not a fixed software package.
+            </p>
+            <p className="text-base text-gray-500 leading-relaxed">
+              For every automation project we review the current process, identify manual work, map the
+              desired workflow, connect the required systems, build and test the automation, and deliver a
+              process that can be monitored and improved over time.
             </p>
           </div>
         </div>
