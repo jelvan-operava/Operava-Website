@@ -38,7 +38,7 @@ const SERVICES: ServiceCard[] = [
       'Scheduling & Recurring Operations',
       'Custom Automation Solutions',
     ],
-    href: '/services/it',
+    href: '/services/automation',
     Icon: Cog,
   },
   {
@@ -306,9 +306,6 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
       onMouseEnter={pauseAutoplay}
     >
       <div className="w-full max-w-[90rem] mx-auto px-5 sm:px-8 text-center mb-8 sm:mb-10 lg:mb-12">
-        <p className="text-[11px] sm:text-xs font-semibold tracking-[0.22em] uppercase text-gray-400 mb-4">
-          OPERAVA / SERVICES
-        </p>
         <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-gray-900 leading-[1.15] max-w-3xl mx-auto">
           Technology, people and operations —{' '}
           <span
@@ -532,44 +529,65 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                 pauseAutoplay()
                 goTo(i)
               }}
-              className="group flex flex-col items-center gap-1.5 min-w-[72px] sm:min-w-[100px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-lg px-1 py-1"
+              aria-label={`Show ${s.title}`}
               aria-current={isOn ? 'true' : undefined}
-              aria-label={`${s.number} ${s.title}`}
+              className={`px-3.5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 ${
+                isOn
+                  ? 'text-white shadow-md'
+                  : 'text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-gray-800'
+              }`}
+              style={
+                isOn
+                  ? {
+                      background: 'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)',
+                    }
+                  : undefined
+              }
             >
-              <span
-                className="text-[10px] sm:text-xs font-semibold tracking-wide transition-colors"
-                style={{ color: isOn ? '#111827' : '#9CA3AF' }}
-              >
-                <span className="mr-1 opacity-70">{s.number}</span>
-                <span className="hidden sm:inline">{s.title}</span>
-                <span className="sm:hidden">{s.title.split(' ')[0]}</span>
-              </span>
-              <span
-                className="h-[2px] w-full max-w-[64px] sm:max-w-[88px] rounded-full transition-all duration-500"
-                style={{
-                  background: isOn
-                    ? 'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)'
-                    : '#E5E7EB',
-                  opacity: isOn ? 1 : 0.7,
-                }}
-              />
+              {s.title}
             </button>
           )
         })}
       </nav>
 
-      <style>{`
-        @keyframes fadeUpContent {
-          from { opacity: 0; transform: translateY(12px) scale(0.985); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          @keyframes fadeUpContent {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-        }
-      `}</style>
+      <div className="mt-5 flex items-center justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            pauseAutoplay()
+            prev()
+          }}
+          aria-label="Previous service"
+          className="h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-700 transition-colors flex items-center justify-center"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div className="flex items-center gap-1.5" aria-hidden>
+          {SERVICES.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === active ? 'w-6 bg-violet-600' : 'w-1.5 bg-gray-200'
+              }`}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            pauseAutoplay()
+            next()
+          }}
+          aria-label="Next service"
+          className="h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-700 transition-colors flex items-center justify-center"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
     </section>
   )
 }
