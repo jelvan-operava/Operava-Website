@@ -147,6 +147,19 @@ export function extractPlainEmail(value: string): string {
   return raw.toLowerCase()
 }
 
+/** Map known aliases to the verified Resend mailbox. */
+function mapVerifiedMailbox(email: string): string {
+  const e = email.toLowerCase()
+  if (
+    e === 'noreply@operavaglobal.com' ||
+    e === 'notification-noreply@operavaglobal.com' ||
+    e === 'no-reply@operavaglobal.com'
+  ) {
+    return 'notification@operavaglobal.com'
+  }
+  return e
+}
+
 /** Ensure Resend-compatible From: "Name <email@domain>". */
 export function normalizeFromAddress(value: string | undefined | null): string {
   const raw = String(value || '').trim()
@@ -154,11 +167,11 @@ export function normalizeFromAddress(value: string | undefined | null): string {
   const angle = raw.match(/^(.*)<([^>]+)>$/)
   if (angle) {
     const name = angle[1].trim().replace(/["<>]/g, '') || 'OPERAVA'
-    const email = angle[2].trim().toLowerCase()
+    const email = mapVerifiedMailbox(angle[2].trim())
     if (PLAIN_EMAIL_RE.test(email)) return name + ' <' + email + '>'
   }
   if (PLAIN_EMAIL_RE.test(raw.toLowerCase())) {
-    return 'OPERAVA <' + raw.toLowerCase() + '>'
+    return 'OPERAVA <' + mapVerifiedMailbox(raw) + '>'
   }
   return DEFAULT_RESEND_FROM
 }
@@ -257,7 +270,6 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
       DEFAULT_RESEND_FROM,
   )
 
-  // Normalize recipients to plain email strings only
   let to: string[] = []
   if (Array.isArray(payload.to)) {
     to = payload.to.map((v) => extractPlainEmail(String(v))).filter((e) => PLAIN_EMAIL_RE.test(e))
@@ -294,7 +306,6 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
   const raw = await res.text().catch(() => '')
   if (!res.ok) {
     console.error('Resend API error', res.status, raw.slice(0, 400))
-    // Surface pattern / validation failures distinctly for logs
     if (/pattern/i.test(raw)) {
       throw new Error('EMAIL_ADDRESS_PATTERN')
     }
