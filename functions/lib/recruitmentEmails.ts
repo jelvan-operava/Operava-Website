@@ -4,7 +4,7 @@
 
 import {
   escapeHtml,
-  normalizeFromAddress,
+  resolveFromEnv,
   renderEmailTemplate,
   sendResend,
   type FormEnv,
@@ -83,7 +83,7 @@ export async function sendRecruitmentPoolEmails(
   },
 ): Promise<void> {
   const talent = env.TALENT_INBOX || 'talents@operavaglobal.com'
-  const from = normalizeFromAddress(env.RESEND_FROM || 'Operava <noreply@operavaglobal.com>')
+  const from = resolveFromEnv(env)
   const subject =
     'OPERAVA Recruitment Pool — ' + opts.applicationId + ' — ' + opts.name
   const html = recruitmentPoolConfirmationHtml(opts)
