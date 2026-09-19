@@ -54,6 +54,7 @@ export default function Footer() {
 
   const footerCompany = [
     { label: t('nav.about', 'About'), href: '/about' },
+    { label: t('nav.academy', 'Operava Academy'), href: '/academy' },
     { label: t('nav.careers', 'Careers'), href: '/careers' },
     { label: t('nav.insights', 'Insights'), href: '/insights' },
     { label: t('nav.contacts', 'Contacts'), href: '/contacts' },
@@ -94,7 +95,6 @@ export default function Footer() {
 
       <footer className="bg-gray-950 text-white border-t border-white/10">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 pt-16 pb-8">
-          {/* Top: brand + company + legal */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
             <div className="lg:col-span-1">
               <Link to="/" className="inline-flex flex-col leading-none mb-5 group" aria-label="OPERAVA Global Solutions — Home">
@@ -163,7 +163,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Services — 3 categories */}
           <div className="py-12 border-b border-white/10">
             <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-8">
               {t('footer.services', 'Services')}
@@ -192,7 +191,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Mobile Contacts (shown under services on small screens) */}
           <div className="lg:hidden py-8 border-b border-white/10">
             <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-4">Contacts</h3>
             <ul className="space-y-3">
