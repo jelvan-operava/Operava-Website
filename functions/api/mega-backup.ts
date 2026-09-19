@@ -1,13 +1,14 @@
 /**
  * POST /api/mega-backup
- * Pages Function aligned with mega-backup/wrangler Worker API.
- * Uses Pages secrets: MEGA_EMAIL, MEGA_PASSWORD, BACKUP_SHARED_SECRET (optional protect)
+ * Pages Function — JSON or plain-text uploads to OPERAVA MEGA folders.
+ * Secrets: MEGA_EMAIL, MEGA_PASSWORD, BACKUP_SHARED_SECRET / MEGA_BACKUP_SECRET
  */
 
 import { MEGA_FOLDERS } from '../lib/megaFolders'
 import {
   megaCredentialsConfigured,
   uploadJsonToMega,
+  uploadTextToMega,
   type MegaCredentialsEnv,
 } from '../lib/megaUpload'
 
@@ -28,12 +29,7 @@ function authorized(request: Request, env: Env): boolean {
     (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim()) ||
     (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim()) ||
     ''
-  // If no shared secret configured, allow same-project internal use only via direct lib calls.
-  // HTTP endpoint requires a secret when one is set.
-  if (!secret || secret.length < 16) {
-    // Still allow GET health; POST requires secret if none set → reject to avoid open proxy
-    return false
-  }
+  if (!secret || secret.length < 16) return false
   const header = request.headers.get('Authorization') || ''
   return header === 'Bearer ' + secret
 }
@@ -62,6 +58,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     fileName?: string
     kind?: string
     payload?: unknown
+    text?: string
   }
   try {
     body = (await request.json()) as typeof body
@@ -70,6 +67,16 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   try {
+    const text = typeof body.text === 'string' ? body.text : ''
+    if (text) {
+      const result = await uploadTextToMega(env, {
+        folder: body.folder,
+        kind: body.kind,
+        fileName: body.fileName || 'operava_backup.txt',
+        text,
+      })
+      return json(result)
+    }
     const result = await uploadJsonToMega(env, {
       folder: body.folder,
       kind: body.kind,
