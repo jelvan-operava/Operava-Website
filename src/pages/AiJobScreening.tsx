@@ -104,6 +104,7 @@ export default function AiJobScreening() {
   const [emailName, setEmailName] = useState('')
   const [emailValue, setEmailValue] = useState('')
   const [otpCode, setOtpCode] = useState('')
+  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', ''])
   const [draftId, setDraftId] = useState('')
   const [maskedEmail, setMaskedEmail] = useState('')
   const [sessionToken, setSessionToken] = useState('')
@@ -116,6 +117,7 @@ export default function AiJobScreening() {
   const endRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const draftIdRef = useRef('')
+  const otpRefs = useRef<Array<HTMLInputElement | null>>([])
   const cats = useMemo(() => categoryStatus(profile), [profile])
   const doneCount = cats.filter((c) => c.status === 'complete').length
 
@@ -217,6 +219,7 @@ export default function AiJobScreening() {
       setDraftId(nextDraft)
       setMaskedEmail(String(data.maskedEmail || email))
       setOtpCode('')
+      setOtpDigits(['', '', '', '', '', ''])
       setProfile((p) => ({ ...p, name, email }))
       setStage('otp')
     } catch {
@@ -243,7 +246,9 @@ export default function AiJobScreening() {
       setDraftId(nextDraft)
       if (data.maskedEmail) setMaskedEmail(String(data.maskedEmail))
       setOtpCode('')
+      setOtpDigits(['', '', '', '', '', ''])
       setError('')
+      otpRefs.current[0]?.focus()
     } catch {
       setError('Network error. Please try again.')
     } finally {
@@ -251,10 +256,10 @@ export default function AiJobScreening() {
     }
   }
 
-  const verifyOtp = async () => {
+  const verifyOtp = async (forcedCode?: string) => {
     if (busy || !position) return
     setError('')
-    const code = otpCode.replace(/\D/g, '').slice(0, 6)
+    const code = (forcedCode ?? otpDigits.join('') || otpCode).replace(/\D/g, '').slice(0, 6)
     if (code.length !== 6) return setError('Enter the 6-digit code from your email.')
     const currentDraft = draftIdRef.current || draftId
     if (!currentDraft) return setError('Verification session missing. Go back and request a new code.')
@@ -372,7 +377,7 @@ export default function AiJobScreening() {
           setAssessmentQ({ number: data.question?.number || 0, prompt: data.question?.prompt || '' })
           setAssessmentMeta({ total: data.total || 30, correctCount: Number(data.correctCount) || 0 })
           const reply = `Question ${data.question?.number} of ${data.total}:\n${data.question?.prompt || ''}`
-          setMessages((m) => [...m, { id: `a-${Date.now()}`, role: 'assistant', text: reply, time: nowTime() }])
+          setMessages((m) => [...m, { id: `a-${Date.now()}`, role: 'assistant', text, time: nowTime() }])
         }
       } catch {
         setError('Network error.')
@@ -404,7 +409,7 @@ export default function AiJobScreening() {
         if (data?.text) reply = data.text
       }
     } catch { /* local fallback */ }
-    setMessages((m) => [...m, { id: `a-${Date.now()}`, role: 'assistant', text: reply, time: nowTime() }])
+    setMessages((m) => [...m, { id: `a-${Date.now()}`, role: 'assistant', text, time: nowTime() }])
     logMsg('assistant', reply)
     setThinking(false)
   }
@@ -425,7 +430,6 @@ export default function AiJobScreening() {
           <Link to="/apply" className="inline-flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold bg-slate-900 text-white">
             Formal apply <ExternalLink className="w-3.5 h-3.5" />
           </Link>
-          <Link to="/" className="text-xs text-slate-500 px-2">Main site</Link>
         </div>
       </div>
     </header>
@@ -435,23 +439,20 @@ export default function AiJobScreening() {
     return (
       <main className="min-h-screen bg-white flex flex-col">
         {header}
-        <div className="flex-1 max-w-5xl w-full mx-auto px-4 py-10">
-          <p className="text-xs font-semibold uppercase tracking-wider text-violet-600 mb-2">Application entry</p>
-          <h1 className="text-2xl font-bold text-slate-900 mb-3">Select the position you are applying for</h1>
-          <p className="text-sm text-slate-600 mb-8 max-w-2xl">
-            Welcome to OPERAVA Recruitment AVA. Choose one track to begin. You will verify your application email before information is saved.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-4">
+        <div className="flex-1 max-w-3xl mx-auto px-4 py-12 w-full">
+          <h1 className="text-2xl font-bold mb-2">Select a position</h1>
+          <p className="text-sm text-slate-600 mb-8">Choose the role you are applying for to begin email verification with Recruitment AVA.</p>
+          <div className="grid gap-4 sm:grid-cols-1">
             {POSITIONS.map((p) => (
               <button
-                key={p.code}
+                key={p.id}
                 type="button"
                 onClick={() => { setPosition(p); setStage('email'); setError('') }}
-                className="text-left rounded-2xl border border-slate-200 p-5 hover:border-violet-300 hover:shadow-sm transition"
+                className="text-left rounded-2xl border border-slate-200 p-5 hover:border-violet-400 hover:shadow-sm transition"
               >
-                <p className="font-semibold text-slate-900 mb-1">{p.title}</p>
-                <p className="text-xs text-slate-500 mb-3">{(p as { location?: string }).location || 'Remote / Global'}</p>
-                <p className="text-xs text-violet-700 font-semibold">Continue →</p>
+                <p className="text-sm font-bold text-slate-900">{p.title}</p>
+                <p className="text-xs text-slate-500 mt-1">{p.location} · {p.type}</p>
+                <p className="text-sm text-slate-600 mt-2">{p.desc}</p>
               </button>
             ))}
           </div>
@@ -482,23 +483,50 @@ export default function AiJobScreening() {
             </div>
           ) : (
             <div className="space-y-3">
-              <input
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm tracking-widest text-center"
-                placeholder="6-digit code"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                onKeyDown={(e) => { if (e.key === 'Enter') void verifyOtp() }}
-                maxLength={6}
-              />
-              <button type="button" disabled={busy || otpCode.replace(/\D/g, '').length !== 6} onClick={() => void verifyOtp()} className="w-full py-3 rounded-xl bg-violet-700 text-white text-sm font-semibold disabled:opacity-50">
+              <div className="flex justify-center gap-2" role="group" aria-label="Verification code">
+                {otpDigits.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => { otpRefs.current[index] = el }}
+                    inputMode="numeric"
+                    autoComplete={index === 0 ? 'one-time-code' : 'off'}
+                    aria-label={`Digit ${index + 1}`}
+                    maxLength={6}
+                    value={digit}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/\D/g, '')
+                      if (raw.length > 1) {
+                        const pasted = raw.slice(0, 6).split('')
+                        const filled = ['', '', '', '', '', ''].map((_, i) => pasted[i] || '')
+                        setOtpDigits(filled)
+                        setOtpCode(filled.join(''))
+                        if (pasted.length === 6) void verifyOtp(pasted.join(''))
+                        return
+                      }
+                      const copy = [...otpDigits]
+                      copy[index] = raw
+                      setOtpDigits(copy)
+                      setOtpCode(copy.join(''))
+                      if (raw && index < 5) otpRefs.current[index + 1]?.focus()
+                      if (copy.join('').length === 6) void verifyOtp(copy.join(''))
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+                        otpRefs.current[index - 1]?.focus()
+                      }
+                      if (e.key === 'Enter') void verifyOtp()
+                    }}
+                    className="w-11 h-12 text-center text-lg font-bold border border-slate-200 rounded-xl"
+                  />
+                ))}
+              </div>
+              <button type="button" disabled={busy || otpDigits.join('').replace(/\D/g, '').length !== 6} onClick={() => void verifyOtp()} className="w-full py-3 rounded-xl bg-violet-700 text-white text-sm font-semibold disabled:opacity-50">
                 {busy ? 'Verifying…' : 'Verify & continue'}
               </button>
               <button type="button" disabled={busy} onClick={() => void resendOtp()} className="w-full py-2 text-sm font-medium text-violet-700 hover:underline disabled:opacity-50">
                 Resend code
               </button>
-              <button type="button" disabled={busy} onClick={() => { setStage('email'); setOtpCode(''); setError('') }} className="w-full py-1 text-xs text-slate-500 hover:underline">
+              <button type="button" disabled={busy} onClick={() => { setStage('email'); setOtpCode(''); setOtpDigits(['', '', '', '', '', '']); setError('') }} className="w-full py-1 text-xs text-slate-500 hover:underline">
                 Use a different email
               </button>
             </div>
@@ -517,45 +545,37 @@ export default function AiJobScreening() {
           <h1 className="text-xl font-bold mb-3">Assessment complete</h1>
           <p className="text-sm text-slate-700 whitespace-pre-wrap mb-6">{resultMsg}</p>
           <p className="text-xs text-slate-500">Application: {profile.applicationId || '—'} · Status: {appStatus}</p>
-          <Link to="/" className="inline-block mt-6 text-sm font-semibold text-violet-700">Return to main site</Link>
+          <Link to="/" className="inline-block mt-6 text-sm font-semibold text-violet-700">Back to home</Link>
         </div>
       </main>
     )
   }
 
   return (
-    <main className="h-[100dvh] bg-white flex flex-col overflow-hidden">
+    <main className="min-h-screen bg-white flex flex-col">
       {header}
-      <div className="flex-1 flex overflow-hidden max-w-6xl w-full mx-auto">
-        <aside className={`w-full max-w-xs border-r border-slate-200 p-4 overflow-y-auto ${profileOpen ? 'block' : 'hidden'} lg:block`}>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Live profile</p>
-            <button type="button" className="lg:hidden" onClick={() => setProfileOpen(false)}><X className="w-4 h-4" /></button>
+      <div className="flex-1 max-w-5xl mx-auto w-full flex min-h-0">
+        <aside className={`w-72 border-r border-slate-200 p-4 shrink-0 ${profileOpen ? 'fixed inset-0 z-30 bg-white' : 'hidden'} lg:block lg:static`}>
+          <div className="flex items-center justify-between mb-4 lg:hidden">
+            <p className="text-sm font-bold">Profile progress</p>
+            <button type="button" onClick={() => setProfileOpen(false)}><X className="w-4 h-4" /></button>
           </div>
-          <p className="text-sm font-semibold text-slate-900 mb-1">{profile.name || 'Applicant'}</p>
-          <p className="text-xs text-slate-500 mb-1">{profile.email || '—'}</p>
-          <p className="text-[11px] text-violet-700 mb-4">{position?.title}</p>
-          <p className="text-[11px] text-slate-500 mb-2">{doneCount}/6 categories · {appStatus}</p>
-          <ul className="space-y-2 mb-4">
+          <p className="text-xs font-semibold text-slate-500 mb-1">{position?.title}</p>
+          <p className="text-sm font-bold text-slate-900 mb-3">{profile.name || 'Applicant'}</p>
+          <p className="text-xs text-slate-500 mb-4">{doneCount}/6 categories complete</p>
+          <ul className="space-y-2 mb-6">
             {cats.map((c) => (
               <li key={c.label} className="flex items-center gap-2 text-xs">
-                {c.status === 'complete' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Circle className="w-3.5 h-3.5 text-slate-300" />}
+                {c.status === 'complete' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : c.status === 'partial' ? <Circle className="w-3.5 h-3.5 text-amber-500" /> : <Circle className="w-3.5 h-3.5 text-slate-300" />}
                 <span className={c.status === 'complete' ? 'text-slate-800' : 'text-slate-500'}>{c.label}</span>
               </li>
             ))}
           </ul>
-          {profile.skills.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-4">
-              {profile.skills.map((s) => (
-                <span key={s} className="text-[10px] px-2 py-0.5 rounded-full bg-violet-50 text-violet-800">{s}</span>
-              ))}
-            </div>
-          )}
           <div className="space-y-2">
-            <button type="button" disabled={busy} onClick={() => void completeProfile()} className="w-full py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold disabled:opacity-50">
+            <button type="button" disabled={busy || doneCount < 6} onClick={() => void completeProfile()} className="w-full py-2 rounded-lg border border-slate-200 text-xs font-semibold disabled:opacity-50">
               Validate profile
             </button>
-            <button type="button" disabled={busy || appStatus === 'APPLICATION_IN_PROGRESS'} onClick={() => void startAssessment()} className="w-full py-2 rounded-lg bg-violet-700 text-white text-xs font-semibold disabled:opacity-50">
+            <button type="button" disabled={busy || appStatus !== 'PROFILE_COMPLETE'} onClick={() => void startAssessment()} className="w-full py-2 rounded-lg bg-violet-700 text-white text-xs font-semibold disabled:opacity-50">
               Start 30-question assessment
             </button>
           </div>
