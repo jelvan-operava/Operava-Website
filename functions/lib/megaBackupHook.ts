@@ -5,7 +5,12 @@
  * Fallback: HTTP webhook to MEGA_BACKUP_URL (separate Worker or /api/mega-backup).
  */
 
-import { megaCredentialsConfigured, uploadJsonToMega, type MegaCredentialsEnv } from './megaUpload'
+import {
+  megaCredentialsConfigured,
+  uploadJsonToMega,
+  uploadTextToMega,
+  type MegaCredentialsEnv,
+} from './megaUpload'
 import type { MegaFolderName } from './megaFolders'
 
 export interface MegaBackupEnv extends MegaCredentialsEnv {
@@ -36,7 +41,75 @@ export function folderForFormType(formType: string): MegaFolder {
 function safeFilePart(value: string, max = 80): string {
   return String(value || 'item')
     .replace(/[^a-zA-Z0-9._-]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
     .slice(0, max)
+}
+
+/** Title format required: {applicationID_Fullname}.txt */
+export function recruitmentMegaFileName(applicationId: string, fullName: string): string {
+  const id = safeFilePart(applicationId, 64) || 'OPERAVA-APP'
+  const name = safeFilePart(fullName, 80) || 'Applicant'
+  return id + '_' + name + '.txt'
+}
+
+export function formatApplicantAssessmentText(data: {
+  applicationId: string
+  fullName: string
+  email: string
+  phone?: string
+  positionTitle: string
+  positionCode: string
+  education?: string
+  experienceYears?: string
+  experienceSummary?: string
+  skills?: string[]
+  positionSpecific?: string
+  availability?: string
+  startDate?: string
+  additional?: string
+  status: string
+  assessment: {
+    correctCount: number
+    total: number
+    scorePercent: number
+    passed: boolean
+    completedAt: string
+  }
+}): string {
+  const skills = Array.isArray(data.skills) ? data.skills.join(', ') : ''
+  const lines = [
+    'OPERAVA RECRUITMENT AVA — APPLICANT RECORD',
+    '==========================================',
+    '',
+    'Application ID: ' + data.applicationId,
+    'Full name: ' + data.fullName,
+    'Email: ' + data.email,
+    'Phone: ' + (data.phone || '—'),
+    'Position: ' + data.positionTitle,
+    'Position code: ' + data.positionCode,
+    'Status: ' + data.status,
+    '',
+    '--- PROFILE ---',
+    'Education: ' + (data.education || '—'),
+    'Experience years: ' + (data.experienceYears || '—'),
+    'Experience summary: ' + (data.experienceSummary || '—'),
+    'Skills: ' + (skills || '—'),
+    'Position-specific: ' + (data.positionSpecific || '—'),
+    'Availability: ' + (data.availability || '—'),
+    'Start date: ' + (data.startDate || '—'),
+    'Additional: ' + (data.additional || '—'),
+    '',
+    '--- ASSESSMENT ---',
+    'Correct: ' + data.assessment.correctCount + ' / ' + data.assessment.total,
+    'Score: ' + data.assessment.scorePercent + '%',
+    'Passed (26/30 required): ' + (data.assessment.passed ? 'YES' : 'NO'),
+    'Completed at: ' + data.assessment.completedAt,
+    '',
+    'Generated: ' + new Date().toISOString(),
+    'Source: OPERAVA Recruitment AVA',
+  ]
+  return lines.join('\n')
 }
 
 async function postMegaWebhook(
@@ -45,7 +118,8 @@ async function postMegaWebhook(
     folder: MegaFolder
     kind: string
     fileName: string
-    payload: Record<string, unknown>
+    payload?: Record<string, unknown>
+    text?: string
   },
 ): Promise<void> {
   const url = String(env.MEGA_BACKUP_URL || '').trim().replace(/\/$/, '')
@@ -67,6 +141,7 @@ async function postMegaWebhook(
         kind: opts.kind,
         fileName: opts.fileName,
         payload: opts.payload,
+        text: opts.text,
       }),
     })
     if (!res.ok) {
@@ -78,7 +153,7 @@ async function postMegaWebhook(
   }
 }
 
-async function runBackup(
+async function runJsonBackup(
   env: MegaBackupEnv,
   opts: {
     folder: MegaFolder
@@ -88,22 +163,45 @@ async function runBackup(
   },
 ): Promise<void> {
   if (!megaBackupConfigured(env)) return
-
-  // Direct path (Pages secrets MEGA_EMAIL / MEGA_PASSWORD)
   if (megaCredentialsConfigured(env)) {
     try {
       await uploadJsonToMega(env, opts)
       return
     } catch (err) {
       console.error('mega direct upload failed', err instanceof Error ? err.message : 'unknown')
-      // fall through to webhook if configured
     }
   }
-
   await postMegaWebhook(env, opts)
 }
 
-/** Recruitment AVA → OPERAVA APPLICANTS */
+async function runTextBackup(
+  env: MegaBackupEnv,
+  opts: {
+    folder: MegaFolder
+    kind: string
+    fileName: string
+    text: string
+  },
+): Promise<void> {
+  if (!megaBackupConfigured(env)) return
+  if (megaCredentialsConfigured(env)) {
+    try {
+      await uploadTextToMega(env, opts)
+      return
+    } catch (err) {
+      console.error('mega text upload failed', err instanceof Error ? err.message : 'unknown')
+    }
+  }
+  await postMegaWebhook(env, {
+    folder: opts.folder,
+    kind: opts.kind,
+    fileName: opts.fileName,
+    text: opts.text,
+    payload: { text: opts.text },
+  })
+}
+
+/** Early verify snapshot (still used); prefer final assessment .txt for pool. */
 export async function backupApplicantToMega(
   env: MegaBackupEnv,
   payload: {
@@ -115,16 +213,41 @@ export async function backupApplicantToMega(
     emailVerifiedAt?: string
   },
 ): Promise<void> {
-  const fileName = safeFilePart(payload.applicationId) + '_' + Date.now() + '.json'
-  await runBackup(env, {
+  const fileName = recruitmentMegaFileName(payload.applicationId, payload.name)
+  const text = [
+    'OPERAVA RECRUITMENT AVA — EMAIL VERIFIED',
+    'Application ID: ' + payload.applicationId,
+    'Full name: ' + payload.name,
+    'Email: ' + payload.email,
+    'Position: ' + payload.position,
+    'Position code: ' + payload.positionCode,
+    'Email verified at: ' + (payload.emailVerifiedAt || ''),
+    'Generated: ' + new Date().toISOString(),
+  ].join('\n')
+  await runTextBackup(env, {
     folder: 'OPERAVA APPLICANTS',
     kind: 'applicant',
     fileName,
-    payload: { ...payload, source: 'recruitment_ava' },
+    text,
   })
 }
 
-/** Verified website forms → mapped folder */
+/** Final applicant + assessment text file after assessment completes. */
+export async function backupRecruitmentAssessmentToMega(
+  env: MegaBackupEnv,
+  data: Parameters<typeof formatApplicantAssessmentText>[0],
+): Promise<void> {
+  const fileName = recruitmentMegaFileName(data.applicationId, data.fullName)
+  const text = formatApplicantAssessmentText(data)
+  await runTextBackup(env, {
+    folder: 'OPERAVA APPLICANTS',
+    kind: 'applicant',
+    fileName,
+    text,
+  })
+}
+
+/** Verified website forms → mapped folder (JSON). */
 export async function backupFormSubmissionToMega(
   env: MegaBackupEnv,
   args: {
@@ -154,7 +277,7 @@ export async function backupFormSubmissionToMega(
     Date.now() +
     '.json'
 
-  await runBackup(env, {
+  await runJsonBackup(env, {
     folder,
     kind,
     fileName,
