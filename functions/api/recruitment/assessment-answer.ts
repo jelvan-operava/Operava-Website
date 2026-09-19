@@ -1,5 +1,5 @@
-import { json, resolveSecret, type FormEnv } from '../../lib/formCore'
-import { parseVerifiedSession } from '../../lib/recruitmentSession'
+import { json, type FormEnv } from '../../lib/formCore'
+import { readVerifiedSession } from '../../lib/recruitmentSession'
 import {
   recruitmentConfigured,
   updateApplicantProfile,
@@ -33,11 +33,7 @@ async function rest(
   return { ok: res.ok, status: res.status, data, raw }
 }
 
-async function scoreAnswer(
-  env: Env,
-  question: string,
-  answer: string,
-): Promise<boolean> {
+async function scoreAnswer(env: Env, question: string, answer: string): Promise<boolean> {
   const trimmed = answer.trim()
   if (trimmed.length < 8) return false
 
@@ -67,7 +63,6 @@ async function scoreAnswer(
     }
   }
 
-  // Conservative heuristic if AI unavailable
   return trimmed.split(/\s+/).length >= 6 && trimmed.length >= 24
 }
 
@@ -76,14 +71,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     if (!recruitmentConfigured(env)) {
       return json({ error: 'Applicant database is not configured.' }, 503)
     }
-    const secret = resolveSecret(env)
     let body: { sessionToken?: string; answer?: string }
     try {
       body = (await request.json()) as typeof body
     } catch {
       return json({ error: 'Invalid request body.' }, 400)
     }
-    const session = await parseVerifiedSession(secret, String(body.sessionToken || ''))
+    const session = await readVerifiedSession(env, String(body.sessionToken || ''))
     if (!session) return json({ error: 'Session expired.' }, 401)
     const answer = String(body.answer || '').trim()
     if (!answer) return json({ error: 'Enter an answer before submitting.' }, 400)

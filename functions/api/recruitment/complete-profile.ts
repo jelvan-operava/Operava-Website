@@ -1,5 +1,5 @@
-import { json, resolveSecret, type FormEnv } from '../../lib/formCore'
-import { parseVerifiedSession } from '../../lib/recruitmentSession'
+import { json, type FormEnv } from '../../lib/formCore'
+import { readVerifiedSession } from '../../lib/recruitmentSession'
 import {
   getApplicantByApplicationId,
   recruitmentConfigured,
@@ -15,14 +15,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     if (!recruitmentConfigured(env)) {
       return json({ error: 'Applicant database is not configured.' }, 503)
     }
-    const secret = resolveSecret(env)
     let body: { sessionToken?: string }
     try {
       body = (await request.json()) as { sessionToken?: string }
     } catch {
       return json({ error: 'Invalid request body.' }, 400)
     }
-    const session = await parseVerifiedSession(secret, String(body.sessionToken || ''))
+    const session = await readVerifiedSession(env, String(body.sessionToken || ''))
     if (!session) return json({ error: 'Session expired. Verify your email again.' }, 401)
 
     const row = await getApplicantByApplicationId(env, session.applicationId)

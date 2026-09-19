@@ -1,5 +1,5 @@
-import { json, resolveSecret, type FormEnv } from '../../lib/formCore'
-import { parseVerifiedSession } from '../../lib/recruitmentSession'
+import { json, type FormEnv } from '../../lib/formCore'
+import { readVerifiedSession } from '../../lib/recruitmentSession'
 import {
   getApplicantByApplicationId,
   recruitmentConfigured,
@@ -44,14 +44,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     if (!recruitmentConfigured(env)) {
       return json({ error: 'Applicant database is not configured.' }, 503)
     }
-    const secret = resolveSecret(env)
     let body: { sessionToken?: string }
     try {
       body = (await request.json()) as { sessionToken?: string }
     } catch {
       return json({ error: 'Invalid request body.' }, 400)
     }
-    const session = await parseVerifiedSession(secret, String(body.sessionToken || ''))
+    const session = await readVerifiedSession(env, String(body.sessionToken || ''))
     if (!session) return json({ error: 'Session expired. Verify your email again.' }, 401)
 
     const row = await getApplicantByApplicationId(env, session.applicationId)
@@ -80,7 +79,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       return json({ error: 'Assessment bank is misconfigured.' }, 500)
     }
 
-    // Upsert assessment row
     const existing = await rest(
       env,
       '/rest/v1/assessments?application_id=eq.' +
@@ -88,13 +86,16 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         '&select=*&limit=1',
     )
     if (existing.ok && Array.isArray(existing.data) && existing.data[0]?.status === 'COMPLETE') {
-      return json({
-        error: 'Assessment already completed for this application.',
-        status: 'COMPLETE',
-        passed: existing.data[0].passed,
-        scorePercent: existing.data[0].score_percent,
-        correctCount: existing.data[0].correct_count,
-      }, 409)
+      return json(
+        {
+          error: 'Assessment already completed for this application.',
+          status: 'COMPLETE',
+          passed: existing.data[0].passed,
+          scorePercent: existing.data[0].score_percent,
+          correctCount: existing.data[0].correct_count,
+        },
+        409,
+      )
     }
 
     const payload = {
@@ -125,10 +126,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       })
       if (!ins.ok) {
         console.error('assessment insert', ins.status, ins.raw.slice(0, 300))
-        return json({
-          error:
-            'Could not create assessment. Ensure supabase/recruitment/002_assessments.sql has been applied.',
-        }, 502)
+        return json(
+          {
+            error:
+              'Could not create assessment. Ensure supabase/recruitment/002_assessments.sql has been applied.',
+          },
+          502,
+        )
       }
     }
 
