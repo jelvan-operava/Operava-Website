@@ -11,6 +11,9 @@ export interface FormEnv {
   SUBMISSIONS_DB?: D1Database
   RESUMES_BUCKET?: R2Bucket
   RESEND_API_KEY?: string
+  /** Preferred From (e.g. OPERAVA <noreply@operavaglobal.com> or OPERAVA<noreply@operavaglobal.com>) */
+  RESEND_EMAIL_FROM?: string
+  /** Legacy alias if RESEND_EMAIL_FROM is empty */
   RESEND_FROM?: string
   OTP_SECRET?: string
   CLIENT_INBOX?: string
@@ -18,13 +21,13 @@ export interface FormEnv {
   ACADEMY_INBOX?: string
 }
 
-export const DEFAULT_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
-export const OTP_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
-export const NOTIFICATION_NOREPLY_FROM = 'Operava <noreply@operavaglobal.com>'
+export const DEFAULT_RESEND_FROM = 'OPERAVA <noreply@operavaglobal.com>'
+export const OTP_RESEND_FROM = 'OPERAVA <noreply@operavaglobal.com>'
+export const NOTIFICATION_NOREPLY_FROM = 'OPERAVA <noreply@operavaglobal.com>'
 export const CLIENT_RESEND_FROM = 'hello@operavaglobal.com'
 export const TALENT_RESEND_FROM = 'talents@operavaglobal.com'
 export const ACADEMY_RESEND_FROM = 'academy@operavaglobal.com'
-export const APPLICANT_CONFIRMATION_FROM = 'Operava <noreply@operavaglobal.com>'
+export const APPLICANT_CONFIRMATION_FROM = 'OPERAVA <noreply@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
 export const ACADEMY_INBOX_DEFAULT = 'academy@operavaglobal.com'
 export const DEFAULT_OTP_SECRET = 'operava-form-secret'
@@ -157,19 +160,36 @@ function mapVerifiedMailbox(email: string): string {
   return e
 }
 
+/**
+ * Normalize to Resend-compatible "Name <email@domain>".
+ * Accepts OPERAVA<noreply@operavaglobal.com> (no space) and OPERAVA <noreply@...>.
+ */
 export function normalizeFromAddress(value: string | undefined | null): string {
-  const raw = String(value || '').trim()
+  let raw = String(value || '').trim()
   if (!raw) return DEFAULT_RESEND_FROM
+
+  // OPERAVA<noreply@...> → OPERAVA <noreply@...>
+  raw = raw.replace(/^([^<\s]+)<([^>]+)>$/, '$1 <$2>')
+
   const angle = raw.match(/^(.*)<([^>]+)>$/)
   if (angle) {
-    const name = angle[1].trim().replace(/["<>]/g, '') || 'Operava'
+    const name = angle[1].trim().replace(/["<>]/g, '') || 'OPERAVA'
     const email = mapVerifiedMailbox(angle[2].trim())
     if (PLAIN_EMAIL_RE.test(email)) return name + ' <' + email + '>'
   }
   if (PLAIN_EMAIL_RE.test(raw.toLowerCase())) {
-    return 'Operava <' + mapVerifiedMailbox(raw) + '>'
+    return 'OPERAVA <' + mapVerifiedMailbox(raw) + '>'
   }
   return DEFAULT_RESEND_FROM
+}
+
+/** Prefer RESEND_EMAIL_FROM, then RESEND_FROM, then default. */
+export function resolveFromEnv(env: FormEnv): string {
+  const preferred =
+    (env.RESEND_EMAIL_FROM && String(env.RESEND_EMAIL_FROM).trim()) ||
+    (env.RESEND_FROM && String(env.RESEND_FROM).trim()) ||
+    ''
+  return normalizeFromAddress(preferred || DEFAULT_RESEND_FROM)
 }
 
 export function json(body: Record<string, unknown>, status = 200) {
@@ -234,7 +254,6 @@ export function renderEmailTemplate(template: string, replacements: Record<strin
   return html
 }
 
-/** Mandatory shell: Hi {full_name}, then body. */
 export function otpEmailHtml(name: string, purpose: string, code: string) {
   const display = name && name.trim() ? name.trim() : 'there'
   return renderEmailTemplate(otpEmailTemplate, {
@@ -269,9 +288,7 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
   }
 
   const from = normalizeFromAddress(
-    (typeof payload.from === 'string' && payload.from) ||
-      (env.RESEND_FROM && String(env.RESEND_FROM)) ||
-      DEFAULT_RESEND_FROM,
+    (typeof payload.from === 'string' && payload.from) || resolveFromEnv(env),
   )
 
   let to: string[] = []
@@ -351,7 +368,7 @@ export function inboxFor(type: FormType, env: FormEnv) {
 }
 
 export function senderFor(_type: FormType, env: FormEnv) {
-  return normalizeFromAddress(env.RESEND_FROM || DEFAULT_RESEND_FROM)
+  return resolveFromEnv(env)
 }
 
 export function purposeLabel(type: FormType) {
