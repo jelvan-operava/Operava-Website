@@ -1,21 +1,22 @@
 # OPERAVA MEGA folder map
 
-Use these **exact** folder names in the MEGA account (as shown in the mobile app):
+Use these **exact** folder names in the MEGA account:
 
 | MEGA folder | Purpose |
 |-------------|--------|
-| `OPERAVA APPLICANTS` | Recruitment AVA / careers applicant JSON backups |
-| `OPERAVA CLIENTS` | Client records / engagement document backups |
-| `OPERAVA EMPLOYEES` | Employee records backups |
-| `OPERAVA FILES AND DOCUMENTS` | General OPERAVA files and shared documents |
+| `OPERAVA APPLICANTS` | Careers applications + Recruitment AVA JSON backups |
+| `OPERAVA CLIENTS` | Client / services / contact inquiry backups |
+| `OPERAVA EMPLOYEES` | Employee records backups (staff systems) |
+| `OPERAVA FILES AND DOCUMENTS` | Academy + general OPERAVA files and documents |
 
-## Recruitment AVA backup target
+## Automatic routing from the website
 
-Automated applicant backups write into:
+| Submission | Folder |
+|------------|--------|
+| Careers form | `OPERAVA APPLICANTS` |
+| Recruitment AVA email verify | `OPERAVA APPLICANTS` |
+| Services / Quote | `OPERAVA CLIENTS` |
+| Contact | `OPERAVA CLIENTS` |
+| Academy | `OPERAVA FILES AND DOCUMENTS` |
 
-```text
-OPERAVA APPLICANTS/
-  OPERAVA-APP-YYYY-######_timestamp.json
-```
-
-Create the four folders in MEGA **before** enabling the backup Worker. The Worker does not create missing top-level folders by default (safer for production).
+Create the four folders in MEGA **before** enabling the backup Worker.
