@@ -270,6 +270,12 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
   const apiKey = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
 
+  // Resend keys are typically re_...
+  if (apiKey.length < 20) {
+    console.error('Resend API key looks truncated')
+    throw new Error('EMAIL_API_KEY_INVALID')
+  }
+
   const from = normalizeFromAddress(
     (typeof payload.from === 'string' && payload.from) ||
       (env.RESEND_FROM && String(env.RESEND_FROM)) ||
@@ -310,23 +316,35 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
   if (replyTo) body.reply_to = replyTo
   if (bcc) body.bcc = bcc
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: 'Bearer ' + apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  })
+  let res: Response
+  try {
+    res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    })
+  } catch (netErr) {
+    console.error('Resend network error', netErr instanceof Error ? netErr.message : 'unknown')
+    throw new Error('EMAIL_SEND_FAILED')
+  }
 
   const raw = await res.text().catch(() => '')
   if (!res.ok) {
-    console.error('Resend API error', res.status, raw.slice(0, 400))
+    console.error('Resend API error', res.status, raw.slice(0, 400), 'from=', from)
+    if (res.status === 401 || res.status === 403) {
+      throw new Error('EMAIL_API_KEY_INVALID')
+    }
     if (/pattern/i.test(raw)) {
       throw new Error('EMAIL_ADDRESS_PATTERN')
     }
     if (/not verified|domain/i.test(raw)) {
       throw new Error('EMAIL_DOMAIN_NOT_VERIFIED')
+    }
+    if (/invalid.*api.?key|unauthorized/i.test(raw)) {
+      throw new Error('EMAIL_API_KEY_INVALID')
     }
     throw new Error('EMAIL_SEND_FAILED')
   }
