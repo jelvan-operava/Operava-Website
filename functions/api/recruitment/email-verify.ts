@@ -20,8 +20,8 @@ type Env = FormEnv & RecruitmentEnv & MegaBackupEnv
 
 /**
  * POST /api/recruitment/email-verify
- * Validates OTP, creates/updates permanent applicant in recruitment Supabase,
- * optionally backs up snapshot to MEGA (OPERAVA APPLICANTS), returns session token.
+ * OTP check is aligned with /api/forms/verify (same secret, hash, signed draft).
+ * On success: create/update applicant + return recruitment session token.
  */
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context
@@ -34,8 +34,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return json({ error: 'Invalid request body.' }, 400)
     }
 
-    const draftId = String(body.draftId || '')
-    const code = String(body.code || '').replace(/\D/g, '')
+    const draftId = String(body.draftId || '').trim()
+    const code = String(body.code || '').replace(/\D/g, '').slice(0, 6)
     if (!draftId || code.length !== 6) return json({ error: 'Enter the 6-digit code.' }, 400)
 
     const signed = await readSignedDraft(secret, draftId)
@@ -43,6 +43,34 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (Date.now() > Number(signed.expiresAt)) return json({ error: 'This code has expired.' }, 400)
     if (Number(signed.attempts) >= 5) {
       return json({ error: 'Too many attempts. Request a new code.' }, 429)
+    }
+
+    // Same hash path as /api/forms/verify — validate before purpose-specific checks
+    const hashed = await hashOtp(secret, code)
+    if (hashed !== signed.codeHash) {
+      // Soft attempt tracking. Do NOT return a new draftId (forms never rotates on fail),
+      // so the client keeps using the original draftId for retries.
+      try {
+        await issueSignedDraft(secret, {
+          email: signed.email,
+          formType: signed.formType,
+          payload: signed.payload,
+          codeHash: signed.codeHash,
+          expiresAt: signed.expiresAt,
+          attempts: Number(signed.attempts || 0) + 1,
+          resends: signed.resends,
+          lastSentAt: signed.lastSentAt,
+        })
+      } catch {
+        /* best-effort attempt bump; still reject */
+      }
+      return json(
+        {
+          error: 'Invalid verification code.',
+          attemptsRemaining: Math.max(0, 4 - Number(signed.attempts || 0)),
+        },
+        401,
+      )
     }
 
     let payload: Record<string, unknown> = {}
@@ -53,28 +81,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
     if (payload.purpose !== 'RECRUITMENT_APPLICATION_EMAIL') {
       return json({ error: 'Invalid recruitment verification session.' }, 400)
-    }
-
-    const hashed = await hashOtp(secret, code)
-    if (hashed !== signed.codeHash) {
-      const bumped = await issueSignedDraft(secret, {
-        email: signed.email,
-        formType: signed.formType,
-        payload: signed.payload,
-        codeHash: signed.codeHash,
-        expiresAt: signed.expiresAt,
-        attempts: Number(signed.attempts || 0) + 1,
-        resends: signed.resends,
-        lastSentAt: signed.lastSentAt,
-      })
-      return json(
-        {
-          error: 'Invalid verification code.',
-          draftId: bumped,
-          attemptsRemaining: Math.max(0, 4 - Number(signed.attempts || 0)),
-        },
-        401,
-      )
     }
 
     if (!recruitmentConfigured(env)) {
