@@ -52,6 +52,7 @@ export default function ITServices() {
                   index={i}
                   showCapabilities={true}
                   maxCapabilities={3}
+                  matchTitleTheme
                 />
               )
             })}
