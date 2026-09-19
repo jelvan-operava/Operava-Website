@@ -20,6 +20,8 @@ export default function Footer() {
     { label: t('nav.about', 'About'), href: '/about' },
     { label: t('nav.careers', 'Careers'), href: '/careers' },
     { label: t('nav.insights', 'Insights'), href: '/insights' },
+    { label: t('nav.contacts', 'Contacts'), href: '/contacts' },
+    { label: t('nav.verification', 'Verification'), href: '/verification' },
     { label: t('nav.contact', 'Contact'), href: '/contact' },
   ]
 
