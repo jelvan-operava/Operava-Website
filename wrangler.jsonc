@@ -9,7 +9,8 @@
   },
   "vars": {
     "NODE_VERSION": "20",
-    "RESEND_FROM": "Operava <noreply@operavaglobal.com>",
+    "RESEND_EMAIL_FROM": "OPERAVA <noreply@operavaglobal.com>",
+    "RESEND_FROM": "OPERAVA <noreply@operavaglobal.com>",
     "CLIENT_INBOX": "hello@operavaglobal.com",
     "TALENT_INBOX": "talents@operavaglobal.com"
   }
