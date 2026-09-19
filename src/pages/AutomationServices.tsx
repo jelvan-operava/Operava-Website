@@ -62,6 +62,7 @@ export default function AutomationServices() {
                   index={i}
                   showCapabilities={true}
                   maxCapabilities={3}
+                  matchTitleTheme
                 />
               )
             })}
