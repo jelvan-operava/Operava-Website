@@ -41,7 +41,7 @@ function contactResponse(rawQuery: string): AvaDirectResponse | null {
         '5. Talent / recruitment: talents@operavaglobal.com\n' +
         '6. Careers page: https://www.operavaglobal.com/careers\n' +
         '7. Compliance: compliance@operavaglobal.com\n' +
-        '8. Document verification: verification@operavaglobal.com — portal: https://verification.operavaglobal.com\n' +
+        '8. Document verification: verification@operavaglobal.com — portal: https://www.operavaglobal.com/verification\n' +
         '9. Billing: billing@operavaglobal.com\n' +
         '10. WhatsApp (general info): +1 812 410 6066\n' +
         '11. Inquiry form: https://www.operavaglobal.com/contact\n\n' +
@@ -58,7 +58,7 @@ function contactResponse(rawQuery: string): AvaDirectResponse | null {
   ) {
     return {
       text:
-        'For document reference checks, use the OPERAVA Verification Portal: https://verification.operavaglobal.com (also www.operavaglobal.com/verification).\n\nFor questions about specific document content beyond the ID status, email verification@operavaglobal.com.',
+        'For document reference checks, use the OPERAVA Verification Portal: https://www.operavaglobal.com/verification.\n\nFor questions about specific document content beyond the ID status, email verification@operavaglobal.com.',
     }
   }
 
