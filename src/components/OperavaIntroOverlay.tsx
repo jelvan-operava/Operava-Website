@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 
 /** Cache-busted URLs — bump ASSET_V when replacing Cloudinary files at the same public_id */
-const ASSET_V = '20260919b'
+const ASSET_V = '20260919c'
 
 const MOBILE_SRC =
   `https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789682664/Intro-mobile-overlay.webp?v=${ASSET_V}`
@@ -23,18 +23,25 @@ function isMobileViewport() {
 }
 
 function unlockPageScroll() {
-  document.body.style.overflow = ''
-  document.documentElement.style.overflow = ''
-  document.body.style.pointerEvents = ''
-  document.documentElement.style.pointerEvents = ''
+  try {
+    document.body.style.overflow = ''
+    document.documentElement.style.overflow = ''
+    document.body.style.pointerEvents = ''
+    document.documentElement.style.pointerEvents = ''
+  } catch {
+    // ignore
+  }
 }
 
 /**
  * OPERAVA introduction overlay.
  *
  * Front = intro image.
- * Back  = solid white (nothing else — no website visible during the flip).
- * After flip finishes → overlay fades away → live homepage opens for navigation.
+ * Back  = solid white only (no website visible during flip).
+ * After flip finishes → overlay fades out and unmounts → live homepage is interactive.
+ *
+ * Important: flip/reveal timers are stored in refs and are NOT cleared by React
+ * effect dependency changes, so the sequence always completes and the site appears.
  */
 export default function OperavaIntroOverlay() {
   const [active, setActive] = useState(true)
@@ -54,37 +61,54 @@ export default function OperavaIntroOverlay() {
   const startAtRef = useRef<number | null>(null)
   const flipDoneRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const revealDoneRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const safetyUnmountRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const autoCloseFiredRef = useRef(false)
+  const activeRef = useRef(true)
 
   const finishClose = useCallback(() => {
+    if (!activeRef.current) return
+    activeRef.current = false
     unlockPageScroll()
-    window.scrollTo({ top: scrollYRef.current, behavior: 'instant' as ScrollBehavior })
+    try {
+      window.scrollTo({ top: scrollYRef.current, behavior: 'instant' as ScrollBehavior })
+    } catch {
+      // ignore
+    }
     setActive(false)
   }, [])
 
   const startFlip = useCallback(() => {
-    if (flipping || revealing || autoCloseFiredRef.current) return
+    // Guard with ref so re-renders cannot restart or cancel the sequence
+    if (autoCloseFiredRef.current) return
     autoCloseFiredRef.current = true
     setFlipping(true)
 
     if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
     if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
+    if (safetyUnmountRef.current) clearTimeout(safetyUnmountRef.current)
 
-    // Phase 1: rotate to solid white back (website stays fully covered)
+    // Phase 1: rotate to solid white back (website fully covered the whole time)
     flipDoneRef.current = setTimeout(() => {
       setRevealing(true)
-      // Phase 2: fade overlay out — only now does the website appear
+      // Phase 2: fade overlay out — website appears only now
       revealDoneRef.current = setTimeout(() => {
         finishClose()
       }, REVEAL_MS)
     }, FLIP_MS)
-  }, [flipping, revealing, finishClose])
+
+    // Absolute safety: if anything blocks the sequence, force-unmount after flip+reveal+buffer
+    safetyUnmountRef.current = setTimeout(() => {
+      finishClose()
+    }, FLIP_MS + REVEAL_MS + 800)
+  }, [finishClose])
 
   const requestClose = useCallback(() => {
-    if (!canClose || flipping || revealing) return
+    if (!canClose) return
+    if (autoCloseFiredRef.current) return
     startFlip()
-  }, [canClose, flipping, revealing, startFlip])
+  }, [canClose, startFlip])
 
+  // Lock scroll while overlay is active; always unlock on unmount
   useEffect(() => {
     if (!active) {
       unlockPageScroll()
@@ -104,11 +128,12 @@ export default function OperavaIntroOverlay() {
     return () => {
       document.removeEventListener('wheel', preventScroll)
       document.removeEventListener('touchmove', preventScroll)
-      // Always unlock when overlay unmounts so the site is usable
       unlockPageScroll()
     }
   }, [active])
 
+  // Entry + 8s countdown + auto-flip. Timers for flip/reveal are owned by startFlip
+  // and must NOT be cleared when this effect re-runs.
   useEffect(() => {
     if (!active) return
 
@@ -131,20 +156,30 @@ export default function OperavaIntroOverlay() {
           clearInterval(tickIntervalRef.current)
           tickIntervalRef.current = null
         }
-        setTimeout(() => {
-          if (!autoCloseFiredRef.current) startFlip()
-        }, 80)
+        // Auto-flip after 8s
+        if (!autoCloseFiredRef.current) {
+          startFlip()
+        }
       }, MANDATORY_MS)
     })
 
     return () => {
+      // Only clear entry/countdown timers — never the in-flight flip/reveal sequence
       if (enterRafRef.current != null) cancelAnimationFrame(enterRafRef.current)
       if (mandatoryTimerRef.current) clearTimeout(mandatoryTimerRef.current)
       if (tickIntervalRef.current) clearInterval(tickIntervalRef.current)
-      if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
-      if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
     }
   }, [active, startFlip])
+
+  // On full unmount of the component, clear remaining flip timers and unlock
+  useEffect(() => {
+    return () => {
+      if (flipDoneRef.current) clearTimeout(flipDoneRef.current)
+      if (revealDoneRef.current) clearTimeout(revealDoneRef.current)
+      if (safetyUnmountRef.current) clearTimeout(safetyUnmountRef.current)
+      unlockPageScroll()
+    }
+  }, [])
 
   useEffect(() => {
     if (canClose && !flipping && !revealing) {
@@ -232,12 +267,10 @@ export default function OperavaIntroOverlay() {
       aria-label="OPERAVA Global Solutions introduction"
       className="fixed inset-0 z-[10050] overflow-hidden"
       style={{
-        // Block all interaction until fully closed
         pointerEvents: busy ? 'none' : 'auto',
         perspective: '1600px',
         WebkitPerspective: '1600px',
-        // ALWAYS solid white until the flip is finished.
-        // Website must not show during the flip — only after reveal starts.
+        // Solid white the entire time until reveal fade — website never shows mid-flip
         backgroundColor: '#FFFFFF',
         opacity: revealing ? 0 : 1,
         transition: revealing
@@ -246,17 +279,12 @@ export default function OperavaIntroOverlay() {
       }}
       onClick={handleSurfaceClick}
     >
-      {/* 3D card — full-bleed, no scale shrink (shrink would expose page underneath) */}
       <div
         className="absolute inset-0"
         style={{
           transformStyle: 'preserve-3d',
           WebkitTransformStyle: 'preserve-3d',
-          transform: flipping
-            ? 'rotateY(-180deg)'
-            : entered
-              ? 'rotateY(0deg)'
-              : 'rotateY(0deg)',
+          transform: flipping ? 'rotateY(-180deg)' : 'rotateY(0deg)',
           transition: flipping
             ? `transform ${FLIP_MS}ms cubic-bezier(0.45, 0.05, 0.2, 1)`
             : entered
@@ -350,7 +378,7 @@ export default function OperavaIntroOverlay() {
           )}
         </div>
 
-        {/* BACK — solid white only. Website is hidden until flip completes. */}
+        {/* BACK — solid white only. Website appears only after overlay unmounts. */}
         <div
           className="absolute inset-0 bg-white"
           aria-hidden
