@@ -10,22 +10,25 @@ import {
   sendResend,
   resolveSecret,
   issueSignedDraft,
-  DEFAULT_RESEND_FROM,
+  senderFor,
+  purposeLabel,
   type FormEnv,
 } from '../../lib/formCore'
 
 /**
  * POST /api/recruitment/email-send
- * Application email OTP for Recruitment AVA (Phase 2).
- * Uses signed draft (no D1 required). Does not create permanent applicant records.
+ * Application email OTP for Recruitment AVA.
+ * Same Resend path as /api/forms/start (signed draft, subject Verification Code).
  */
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
-    if (!env.RESEND_API_KEY || String(env.RESEND_API_KEY).trim().length < 8) {
+    const apiKey = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
+    if (!apiKey || apiKey.length < 8) {
       return json(
         {
           error:
             'Email delivery is not configured. Please contact talents@operavaglobal.com.',
+          code: 'RESEND_NOT_CONFIGURED',
         },
         503,
       )
@@ -53,6 +56,9 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     if (name.length < 2) return json({ error: 'Full name is required.' }, 400)
     if (!EMAIL_RE.test(email)) return json({ error: 'A valid application email is required.' }, 400)
     if (!position) return json({ error: 'Position is required.' }, 400)
+    if (!['tech', 'ops', 'cx'].includes(positionCode)) {
+      return json({ error: 'Invalid position selection.' }, 400)
+    }
 
     const now = Date.now()
     const code = generateOtp()
@@ -66,7 +72,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     })
     const expiresAt = now + 10 * 60 * 1000
 
-    // Reuse signed-draft machinery; formType CAREERS keeps payload compatible with FormType union
     const draftId = await issueSignedDraft(secret, {
       email,
       formType: 'CAREERS',
@@ -78,25 +83,41 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       lastSentAt: now,
     })
 
+    const purpose = purposeLabel('CAREERS')
     try {
       await sendResend(env, {
-        from: DEFAULT_RESEND_FROM,
+        from: senderFor('CAREERS', env),
         to: [email],
         subject: 'Verification Code',
-        html: otpEmailHtml(name, 'RECRUITMENT AVA APPLICATION EMAIL',
-          code),
-        text: otpEmailText(name, 'RECRUITMENT AVA APPLICATION EMAIL', code),
+        html: otpEmailHtml(name, purpose, code),
+        text: otpEmailText(name, purpose, code),
       })
     } catch (mailErr) {
       const msg = mailErr instanceof Error ? mailErr.message : 'unknown'
       console.error('recruitment OTP email failed', msg)
-      return json(
-        {
-          error:
-            'Unable to send verification email right now. Please try again in a moment, or contact talents@operavaglobal.com.',
-        },
-        502,
-      )
+      let error =
+        'Unable to send verification email right now. Please try again in a moment, or contact talents@operavaglobal.com.'
+      let codeOut = 'EMAIL_SEND_FAILED'
+      if (msg === 'EMAIL_DOMAIN_NOT_VERIFIED') {
+        error =
+          'Email sender domain is not verified with Resend. Contact the site operator to verify operavaglobal.com.'
+        codeOut = msg
+      } else if (msg === 'EMAIL_ADDRESS_PATTERN') {
+        error =
+          'Email address was rejected by the mail provider. Check the application email format and try again.'
+        codeOut = msg
+      } else if (msg === 'EMAIL_INVALID_TO') {
+        error = 'A valid application email is required.'
+        codeOut = msg
+      } else if (msg === 'RESEND_API_KEY is not configured') {
+        error = 'Email delivery is not configured. Please contact talents@operavaglobal.com.'
+        codeOut = 'RESEND_NOT_CONFIGURED'
+      } else if (msg === 'EMAIL_UNAUTHORIZED' || msg === 'EMAIL_API_KEY_INVALID') {
+        error =
+          'Email service authentication failed. The site operator must update RESEND_API_KEY in Cloudflare Pages secrets.'
+        codeOut = msg
+      }
+      return json({ error, code: codeOut }, 502)
     }
 
     return json({

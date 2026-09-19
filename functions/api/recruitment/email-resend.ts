@@ -9,7 +9,8 @@ import {
   resolveSecret,
   readSignedDraft,
   issueSignedDraft,
-  DEFAULT_RESEND_FROM,
+  senderFor,
+  purposeLabel,
   type FormEnv,
 } from '../../lib/formCore'
 
@@ -20,7 +21,7 @@ import {
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
     if (!env.RESEND_API_KEY || String(env.RESEND_API_KEY).trim().length < 8) {
-      return json({ error: 'Email delivery is not configured.' }, 503)
+      return json({ error: 'Email delivery is not configured.', code: 'RESEND_NOT_CONFIGURED' }, 503)
     }
 
     const secret = resolveSecret(env)
@@ -60,6 +61,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     const expiresAt = now + 10 * 60 * 1000
     const name = String(payload.name || '')
     const email = signed.email
+    const purpose = purposeLabel('CAREERS')
 
     const newDraftId = await issueSignedDraft(secret, {
       email,
@@ -74,18 +76,22 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     try {
       await sendResend(env, {
-        from: DEFAULT_RESEND_FROM,
+        from: senderFor('CAREERS', env),
         to: [email],
         subject: 'Verification Code',
-        html: otpEmailHtml(name, 'RECRUITMENT AVA APPLICATION EMAIL', code),
-        text: otpEmailText(name, 'RECRUITMENT AVA APPLICATION EMAIL', code),
+        html: otpEmailHtml(name, purpose, code),
+        text: otpEmailText(name, purpose, code),
       })
     } catch (mailErr) {
-      console.error('recruitment OTP resend failed', mailErr instanceof Error ? mailErr.message : 'unknown')
+      const msg = mailErr instanceof Error ? mailErr.message : 'unknown'
+      console.error('recruitment OTP resend failed', msg)
       return json(
         {
           error:
-            'Unable to resend verification email right now. Please try again shortly.',
+            msg === 'EMAIL_API_KEY_INVALID' || msg === 'EMAIL_UNAUTHORIZED'
+              ? 'Email service authentication failed. The site operator must update RESEND_API_KEY.'
+              : 'Unable to resend verification email right now. Please try again shortly.',
+          code: msg.startsWith('EMAIL_') ? msg : 'EMAIL_SEND_FAILED',
         },
         502,
       )
