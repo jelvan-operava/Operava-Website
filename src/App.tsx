@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { LanguageProvider } from './i18n/LanguageContext'
@@ -34,6 +34,13 @@ import NotFound from './pages/NotFound'
 import { getMetadataForPath, updatePageSEO } from './utils/seo'
 import { injectSchemaMarkup } from './utils/schema'
 
+/** True when the app is loaded on the dedicated verification subdomain */
+function isVerificationHost(): boolean {
+  if (typeof window === 'undefined') return false
+  const host = window.location.hostname.toLowerCase()
+  return host === 'verification.operavaglobal.com' || host.startsWith('verification.')
+}
+
 function RouteManager() {
   const location = useLocation()
   const [loading, setLoading] = useState(false)
@@ -45,10 +52,15 @@ function RouteManager() {
       win.lenis.scrollTo(0, { immediate: true })
     }
 
-    const metadata = getMetadataForPath(location.pathname)
+    const pathForSeo =
+      isVerificationHost() && (location.pathname === '/' || location.pathname === '')
+        ? '/verification'
+        : location.pathname
+
+    const metadata = getMetadataForPath(pathForSeo)
     updatePageSEO(metadata)
 
-    injectSchemaMarkup(location.pathname, {
+    injectSchemaMarkup(pathForSeo, {
       title: metadata.title,
       description: metadata.description,
       breadcrumbs: metadata.breadcrumbs,
@@ -64,6 +76,26 @@ function RouteManager() {
   }, [location.pathname])
 
   return <RouteLoadingProgress isLoading={loading} pathname={location.pathname} />
+}
+
+/** On verification.operavaglobal.com, keep users on the portal surface */
+function VerificationHostGuard() {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!isVerificationHost()) return
+    const path = location.pathname
+    if (path === '/' || path === '') {
+      navigate('/verification', { replace: true })
+      return
+    }
+    if (!path.startsWith('/verification') && !path.startsWith('/api')) {
+      navigate('/verification', { replace: true })
+    }
+  }, [location.pathname, navigate])
+
+  return null
 }
 
 const pageTransitionVariants = {
@@ -94,7 +126,9 @@ const pageTransitionVariants = {
 
 function Layout() {
   const location = useLocation()
+  const onVerificationHost = isVerificationHost()
   const isVerification =
+    onVerificationHost ||
     location.pathname === '/verification' ||
     location.pathname.startsWith('/verification/')
 
@@ -102,6 +136,7 @@ function Layout() {
     <div className="min-h-screen flex flex-col justify-between bg-white text-gray-900 selection:bg-violet-100 selection:text-violet-800">
       <SmoothScroll />
       <RouteManager />
+      <VerificationHostGuard />
       {!isVerification && <Navigation />}
 
       <div className="flex-1 overflow-hidden bg-white">
@@ -115,7 +150,8 @@ function Layout() {
             className="w-full flex-1 bg-white"
           >
             <Routes location={location} key={location.pathname}>
-              <Route path="/" element={<Home />} />
+              {/* On verification host, root also renders the portal (guard navigates to /verification) */}
+              <Route path="/" element={onVerificationHost ? <Verification /> : <Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/services/automation" element={<AutomationServices />} />
               <Route path="/services/it" element={<ITServices />} />
@@ -144,7 +180,7 @@ function Layout() {
               <Route path="/payment" element={<PaymentPortal />} />
               <Route path="/pay" element={<PaymentPortal />} />
               <Route path="/client-portal/payment" element={<PaymentPortal />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="*" element={onVerificationHost ? <Verification /> : <NotFound />} />
             </Routes>
           </motion.div>
         </AnimatePresence>
