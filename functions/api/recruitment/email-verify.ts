@@ -14,15 +14,17 @@ import {
   upsertApplicantOnVerify,
   type RecruitmentEnv,
 } from '../../lib/recruitmentDb'
+import { backupApplicantToMega, type MegaBackupEnv } from '../../lib/megaBackupHook'
 
-type Env = FormEnv & RecruitmentEnv
+type Env = FormEnv & RecruitmentEnv & MegaBackupEnv
 
 /**
  * POST /api/recruitment/email-verify
  * Validates OTP, creates/updates permanent applicant in recruitment Supabase,
- * returns verified session token.
+ * optionally backs up snapshot to MEGA (OPERAVA APPLICANTS), returns session token.
  */
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  const { request, env } = context
   try {
     const secret = resolveSecret(env)
     let body: { draftId?: string; code?: string }
@@ -115,6 +117,23 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         },
         502,
       )
+    }
+
+    // Optional MEGA snapshot into OPERAVA APPLICANTS (never blocks verify)
+    const megaTask = backupApplicantToMega(env, {
+      applicationId,
+      name,
+      email,
+      position,
+      positionCode,
+      emailVerifiedAt,
+    })
+    try {
+      const ctx = context as { waitUntil?: (p: Promise<unknown>) => void }
+      if (typeof ctx.waitUntil === 'function') ctx.waitUntil(megaTask)
+      else void megaTask
+    } catch {
+      void megaTask
     }
 
     const sessionExpiresAt = Date.now() + 24 * 60 * 60 * 1000
