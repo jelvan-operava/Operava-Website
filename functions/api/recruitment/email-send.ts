@@ -9,6 +9,7 @@ import {
   otpEmailText,
   sendResend,
   resolveSecret,
+  otpSecretMissingResponse,
   issueSignedDraft,
   senderFor,
   purposeLabel,
@@ -35,6 +36,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
 
     const secret = resolveSecret(env)
+    if (!secret) return otpSecretMissingResponse()
 
     let body: Record<string, unknown>
     try {
