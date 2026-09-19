@@ -1,10 +1,20 @@
 name = "operava-mega-backup"
 main = "src/index.ts"
 compatibility_date = "2026-08-16"
-compatibility_flags = ["nodejs_compat"]
+compatibility_flags = [ "nodejs_compat" ]
 
-# Secrets (set via wrangler secret put — never commit):
-# MEGA_EMAIL
-# MEGA_PASSWORD
-# MEGA_TOTP (optional)
-# BACKUP_SHARED_SECRET
+# Public workers.dev hostname after first deploy:
+#   https://operava-mega-backup.<your-account>.workers.dev
+workers_dev = true
+
+# Account-level defaults; override with CLOUDFLARE_ACCOUNT_ID if needed
+# account_id = ""
+
+[observability]
+enabled = true
+
+# Secrets — set with wrangler, never commit values:
+#   npx wrangler secret put MEGA_EMAIL
+#   npx wrangler secret put MEGA_PASSWORD
+#   npx wrangler secret put BACKUP_SHARED_SECRET
+#   npx wrangler secret put MEGA_TOTP   # optional, 2FA only

@@ -4,13 +4,19 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev"
+    "secret:mega-email": "wrangler secret put MEGA_EMAIL",
+    "secret:mega-password": "wrangler secret put MEGA_PASSWORD",
+    "secret:backup": "wrangler secret put BACKUP_SHARED_SECRET",
+    "tail": "wrangler tail"
   },
   "dependencies": {
-    "megajs": "^1.3.0"
+    "megajs": "^1.3.9"
   },
   "devDependencies": {
-    "wrangler": "^4.0.0"
+    "@cloudflare/workers-types": "^4.20250816.0",
+    "typescript": "^5.7.0",
+    "wrangler": "^4.28.0"
   }
 }
