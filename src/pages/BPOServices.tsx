@@ -52,6 +52,7 @@ export default function BPOServices() {
                   index={i}
                   showCapabilities={true}
                   maxCapabilities={3}
+                  matchTitleTheme
                 />
               )
             })}
