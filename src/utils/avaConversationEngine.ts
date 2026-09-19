@@ -2,6 +2,7 @@
  * Authoritative Conversation Engine for AVA (OPERAVA assistant)
  * Controlled knowledge only — human-like answers with meaning, process, examples.
  * Contact rule: only the specific email/channel asked for; full list only when explicitly requested.
+ * Document verification: users can paste a reference ID in chat; AvaAssistant looks up via API.
  */
 
 export interface AvaDirectResponse {
@@ -29,7 +30,6 @@ function wantsAllContacts(q: string): boolean {
 function contactResponse(rawQuery: string): AvaDirectResponse | null {
   const q = rawQuery.trim().toLowerCase()
 
-  // Full list only when explicitly requested
   if (wantsAllContacts(q)) {
     return {
       text:
@@ -41,7 +41,7 @@ function contactResponse(rawQuery: string): AvaDirectResponse | null {
         '5. Talent / recruitment: talents@operavaglobal.com\n' +
         '6. Careers page: https://www.operavaglobal.com/careers\n' +
         '7. Compliance: compliance@operavaglobal.com\n' +
-        '8. Document verification: verification@operavaglobal.com — portal: https://www.operavaglobal.com/verification\n' +
+        '8. Document verification: verification@operavaglobal.com — portal: https://www.operavaglobal.com/verification (or paste the document ID here in chat)\n' +
         '9. Billing: billing@operavaglobal.com\n' +
         '10. WhatsApp (general info): +1 812 410 6066\n' +
         '11. Inquiry form: https://www.operavaglobal.com/contact\n\n' +
@@ -49,7 +49,6 @@ function contactResponse(rawQuery: string): AvaDirectResponse | null {
     }
   }
 
-  // Specific channels — only that email
   if (
     q.includes('verification') ||
     q.includes('verify document') ||
@@ -58,7 +57,7 @@ function contactResponse(rawQuery: string): AvaDirectResponse | null {
   ) {
     return {
       text:
-        'For document reference checks, use the OPERAVA Verification Portal: https://www.operavaglobal.com/verification.\n\nFor questions about specific document content beyond the ID status, email verification@operavaglobal.com.',
+        'I can verify OPERAVA document reference IDs here in chat.\n\nPaste the document ID (for example OPERAVA-DOC-00000001) and I will check it.\n\nYou can also use the portal: https://www.operavaglobal.com/verification\n\nFor questions about specific document content beyond the ID status, email verification@operavaglobal.com.',
     }
   }
 
@@ -156,13 +155,13 @@ export function generateAvaHumanResponse(rawQuery: string): AvaDirectResponse {
     q.startsWith('hey ')
   ) {
     return {
-      text: "Hello — I'm AVA, OPERAVA's business assistant.\n\nI can walk you through what we offer, what each service means, how delivery works, and practical examples — from software and cloud work to customer operations and dedicated teams.\n\nWhat are you exploring today: technology, operations support, workforce, or careers?",
+      text: "Hello — I'm AVA, OPERAVA's business assistant.\n\nI can walk you through what we offer, help you get in touch, or verify an OPERAVA document if you paste the reference ID.\n\nWhat are you exploring today?",
     }
   }
 
   if (q.includes('how are you') || q.includes('how are things') || q.includes('how are u')) {
     return {
-      text: "I'm doing well — thank you for asking. Ready when you are.\n\nI can explain OPERAVA services in plain language: what they cover, how we typically deliver them, and examples that fit startups through enterprises. What would you like to dig into?",
+      text: "I'm doing well — thank you for asking. Ready when you are.\n\nI can explain OPERAVA services, contacts, careers, or verify a document ID if you paste it here.",
     }
   }
 
@@ -174,12 +173,12 @@ export function generateAvaHumanResponse(rawQuery: string): AvaDirectResponse {
     q.includes('help me with')
   ) {
     return {
-      text: "I'm AVA — OPERAVA Global Solutions' assistant. I only use our controlled company knowledge (not the open web).\n\nI can explain, in practical terms:\na. IT & software — custom software, web/mobile, SaaS, systems, programming, consulting, integration, databases\nb. BPO & workforce — customer service, technical support, help desk, back-office, data and document work, virtual assistance\nc. How we engage — one professional, one dedicated team, or multiple teams\nd. Company basics and careers\n\nAsk about any service and I'll break down meaning, process, and examples. For a specific department email, just name the team.",
+      text: "I'm AVA — OPERAVA Global Solutions' assistant. I only use our controlled company knowledge (not the open web).\n\nI can explain:\na. IT & software services\nb. BPO & workforce services\nc. Engagement models\nd. Company basics and careers\ne. Document verification — paste a reference ID here and I will check it\n\nFor a specific department email, just name the team.",
     }
   }
 
   if (q.includes('thank you') || q.includes('thanks') || q.includes('appreciate it')) {
-    return { text: "You're very welcome. Ask anytime if you want more detail on a service, process, or example." }
+    return { text: "You're very welcome. Ask anytime if you want more detail on a service, process, example, or document verification." }
   }
 
   if (
@@ -354,6 +353,6 @@ export function generateAvaHumanResponse(rawQuery: string): AvaDirectResponse {
   }
 
   return {
-    text: "I can help with OPERAVA's technology, BPO, workforce, company background, engagement models, or careers — using only our controlled knowledge.\n\nTry asking about a specific service, how we deliver, or a specific department if you need an email. Formal quotes: Request a Quote. Applications: Careers / Apply.",
+    text: "I can help with OPERAVA's technology, BPO, workforce, company background, engagement models, careers, or document verification (paste a reference ID). Formal quotes: Request a Quote. Applications: Careers / Apply.",
   }
 }
