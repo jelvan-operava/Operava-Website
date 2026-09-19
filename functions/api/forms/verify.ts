@@ -3,10 +3,12 @@ import {
   clientConfirmationEmail,
   ensureTables,
   hashOtp,
+  otpHashMatches,
   json,
   makeReference,
   sendResend,
   resolveSecret,
+  otpSecretMissingResponse,
   readSignedDraft,
   issueSignedDraft,
   staffNotificationEmail,
@@ -62,6 +64,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return json({ error: 'Email delivery is not configured.' }, 503)
     }
     const secret = resolveSecret(env)
+    if (!secret) return otpSecretMissingResponse()
+
     let body: { draftId?: string; code?: string }
     try {
       body = (await request.json()) as { draftId?: string; code?: string }
@@ -78,7 +82,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (Number(signed.attempts) >= 5) return json({ error: 'Too many attempts. Request a new code.' }, 429)
 
     const hashed = await hashOtp(secret, code)
-    if (hashed !== signed.codeHash) {
+    if (!otpHashMatches(signed.codeHash, hashed)) {
       const bumped = await issueSignedDraft(secret, {
         email: signed.email,
         formType: signed.formType,
@@ -124,7 +128,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       }
     }
 
-    // MEGA backup by form type → OPERAVA APPLICANTS | CLIENTS | FILES (non-blocking)
     const megaTask = backupFormSubmissionToMega(env, {
       formType,
       referenceId,
