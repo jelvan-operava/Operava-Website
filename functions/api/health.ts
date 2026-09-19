@@ -6,8 +6,11 @@ interface Env {
   SUBMISSIONS_DB?: unknown
   RECRUITMENT_SUPABASE_URL?: string
   RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY?: string
+  MEGA_EMAIL?: string
+  MEGA_PASSWORD?: string
   MEGA_BACKUP_URL?: string
   MEGA_BACKUP_SECRET?: string
+  BACKUP_SHARED_SECRET?: string
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
@@ -16,9 +19,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   const recruitmentKey =
     env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY &&
     String(env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY).trim().length > 20
+  const megaEmail = env.MEGA_EMAIL && String(env.MEGA_EMAIL).trim()
+  const megaPassword = env.MEGA_PASSWORD && String(env.MEGA_PASSWORD).trim().length >= 4
   const megaUrl = env.MEGA_BACKUP_URL && String(env.MEGA_BACKUP_URL).trim().startsWith('http')
   const megaSecret =
-    env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim().length >= 16
+    (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim().length >= 16) ||
+    (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim().length >= 16)
 
   const body = {
     status: 'ok',
@@ -32,6 +38,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
       resumesBucketBound: Boolean(env.RESUMES_BUCKET),
       submissionsDbBound: Boolean(env.SUBMISSIONS_DB),
       recruitmentSupabaseConfigured: Boolean(recruitmentUrl && recruitmentKey),
+      megaCredentialsConfigured: Boolean(megaEmail && megaPassword),
       megaBackupWebhookConfigured: Boolean(megaUrl && megaSecret),
     },
   }
