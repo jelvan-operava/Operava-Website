@@ -160,15 +160,10 @@ function mapVerifiedMailbox(email: string): string {
   return e
 }
 
-/**
- * Normalize to Resend-compatible "Name <email@domain>".
- * Accepts OPERAVA<noreply@operavaglobal.com> (no space) and OPERAVA <noreply@...>.
- */
 export function normalizeFromAddress(value: string | undefined | null): string {
   let raw = String(value || '').trim()
   if (!raw) return DEFAULT_RESEND_FROM
 
-  // OPERAVA<noreply@...> → OPERAVA <noreply@...>
   raw = raw.replace(/^([^<\s]+)<([^>]+)>$/, '$1 <$2>')
 
   const angle = raw.match(/^(.*)<([^>]+)>$/)
@@ -183,7 +178,6 @@ export function normalizeFromAddress(value: string | undefined | null): string {
   return DEFAULT_RESEND_FROM
 }
 
-/** Prefer RESEND_EMAIL_FROM, then RESEND_FROM, then default. */
 export function resolveFromEnv(env: FormEnv): string {
   const preferred =
     (env.RESEND_EMAIL_FROM && String(env.RESEND_EMAIL_FROM).trim()) ||
@@ -279,12 +273,39 @@ export function otpEmailText(name: string, purpose: string, code: string) {
 
 export type SendResendResult = { id: string; status: number }
 
+/** Thrown by sendResend — includes safe provider details for API responses. */
+export class EmailSendError extends Error {
+  code: string
+  providerStatus?: number
+  providerMessage?: string
+  fromUsed?: string
+  constructor(
+    code: string,
+    message: string,
+    extra?: { providerStatus?: number; providerMessage?: string; fromUsed?: string },
+  ) {
+    super(message)
+    this.name = 'EmailSendError'
+    this.code = code
+    this.providerStatus = extra?.providerStatus
+    this.providerMessage = extra?.providerMessage
+    this.fromUsed = extra?.fromUsed
+  }
+}
+
+function sanitizeProviderMessage(raw: string): string {
+  return String(raw || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 240)
+}
+
 export async function sendResend(env: FormEnv, payload: Record<string, unknown>): Promise<SendResendResult> {
   const apiKey = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
-  if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
+  if (!apiKey) throw new EmailSendError('RESEND_NOT_CONFIGURED', 'RESEND_API_KEY is not configured')
   if (apiKey.length < 20) {
     console.error('Resend API key looks truncated')
-    throw new Error('EMAIL_API_KEY_INVALID')
+    throw new EmailSendError('EMAIL_API_KEY_INVALID', 'EMAIL_API_KEY_INVALID')
   }
 
   const from = normalizeFromAddress(
@@ -298,7 +319,7 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     const e = extractPlainEmail(payload.to)
     if (PLAIN_EMAIL_RE.test(e)) to = [e]
   }
-  if (to.length === 0) throw new Error('EMAIL_INVALID_TO')
+  if (to.length === 0) throw new EmailSendError('EMAIL_INVALID_TO', 'EMAIL_INVALID_TO', { fromUsed: from })
 
   let replyTo: string | undefined
   if (typeof payload.reply_to === 'string' && payload.reply_to.trim()) {
@@ -337,17 +358,57 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     })
   } catch (netErr) {
     console.error('Resend network error', netErr instanceof Error ? netErr.message : 'unknown')
-    throw new Error('EMAIL_SEND_FAILED')
+    throw new EmailSendError('EMAIL_SEND_FAILED', 'EMAIL_SEND_FAILED', { fromUsed: from })
   }
 
   const raw = await res.text().catch(() => '')
   if (!res.ok) {
-    console.error('Resend API error', res.status, raw.slice(0, 400), 'from=', from)
-    if (res.status === 401 || res.status === 403) throw new Error('EMAIL_API_KEY_INVALID')
-    if (/pattern/i.test(raw)) throw new Error('EMAIL_ADDRESS_PATTERN')
-    if (/not verified|domain/i.test(raw)) throw new Error('EMAIL_DOMAIN_NOT_VERIFIED')
-    if (/invalid.*api.?key|unauthorized/i.test(raw)) throw new Error('EMAIL_API_KEY_INVALID')
-    throw new Error('EMAIL_SEND_FAILED')
+    const providerMessage = sanitizeProviderMessage(raw)
+    console.error('Resend API error', res.status, providerMessage, 'from=', from)
+
+    if (res.status === 401 || res.status === 403) {
+      throw new EmailSendError('EMAIL_API_KEY_INVALID', 'EMAIL_API_KEY_INVALID', {
+        providerStatus: res.status,
+        providerMessage,
+        fromUsed: from,
+      })
+    }
+
+    // Precise domain verification signals (avoid matching any message that merely contains "domain")
+    if (
+      /domain is not verified/i.test(raw) ||
+      /not verified/i.test(raw) ||
+      /verify.*(domain|email)/i.test(raw) ||
+      /sender.*not.*allowed/i.test(raw)
+    ) {
+      throw new EmailSendError('EMAIL_DOMAIN_NOT_VERIFIED', 'EMAIL_DOMAIN_NOT_VERIFIED', {
+        providerStatus: res.status,
+        providerMessage,
+        fromUsed: from,
+      })
+    }
+
+    if (/pattern/i.test(raw) || /invalid.*(from|to|email)/i.test(raw)) {
+      throw new EmailSendError('EMAIL_ADDRESS_PATTERN', 'EMAIL_ADDRESS_PATTERN', {
+        providerStatus: res.status,
+        providerMessage,
+        fromUsed: from,
+      })
+    }
+
+    if (/invalid.*api.?key|unauthorized/i.test(raw)) {
+      throw new EmailSendError('EMAIL_API_KEY_INVALID', 'EMAIL_API_KEY_INVALID', {
+        providerStatus: res.status,
+        providerMessage,
+        fromUsed: from,
+      })
+    }
+
+    throw new EmailSendError('EMAIL_SEND_FAILED', 'EMAIL_SEND_FAILED', {
+      providerStatus: res.status,
+      providerMessage,
+      fromUsed: from,
+    })
   }
 
   let id = ''

@@ -12,13 +12,13 @@ import {
   issueSignedDraft,
   senderFor,
   purposeLabel,
+  EmailSendError,
   type FormEnv,
 } from '../../lib/formCore'
 
 /**
  * POST /api/recruitment/email-send
  * Application email OTP for Recruitment AVA.
- * Same Resend path as /api/forms/start (signed draft, subject Verification Code).
  */
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
@@ -43,7 +43,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       return json({ error: 'Invalid request body.' }, 400)
     }
 
-    // Honeypot
     if (clean(body.website, 80)) {
       return json({ ok: true, draftId: 'filtered', maskedEmail: 'hidden' })
     }
@@ -93,31 +92,40 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
         text: otpEmailText(name, purpose, code),
       })
     } catch (mailErr) {
+      const err = mailErr instanceof EmailSendError ? mailErr : null
       const msg = mailErr instanceof Error ? mailErr.message : 'unknown'
-      console.error('recruitment OTP email failed', msg)
+      const codeOut = err?.code || msg
+      console.error('recruitment OTP email failed', codeOut, err?.providerMessage, err?.fromUsed)
+
       let error =
         'Unable to send verification email right now. Please try again in a moment, or contact talents@operavaglobal.com.'
-      let codeOut = 'EMAIL_SEND_FAILED'
-      if (msg === 'EMAIL_DOMAIN_NOT_VERIFIED') {
+
+      if (codeOut === 'EMAIL_DOMAIN_NOT_VERIFIED') {
         error =
-          'Email sender domain is not verified with Resend. Contact the site operator to verify operavaglobal.com.'
-        codeOut = msg
-      } else if (msg === 'EMAIL_ADDRESS_PATTERN') {
+          'Email sender domain is not verified with Resend for this API key. In Resend: Domains must show operavaglobal.com as Verified, and RESEND_API_KEY must belong to that same Resend account. From used: ' +
+          (err?.fromUsed || 'OPERAVA <noreply@operavaglobal.com>')
+      } else if (codeOut === 'EMAIL_ADDRESS_PATTERN') {
         error =
           'Email address was rejected by the mail provider. Check the application email format and try again.'
-        codeOut = msg
-      } else if (msg === 'EMAIL_INVALID_TO') {
+      } else if (codeOut === 'EMAIL_INVALID_TO') {
         error = 'A valid application email is required.'
-        codeOut = msg
-      } else if (msg === 'RESEND_API_KEY is not configured') {
+      } else if (codeOut === 'RESEND_NOT_CONFIGURED' || msg === 'RESEND_API_KEY is not configured') {
         error = 'Email delivery is not configured. Please contact talents@operavaglobal.com.'
-        codeOut = 'RESEND_NOT_CONFIGURED'
-      } else if (msg === 'EMAIL_UNAUTHORIZED' || msg === 'EMAIL_API_KEY_INVALID') {
+      } else if (codeOut === 'EMAIL_API_KEY_INVALID') {
         error =
-          'Email service authentication failed. The site operator must update RESEND_API_KEY in Cloudflare Pages secrets.'
-        codeOut = msg
+          'Email service authentication failed. Update RESEND_API_KEY in Cloudflare Pages secrets (full re_ key from the same Resend account where the domain is verified).'
       }
-      return json({ error, code: codeOut }, 502)
+
+      return json(
+        {
+          error,
+          code: codeOut,
+          fromUsed: err?.fromUsed || undefined,
+          providerStatus: err?.providerStatus || undefined,
+          providerMessage: err?.providerMessage || undefined,
+        },
+        502,
+      )
     }
 
     return json({
