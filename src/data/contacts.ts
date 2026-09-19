@@ -63,9 +63,9 @@ export const contactChannels: ContactChannel[] = [
     id: 'verification',
     title: 'Document Verification',
     email: 'verification@operavaglobal.com',
-    url: 'https://verification.operavaglobal.com',
+    url: 'https://www.operavaglobal.com/verification',
     description: 'Verify OPERAVA-issued document reference IDs and request clarification on verified records.',
-    whenToContact: 'Use the Verification Portal to check a reference ID. Email this address only when you need confirmation of specific document content beyond the ID status.',
+    whenToContact: 'Use the Verification Portal at https://www.operavaglobal.com/verification to check a reference ID. Email verification@operavaglobal.com only when you need confirmation of specific document content beyond the ID status.',
   },
   {
     id: 'billing',
@@ -90,5 +90,6 @@ export const contactChannels: ContactChannel[] = [
   },
 ]
 
-export const verificationPortalUrl = 'https://verification.operavaglobal.com'
+/** Official document verification portal (main site path only) */
+export const verificationPortalUrl = 'https://www.operavaglobal.com/verification'
 export const verificationEmail = 'verification@operavaglobal.com'
