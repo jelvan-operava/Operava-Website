@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import AcademyEnrollmentForm from '../components/forms/AcademyEnrollmentForm'
 import {
   GraduationCap,
   BookOpen,
@@ -102,7 +103,7 @@ const partnershipFeatures = [
   },
   {
     title: 'Diploma programs',
-    desc: 'Diploma-level credentials developed or co-delivered with partner institutions, subject to each partner’s academic standards and regulations.',
+    desc: 'Diploma-level credentials developed or co-delivered with partner institutions, subject to each partner\'s academic standards and regulations.',
     icon: FileBadge,
   },
   {
@@ -112,7 +113,7 @@ const partnershipFeatures = [
   },
   {
     title: 'Global accessibility',
-    desc: 'Online delivery supports learners across regions while formal credentials remain governed by the issuing institution’s jurisdiction and rules.',
+    desc: 'Online delivery supports learners across regions while formal credentials remain governed by the issuing institution\'s jurisdiction and rules.',
     icon: Globe2,
   },
 ]
@@ -143,7 +144,6 @@ const howItWorks = [
 export default function Academy() {
   return (
     <main className="bg-[#FBFBFA]">
-      {/* Hero */}
       <section className="pt-28 pb-16 lg:pt-36 lg:pb-24 bg-gradient-to-b from-violet-950 via-violet-900 to-indigo-950 text-white">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="max-w-4xl">
@@ -159,14 +159,22 @@ export default function Academy() {
               Intelligence, Human Resources, and Leadership — and works with institutions to support
               degree and diploma pathways for learners who need formal academic credentials.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                to="/contact"
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+              <a
+                href="https://academy.operavaglobal.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-violet-900 font-semibold text-sm hover:bg-violet-50 transition-colors"
               >
-                Inquire about programs
+                Learning Management System
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </a>
+              <a
+                href="#enroll"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/30 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
+              >
+                Course / training enrollment
+              </a>
               <a
                 href="#partnerships"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/30 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
@@ -178,7 +186,6 @@ export default function Academy() {
         </div>
       </section>
 
-      {/* Three pillars */}
       <section className="py-16 lg:py-24 bg-[#FBFBFA]">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="max-w-3xl mb-12">
@@ -218,7 +225,6 @@ export default function Academy() {
         </div>
       </section>
 
-      {/* Certification tracks */}
       <section className="py-16 lg:py-24 bg-[#F7F6F4] border-y border-stone-100/80">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="max-w-3xl mb-12">
@@ -260,13 +266,13 @@ export default function Academy() {
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      to="/contact"
+                    <a
+                      href="#enroll"
                       className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-violet-700 bg-violet-50 hover:bg-violet-100 transition-colors"
                     >
                       Ask about this track
                       <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    </a>
                   </div>
                 </div>
               )
@@ -275,7 +281,6 @@ export default function Academy() {
         </div>
       </section>
 
-      {/* Online learning detail */}
       <section className="py-16 lg:py-24 bg-[#FBFBFA]">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -288,7 +293,7 @@ export default function Academy() {
                 Built for remote-first professionals
               </h2>
               <p className="text-base text-gray-600 leading-relaxed mb-6">
-                OPERAVA Academy’s online model mirrors how modern work happens: digital tools,
+                OPERAVA Academy's online model mirrors how modern work happens: digital tools,
                 clear outcomes, and accountability. Courses combine conceptual foundations with
                 practical application so learners can use skills immediately in technology,
                 operations, and people leadership roles.
@@ -338,7 +343,46 @@ export default function Academy() {
         </div>
       </section>
 
-      {/* Partnerships */}
+      <section id="enroll" className="py-16 lg:py-24 bg-white border-y border-gray-100 scroll-mt-24">
+        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+            <div>
+              <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-700 mb-3">
+                <Laptop className="w-3.5 h-3.5" />
+                Learning Management System
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">
+                Learn on the OPERAVA Academy platform
+              </h2>
+              <p className="text-base text-gray-600 leading-relaxed mb-6">
+                Access courses, progress tracking, and Academy resources through the Learning Management System.
+              </p>
+              <a
+                href="https://academy.operavaglobal.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-700 text-white text-sm font-semibold hover:bg-violet-800 transition-colors"
+              >
+                Open LMS — academy.operavaglobal.com
+                <ArrowRight className="w-4 h-4" />
+              </a>
+              <p className="mt-6 text-sm text-gray-500 leading-relaxed">
+                For course or training enrollment and details inquiries, use the form. Submissions use the same email
+                verification flow as other OPERAVA forms. Confirmations are sent from our notification address and
+                copied to academy@operavaglobal.com.
+              </p>
+            </div>
+            <div className="p-6 sm:p-8 rounded-2xl border border-gray-200 bg-[#FBFBFA] shadow-sm">
+              <h3 className="text-xl font-bold text-gray-900 mb-1">Enrollment & details inquiry</h3>
+              <p className="text-sm text-gray-500 mb-6">
+                Course enrollment, training enrollment, or questions about programs and certifications.
+              </p>
+              <AcademyEnrollmentForm />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="partnerships" className="py-16 lg:py-24 bg-gray-950 text-white scroll-mt-24">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="max-w-3xl mb-12">
@@ -380,13 +424,13 @@ export default function Academy() {
               and credential titles depend on each partnership agreement.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Link
-                to="/contact"
+              <a
+                href="#enroll"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-violet-600 text-white text-sm font-semibold hover:bg-violet-500 transition-colors"
               >
-                Partner with OPERAVA Academy
+                Partner / program inquiry
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </a>
               <a
                 href="mailto:partners@operavaglobal.com"
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border border-white/20 text-white text-sm font-semibold hover:bg-white/10 transition-colors"
@@ -398,16 +442,12 @@ export default function Academy() {
         </div>
       </section>
 
-      {/* How it works */}
       <section className="py-16 lg:py-24 bg-[#FBFBFA]">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
           <div className="max-w-3xl mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">
-              How it works
-            </h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-4">How it works</h2>
             <p className="text-base text-gray-600 leading-relaxed">
-              From first inquiry to certificate — and, where partnered, toward diploma or degree
-              pathways.
+              From first inquiry to certificate — and, where partnered, toward diploma or degree pathways.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -422,32 +462,28 @@ export default function Academy() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 lg:py-20 bg-[#F7F6F4] border-t border-stone-100/80">
-        <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
-          <div className="p-8 sm:p-10 rounded-2xl bg-gradient-to-r from-violet-900 to-indigo-900 text-white flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-            <div className="max-w-2xl">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-3">Ready to start or partner?</h2>
-              <p className="text-sm sm:text-base text-violet-100/90 leading-relaxed">
-                Ask about online programs, professional certifications in AI, HR, and Leadership, or
-                institutional partnerships for degree and diploma pathways.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-              <Link
-                to="/contact"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-violet-900 font-bold text-sm hover:bg-violet-50 transition-colors"
-              >
-                Contact OPERAVA
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/careers"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/30 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
-              >
-                Careers at OPERAVA
-              </Link>
-            </div>
+      <section className="py-16 lg:py-20 bg-violet-950 text-white">
+        <div className="w-full max-w-4xl mx-auto px-5 sm:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to start learning?</h2>
+          <p className="text-violet-100 mb-8">
+            Open the LMS or send an enrollment inquiry — the Academy team will guide next steps.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="https://academy.operavaglobal.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-violet-900 font-semibold text-sm hover:bg-violet-50"
+            >
+              Learning Management System
+              <ArrowRight className="w-4 h-4" />
+            </a>
+            <a
+              href="#enroll"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/30 text-white font-semibold text-sm hover:bg-white/10"
+            >
+              Enrollment form
+            </a>
           </div>
         </div>
       </section>
