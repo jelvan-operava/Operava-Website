@@ -9,13 +9,20 @@ import {
   extractPlainEmail,
   type FormEnv,
 } from '../../lib/formCore'
+import {
+  recruitmentConfigured,
+  upsertApplicantOnVerify,
+  type RecruitmentEnv,
+} from '../../lib/recruitmentDb'
+
+type Env = FormEnv & RecruitmentEnv
 
 /**
  * POST /api/recruitment/email-verify
- * Validates OTP and returns a short-lived verified session token.
- * Does NOT create permanent Supabase/D1 applicant rows (Phase 3+).
+ * Validates OTP, creates/updates permanent applicant in recruitment Supabase,
+ * returns verified session token.
  */
-export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   try {
     const secret = resolveSecret(env)
     let body: { draftId?: string; code?: string }
@@ -48,7 +55,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     const hashed = await hashOtp(secret, code)
     if (hashed !== signed.codeHash) {
-      // Re-issue draft with incremented attempts so client can keep trying with same draftId replaced
       const bumped = await issueSignedDraft(secret, {
         email: signed.email,
         formType: signed.formType,
@@ -69,14 +75,47 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       )
     }
 
+    if (!recruitmentConfigured(env)) {
+      return json(
+        {
+          error:
+            'Applicant database is not configured. Contact talents@operavaglobal.com.',
+        },
+        503,
+      )
+    }
+
     const name = String(payload.name || '')
     const email = extractPlainEmail(signed.email)
     const position = String(payload.position || '')
     const positionCode = String(payload.positionCode || '')
+    const emailVerifiedAt = new Date().toISOString()
 
     const year = new Date().getUTCFullYear()
     const n = crypto.getRandomValues(new Uint32Array(1))[0] % 900000
-    const applicationId = 'OPERAVA-APP-' + year + '-' + String(100000 + n).padStart(6, '0')
+    const provisionalId = 'OPERAVA-APP-' + year + '-' + String(100000 + n).padStart(6, '0')
+
+    let applicationId = provisionalId
+    try {
+      const row = await upsertApplicantOnVerify(env, {
+        application_id: provisionalId,
+        full_name: name,
+        email,
+        position_title: position,
+        position_code: positionCode,
+        email_verified_at: emailVerifiedAt,
+      })
+      applicationId = row.application_id
+    } catch (dbErr) {
+      console.error('recruitment upsert failed', dbErr instanceof Error ? dbErr.message : 'unknown')
+      return json(
+        {
+          error:
+            'Email verified locally but applicant record could not be saved. Ensure the recruitment schema is applied in Supabase, then try again.',
+        },
+        502,
+      )
+    }
 
     const sessionExpiresAt = Date.now() + 24 * 60 * 60 * 1000
     const sessionBody = JSON.stringify({
@@ -87,7 +126,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       position,
       positionCode,
       applicationId,
-      emailVerifiedAt: new Date().toISOString(),
+      emailVerifiedAt,
       expiresAt: sessionExpiresAt,
     })
     const sessionPayload = b64urlEncode(sessionBody)
@@ -104,6 +143,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       positionCode,
       sessionToken,
       expiresAt: sessionExpiresAt,
+      persisted: true,
     })
   } catch (err) {
     console.error('recruitment email-verify failed', err instanceof Error ? err.message : 'unknown')
