@@ -49,7 +49,18 @@ export default function OtpVerify({
         body: JSON.stringify({ draftId, code: value }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Verification failed.')
+      if (data.draftId) {
+        setDraftId(String(data.draftId))
+        onDraftIdChange?.(String(data.draftId))
+      }
+      if (!res.ok) {
+        const remaining = data.attemptsRemaining
+        const base = String(data.error || 'Verification failed.')
+        if (typeof remaining === 'number') {
+          throw new Error(base + (remaining > 0 ? ` (${remaining} attempts left)` : ''))
+        }
+        throw new Error(base)
+      }
       onVerified({ referenceId: data.referenceId, name: data.name, formType: data.formType })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Verification failed.')
@@ -92,6 +103,8 @@ export default function OtpVerify({
     }
     setSeconds(45)
     setError('')
+    setDigits(['', '', '', '', '', ''])
+    refs.current[0]?.focus()
   }
 
   return (
@@ -117,7 +130,7 @@ export default function OtpVerify({
       <button type="button" disabled={busy || code.length !== 6} onClick={() => verify()} className="w-full py-3 rounded-xl bg-violet-700 text-white text-sm font-bold disabled:opacity-50">
         {busy ? 'Verifying…' : 'VERIFY EMAIL'}
       </button>
-      <p className="text-xs text-gray-500">Didn&apos;t receive the code?</p>
+      <p className="text-xs text-gray-500">Didn't receive the code?</p>
       <button type="button" onClick={resend} disabled={seconds > 0} className="text-xs font-semibold text-violet-700 disabled:text-gray-400">
         Resend code{seconds > 0 ? ` in 00:${String(seconds).padStart(2, '0')}` : ''}
       </button>
