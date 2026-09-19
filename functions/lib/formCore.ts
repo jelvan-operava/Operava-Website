@@ -20,16 +20,16 @@ export interface FormEnv {
 
 /**
  * Resend from format: "Display Name <email@verified-domain.com>"
- * Verified OPERAVA sender on Resend: notification@operavaglobal.com
- * noreply@operavaglobal.com is mapped to the verified notification mailbox.
+ * Default verified OPERAVA sender: noreply@operavaglobal.com
+ * Aliases (notification@, no-reply@) map to noreply@operavaglobal.com.
  */
-export const DEFAULT_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
-export const OTP_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
-export const NOTIFICATION_NOREPLY_FROM = 'OPERAVA <notification@operavaglobal.com>'
+export const DEFAULT_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
+export const OTP_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
+export const NOTIFICATION_NOREPLY_FROM = 'Operava <noreply@operavaglobal.com>'
 export const CLIENT_RESEND_FROM = 'hello@operavaglobal.com'
 export const TALENT_RESEND_FROM = 'talents@operavaglobal.com'
 export const ACADEMY_RESEND_FROM = 'academy@operavaglobal.com'
-export const APPLICANT_CONFIRMATION_FROM = 'OPERAVA <notification@operavaglobal.com>'
+export const APPLICANT_CONFIRMATION_FROM = 'Operava <noreply@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
 export const ACADEMY_INBOX_DEFAULT = 'academy@operavaglobal.com'
 export const DEFAULT_OTP_SECRET = 'operava-form-secret'
@@ -151,15 +151,16 @@ export function extractPlainEmail(value: string): string {
   return raw.toLowerCase()
 }
 
-/** Map known aliases to the verified Resend mailbox. */
+/** Map known aliases to the verified Resend mailbox: noreply@operavaglobal.com */
 function mapVerifiedMailbox(email: string): string {
   const e = email.toLowerCase()
   if (
-    e === 'noreply@operavaglobal.com' ||
+    e === 'notification@operavaglobal.com' ||
     e === 'notification-noreply@operavaglobal.com' ||
-    e === 'no-reply@operavaglobal.com'
+    e === 'no-reply@operavaglobal.com' ||
+    e === 'noreply@operavaglobal.com'
   ) {
-    return 'notification@operavaglobal.com'
+    return 'noreply@operavaglobal.com'
   }
   return e
 }
@@ -170,12 +171,12 @@ export function normalizeFromAddress(value: string | undefined | null): string {
   if (!raw) return DEFAULT_RESEND_FROM
   const angle = raw.match(/^(.*)<([^>]+)>$/)
   if (angle) {
-    const name = angle[1].trim().replace(/["<>]/g, '') || 'OPERAVA'
+    const name = angle[1].trim().replace(/["<>]/g, '') || 'Operava'
     const email = mapVerifiedMailbox(angle[2].trim())
     if (PLAIN_EMAIL_RE.test(email)) return name + ' <' + email + '>'
   }
   if (PLAIN_EMAIL_RE.test(raw.toLowerCase())) {
-    return 'OPERAVA <' + mapVerifiedMailbox(raw) + '>'
+    return 'Operava <' + mapVerifiedMailbox(raw) + '>'
   }
   return DEFAULT_RESEND_FROM
 }
