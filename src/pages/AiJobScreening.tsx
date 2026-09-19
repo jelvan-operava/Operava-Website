@@ -328,6 +328,35 @@ export default function AiJobScreening() {
         },
       ])
       setStage('session')
+      void (async () => {
+        try {
+          const res = await fetch('/api/recruitment/profile-get', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionToken: data.sessionToken }),
+          })
+          if (!res.ok) return
+          const row = await res.json()
+          setProfile((prev) => ({
+            ...prev,
+            name: row.name || prev.name,
+            email: row.email || prev.email,
+            phone: row.phone || prev.phone,
+            education: row.education || prev.education,
+            experienceYears: row.experienceYears || prev.experienceYears,
+            experienceSummary: row.experienceSummary || prev.experienceSummary,
+            skills: Array.isArray(row.skills) && row.skills.length ? row.skills : prev.skills,
+            positionSpecific: row.positionSpecific || prev.positionSpecific,
+            availability: row.availability || prev.availability,
+            startDate: row.startDate || prev.startDate,
+            additional: row.additional || prev.additional,
+            emailVerified: true,
+            applicationId: row.applicationId || prev.applicationId,
+          }))
+        } catch {
+          /* keep session snapshot */
+        }
+      })()
     } catch {
       sessionStorage.removeItem(SESSION_KEY)
     }
@@ -364,13 +393,34 @@ export default function AiJobScreening() {
     setVerifyError('')
   }
 
+  const persistProfile = (next: ApplicantProfile, token: string) => {
+    if (!token || !next.emailVerified) return
+    void fetch('/api/recruitment/profile-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionToken: token,
+        name: next.name,
+        phone: next.phone,
+        education: next.education,
+        experienceYears: next.experienceYears,
+        experienceSummary: next.experienceSummary,
+        skills: next.skills,
+        positionSpecific: next.positionSpecific,
+        availability: next.availability,
+        startDate: next.startDate,
+        additional: next.additional,
+      }),
+    }).catch(() => {})
+  }
+
   const mergeProfile = (partial: Partial<ApplicantProfile>) => {
     setProfile((prev) => {
       const skills =
         partial.skills !== undefined
           ? Array.from(new Set([...(prev.skills || []), ...partial.skills])).slice(0, 12)
           : prev.skills
-      return {
+      const next: ApplicantProfile = {
         ...prev,
         ...partial,
         skills,
@@ -380,6 +430,8 @@ export default function AiJobScreening() {
             ? partial.experienceSummary
             : prev.experienceSummary || partial.experienceSummary || '',
       }
+      if (sessionToken) persistProfile(next, sessionToken)
+      return next
     })
   }
 
@@ -839,7 +891,7 @@ export default function AiJobScreening() {
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Application status</p>
           <p className="text-xs font-semibold text-violet-700">Application in progress</p>
           <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
-            Email verified. Profile details stay in this session until permanent storage (Phase 3).
+            Email verified. Profile fields are saved to your permanent application record.
           </p>
         </section>
       </div>
@@ -919,7 +971,7 @@ export default function AiJobScreening() {
           <div className="px-4 sm:px-6 py-2 border-b border-slate-100 bg-violet-50/60">
             <p className="text-[11px] text-violet-900/80 leading-snug">
               <span className="font-semibold">{position?.shortTitle}</span>
-              {' · '}Email verified · Guided application · Not a final hiring decision
+              {' · '}Email verified · Saved application · Guided screening · Not a final hiring decision
             </p>
           </div>
 
