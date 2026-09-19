@@ -11,7 +11,9 @@ import {
   staffNotificationEmail,
   senderFor,
   extractPlainEmail,
+  ACADEMY_INBOX_DEFAULT,
   type FormEnv,
+  type FormType,
 } from '../../lib/formCore'
 
 const LABEL_MAP: Record<string, string> = {
@@ -20,8 +22,8 @@ const LABEL_MAP: Record<string, string> = {
   company: 'Company',
   phone: 'Phone',
   country: 'Country / Location',
-  category: 'Category',
-  service: 'Service',
+  category: 'Inquiry Type',
+  service: 'Program / Track',
   description: 'Description',
   message: 'Message',
   budget: 'Budget',
@@ -80,7 +82,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
     const name = String(payload.name || '')
     const email = extractPlainEmail(signed.email)
-    const formType = signed.formType
+    const formType = signed.formType as FormType
     const referenceId = makeReference(formType)
     const nowIso = new Date().toISOString()
 
@@ -99,22 +101,31 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
 
     const rows = payloadRows(payload)
     const isCareer = formType === 'CAREERS'
+    const isAcademy = formType === 'ACADEMY'
 
-    const subject = isCareer ? 'WE RECEIVED YOUR APPLICATION' : 'WE RECEIVED YOUR INQUIRY'
+    const subject = isCareer
+      ? 'WE RECEIVED YOUR APPLICATION'
+      : isAcademy
+        ? 'WE RECEIVED YOUR ACADEMY INQUIRY'
+        : 'WE RECEIVED YOUR INQUIRY'
 
     const html = isCareer
       ? applicantConfirmationEmail({
           name,
           email,
           referenceId,
-          sourceLabel: isCareer ? 'Careers application form' : 'Services form',
+          sourceLabel: 'Careers application form',
           rows,
         })
       : clientConfirmationEmail({
           name,
           email,
           referenceId,
-          sourceLabel: formType === 'SERVICES' ? 'Services / Request a Quote form' : 'Contact form',
+          sourceLabel: isAcademy
+            ? 'OPERAVA Academy enrollment / inquiry form'
+            : formType === 'SERVICES'
+              ? 'Services / Request a Quote form'
+              : 'Contact form',
           rows,
         })
 
@@ -124,19 +135,29 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
         ',\n\nThank you for contacting OPERAVA and for your interest in our opportunities.\n\nWe confirm that we have received your application. Reference: ' +
         referenceId +
         '.\n\nYour application will be reviewed by the appropriate team.\n\nRegards,\nTalent Acquisition Team\nOPERAVA Global Solutions\n\nwww.operavaglobal.com'
-      : 'CONFIRMATION\n\nHi ' +
-        name +
-        ',\n\nThank you for contacting OPERAVA and for your interest in our services and business solutions.\n\nWe confirm that we have received your service inquiry. Reference: ' +
-        referenceId +
-        '.\n\nYour service inquiry will be reviewed by the appropriate OPERAVA team.\n\nRegards,\nClient Support Team\nOPERAVA Global Solutions\n\nwww.operavaglobal.com'
+      : isAcademy
+        ? 'CONFIRMATION\n\nHi ' +
+          name +
+          ',\n\nThank you for contacting OPERAVA Academy.\n\nWe confirm that we have received your course/training enrollment or details inquiry. Reference: ' +
+          referenceId +
+          '.\n\nThe Academy team will review your request. Learning Management System: https://academy.operavaglobal.com\n\nRegards,\nOPERAVA Academy\nOPERAVA Global Solutions\n\nwww.operavaglobal.com'
+        : 'CONFIRMATION\n\nHi ' +
+          name +
+          ',\n\nThank you for contacting OPERAVA and for your interest in our services and business solutions.\n\nWe confirm that we have received your service inquiry. Reference: ' +
+          referenceId +
+          '.\n\nYour service inquiry will be reviewed by the appropriate OPERAVA team.\n\nRegards,\nClient Support Team\nOPERAVA Global Solutions\n\nwww.operavaglobal.com'
 
     const staffInbox = isCareer
       ? env.TALENT_INBOX || 'talents@operavaglobal.com'
-      : env.CLIENT_INBOX || 'hello@operavaglobal.com'
+      : isAcademy
+        ? env.ACADEMY_INBOX || ACADEMY_INBOX_DEFAULT
+        : env.CLIENT_INBOX || 'hello@operavaglobal.com'
 
     const staffSubject = isCareer
       ? 'New application — ' + referenceId
-      : 'New inquiry — ' + referenceId
+      : isAcademy
+        ? 'New Academy enrollment / inquiry — ' + referenceId
+        : 'New inquiry — ' + referenceId
 
     const staffHtml = staffNotificationEmail({
       formType,
@@ -147,7 +168,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     })
 
     const staffText =
-      (isCareer ? 'APPLICATION' : 'INQUIRY') +
+      (isCareer ? 'APPLICATION' : isAcademy ? 'ACADEMY' : 'INQUIRY') +
       ' received\nReference: ' +
       referenceId +
       '\nFrom: ' +
@@ -155,16 +176,19 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       ' <' +
       email +
       '>\n\nReply to this message to contact the ' +
-      (isCareer ? 'applicant' : 'customer') +
+      (isCareer ? 'applicant' : isAcademy ? 'learner' : 'customer') +
       ' directly.\n'
 
     let emailWarning: string | undefined
+    // From noreply/notification@operavaglobal.com (verified Resend sender)
     const from = senderFor(formType, env)
 
     try {
       await sendResend(env, {
         from,
         to: [email],
+        // Learner confirmation BCC to Academy inbox
+        ...(isAcademy ? { bcc: [env.ACADEMY_INBOX || ACADEMY_INBOX_DEFAULT] } : {}),
         subject,
         html,
         text,
