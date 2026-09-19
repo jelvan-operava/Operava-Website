@@ -18,7 +18,7 @@ import {
   type FormType,
 } from '../../lib/formCore'
 
-const TYPES = new Set(['SERVICES', 'CAREERS', 'CONTACT'])
+const TYPES = new Set(['SERVICES', 'CAREERS', 'CONTACT', 'ACADEMY'])
 
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
@@ -65,6 +65,14 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
     if (formType === 'CONTACT' && clean(body.message || body.description, 4000).length < 10) {
       return json({ error: 'Message is required.' }, 400)
+    }
+    if (formType === 'ACADEMY') {
+      if (!clean(body.category, 180)) {
+        return json({ error: 'Inquiry type is required.' }, 400)
+      }
+      if (clean(body.description || body.message, 4000).length < 10) {
+        return json({ error: 'Please describe your enrollment or inquiry.' }, 400)
+      }
     }
 
     const now = Date.now()
