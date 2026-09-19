@@ -4,9 +4,17 @@ interface Env {
   AI?: unknown
   RESUMES_BUCKET?: unknown
   SUBMISSIONS_DB?: unknown
+  RECRUITMENT_SUPABASE_URL?: string
+  RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY?: string
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
+  const recruitmentUrl =
+    env.RECRUITMENT_SUPABASE_URL && String(env.RECRUITMENT_SUPABASE_URL).trim().startsWith('http')
+  const recruitmentKey =
+    env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY &&
+    String(env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY).trim().length > 20
+
   const body = {
     status: 'ok',
     platform: 'Cloudflare Pages Functions',
@@ -18,6 +26,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
       aiBound: Boolean(env.AI),
       resumesBucketBound: Boolean(env.RESUMES_BUCKET),
       submissionsDbBound: Boolean(env.SUBMISSIONS_DB),
+      recruitmentSupabaseConfigured: Boolean(recruitmentUrl && recruitmentKey),
     },
   }
 
