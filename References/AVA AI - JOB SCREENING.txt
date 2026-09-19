@@ -1,0 +1,1542 @@
+OPERAVA RECRUITMENT AVA
+COMPLETE PRODUCTION ARCHITECTURE, UI, WORKFLOW & SYSTEM SPECIFICATION
+
+VERSION: Production Specification
+SYSTEM: OPERAVA Recruitment AVA
+AI: Existing Cloudflare Worker AI
+BACKEND: Existing Cloudflare Worker
+DATABASE: Dedicated Supabase Recruitment Database
+EMAIL: Existing production email infrastructure / Resend
+DEPLOYMENT: Production Only
+MODE: No Demo / No Mock / No Simulated Data
+
+==================================================
+
+1. SYSTEM PURPOSE
+   ==================================================
+
+OPERAVA Recruitment AVA is an AI-powered recruitment application designed as a ChatGPT-style conversational experience.
+
+The applicant should not navigate through multiple traditional forms.
+
+The entire application process is conducted through one primary interface:
+
+LEFT PANEL:
+Live Applicant Profile
+
+RIGHT PANEL:
+Recruitment AVA Chat
+
+AVA identity:
+
+RECRUITMENT AVA
+Your Virtual Assistant for today
+
+AVA guides the applicant through the application, asks required questions, acknowledges answers professionally and in a friendly manner, identifies missing information, gathers structured information, and automatically updates the applicant profile.
+
+Once all required application information has been gathered and validated, AVA creates the applicant profile and prepares the applicant for a 30-question assessment.
+
+The entire system must be connected to real production services.
+
+No demo records.
+No mock API.
+No fake applicant.
+No simulated assessment.
+No fake score.
+No placeholder backend.
+No fake email success message.
+
+If a production dependency is unavailable, the system must display an actual error or controlled unavailable state rather than pretending the operation succeeded.
+
+==================================================
+2. CORE ARCHITECTURE
+
+APPLICANT
+|
+v
+RECRUITMENT AVA WEB INTERFACE
+|
++-----------------------------+
+|                             |
+v                             v
+LEFT PANEL                    RIGHT PANEL
+Applicant Profile             AVA Chat
+|                             |
++-------------+---------------+
+|
+v
+CLOUDFLARE WORKER
+|
++----------+----------+
+|          |          |
+v          v          v
+Cloudflare     Supabase   Email/Resend
+Worker AI      Database   Verification
+|
+v
+Assessment Engine
+|
+v
+30 Question Assessment
+|
+v
+Score / Result
+|
++--------------------+
+|                    |
+v                    v
+PASS                  FAIL
+|                    |
+v                    v
+Recruitment Pool       Further Evaluation
+|
+v
+Temporary Agreement
+|
+v
+Email OTP Verification
+|
+v
+Recruitment Pool Enrollment
+|
+v
+Confirmation Email
+
+==================================================
+3. TECHNOLOGY STACK
+
+FRONTEND
+
+Use the existing OPERAVA production frontend and existing visual/theme system.
+
+The UI should be optimized for desktop and mobile while maintaining the primary two-panel ChatGPT-style experience.
+
+BACKEND
+
+Cloudflare Worker.
+
+The Worker is the authoritative backend.
+
+The Worker controls:
+
+- application state
+- session state
+- AI orchestration
+- profile extraction
+- database writes
+- email verification
+- assessment state
+- assessment questions
+- assessment scoring
+- anti-abuse controls
+- recruitment pool
+- agreement acknowledgement
+- second OTP verification
+- email sending
+- audit logs
+
+AI
+
+Use the existing Cloudflare Worker AI.
+
+DATABASE
+
+Use a separate Supabase database/project specifically for Recruitment AVA.
+
+EMAIL
+
+Use the existing production email/Resend implementation.
+
+The existing mandatory OPERAVA confirmation email format located at the project root must be reused for confirmation/result emails.
+
+==================================================
+4. SECURITY ARCHITECTURE
+
+The browser must never contain sensitive server credentials.
+
+Never expose:
+
+- Supabase service-role key
+- Resend API key
+- Cloudflare private secrets
+- AI credentials
+- database credentials
+- assessment answer keys
+- internal recruitment configuration
+- private applicant data to external search
+
+All sensitive operations must pass through the Cloudflare Worker.
+
+ARCHITECTURE:
+
+Browser
+|
+v
+Cloudflare Worker
+|
++--> AI
++--> Supabase
++--> Email
+
+The frontend is never the authority for:
+
+- applicant status
+- profile completion
+- assessment completion
+- score
+- pass/fail
+- agreement acceptance
+- recruitment pool enrollment
+
+==================================================
+5. APPLICATION ENTRY
+
+Opening the Recruitment AVA application displays:
+
+RECRUITMENT AVA
+
+Your Virtual Assistant for today
+
+Welcome message:
+
+"Welcome to OPERAVA Recruitment AVA. I'll guide you through your application, gather the required information, and help prepare your application for assessment."
+
+The applicant selects the position:
+
+1. Operava Technology Executive
+2. Operava Business Operation Executive
+3. Operava Customer Service Executive
+
+The selected position is stored as part of the application session.
+
+==================================================
+6. APPLICATION EMAIL VERIFICATION
+
+Before AVA permanently saves applicant information, the applicant must verify the Application Email.
+
+The applicant enters:
+
+APPLICATION EMAIL
+
+The interface explains:
+
+"We'll send a verification code to this email before your application information is saved."
+
+FLOW:
+
+Applicant enters email
+|
+v
+Cloudflare Worker
+|
+v
+Generate one-time OTP
+|
+v
+Send verification email
+|
+v
+Applicant enters OTP
+|
+v
+Worker validates OTP
+|
+v
+Email verified
+|
+v
+Persistent applicant information may now be saved
+
+OTP REQUIREMENTS:
+
+- six-digit code
+- short expiration period
+- one-time use
+- previous active OTP invalidated when a new OTP is issued
+- resend rate limiting
+- verification attempt rate limiting
+- secure OTP storage
+- plaintext OTP must not be logged
+- OTP must not be returned through the frontend API
+- excessive failed attempts must temporarily lock verification
+
+This should follow the same security principle as the existing OPERAVA form-submission email verification logic, specifically adapted for Application Email Verification.
+
+==================================================
+7. PRE-VERIFICATION SESSION
+
+Before email verification:
+
+The applicant may have a temporary conversation session.
+
+However:
+
+DO NOT create the permanent applicant profile.
+
+DO NOT permanently save the applicant's structured information.
+
+DO NOT mark the application as verified.
+
+Temporary session state may contain only what is necessary to complete verification and maintain the conversation experience.
+
+After verification:
+
+email_verified = TRUE
+
+The Worker can persist applicant information.
+
+==================================================
+8. MAIN UI
+
+The application must look and behave like a modern ChatGPT-style interface.
+
+ONE SCREEN.
+
+LEFT:
+Applicant information.
+
+RIGHT:
+AVA conversation.
+
+Do not create unnecessary dashboard navigation for the applicant.
+
+---
+
+LEFT PANEL
+
+Header:
+
+APPLICANT
+
+Applicant Name
+Application ID
+
+POSITION
+
+Selected position
+
+CONTACT
+
+Email
+Verification status
+Phone
+
+PERSONAL INFORMATION
+
+Required personal/application information
+
+EDUCATION
+
+Education/training
+
+EXPERIENCE
+
+Professional experience
+
+SKILLS
+
+Relevant skills
+
+AVAILABILITY
+
+Work schedule
+Start date
+Other availability
+
+SCREENING
+
+Category completion indicators
+
+APPLICATION STATUS
+
+Current application stage
+
+Example:
+
+APPLICANT
+
+Maria Santos
+OPERAVA-APP-2026-000124
+
+POSITION
+
+Operava Customer Service Executive
+
+EMAIL
+
+maria@example.com
+Verified
+
+EXPERIENCE
+
+3 years
+Customer Service / BPO
+
+SKILLS
+
+Customer Service
+Salesforce
+Zendesk
+Email Support
+
+AVAILABILITY
+
+Night Shift
+Start Date: October 1, 2026
+
+SCREENING
+
+Personal Information      ✓
+Education                 ✓
+Experience                ✓
+Skills                    ✓
+Availability              ?
+
+APPLICATION STATUS
+
+Application In Progress
+
+---
+
+RIGHT PANEL
+
+Header:
+
+RECRUITMENT AVA
+Your Virtual Assistant for today
+
+Below the header is the conversation.
+
+At the bottom:
+
+Ask Recruitment AVA anything...
+
+Send button
+
+Optional attachment control where appropriate.
+
+The interface should be visually clean, minimal and consistent with the OPERAVA theme.
+
+==================================================
+9. AVA CONVERSATION ENGINE
+
+AVA must behave as a professional and friendly recruitment assistant.
+
+AVA should not behave like an uncontrolled general-purpose chatbot.
+
+AVA should:
+
+- understand the current application category
+- ask the next required question
+- recognize complete answers
+- detect incomplete answers
+- ask follow-up questions
+- acknowledge answers
+- extract structured information
+- update the applicant profile
+- continue the application flow
+- avoid asking questions that have already been answered
+- avoid unnecessarily repeating information
+- maintain conversation context
+- stay within Recruitment AVA's authorized knowledge
+
+Example:
+
+AVA:
+
+"How many years of customer service experience do you have?"
+
+Applicant:
+
+"I worked in customer service for three years."
+
+AVA:
+
+"Thank you. I've recorded three years of customer service experience. What type of customer interactions did you primarily handle?"
+
+The profile can update immediately:
+
+EXPERIENCE
+3 years
+
+==================================================
+10. APPLICATION CATEGORIES
+
+AVA should gather information through controlled categories.
+
+Recommended structure:
+
+CATEGORY 1
+Application / Personal Information
+
+CATEGORY 2
+Education / Training
+
+CATEGORY 3
+Professional Experience
+
+CATEGORY 4
+Skills and Knowledge
+
+CATEGORY 5
+Position-Specific Experience
+
+CATEGORY 6
+Availability
+
+CATEGORY 7
+Additional Required Information
+
+APPLICATION COMPLETE
+
+The exact required fields should be configurable through Supabase.
+
+Do not hard-code all requirements exclusively into the frontend.
+
+==================================================
+11. CATEGORY COMPLETION
+
+After every answer, AVA determines whether the required information is sufficient.
+
+FLOW:
+
+Answer received
+|
+v
+AVA analyzes answer
+|
++--> Insufficient
+|       |
+|       v
+|   Follow-up question
+|
++--> Sufficient
+|
+v
+Professional acknowledgement
+|
+v
+Extract structured information
+|
+v
+Validate information
+|
+v
+Update profile
+|
+v
+Continue next question
+
+Category completion example:
+
+"Thank you. I have the information needed for this section. Let's continue."
+
+The acknowledgement should remain concise, professional and friendly.
+
+==================================================
+12. LIVE PROFILE UPDATES
+
+The left panel is not static.
+
+It is a live representation of structured applicant data.
+
+Example:
+
+Applicant:
+
+"I have five years of customer service experience."
+
+AVA:
+
+"Thank you. I've recorded five years of customer service experience."
+
+LEFT PANEL immediately changes:
+
+EXPERIENCE
+
+5 years
+Customer Service
+
+Another example:
+
+Applicant:
+
+"I'm available for night shift."
+
+LEFT PANEL:
+
+AVAILABILITY
+
+Night Shift ✓
+
+Another:
+
+Applicant:
+
+"I used Salesforce and Zendesk."
+
+LEFT PANEL:
+
+SKILLS
+
+Salesforce
+Zendesk
+
+==================================================
+13. PROFILE UPDATE SOURCES
+
+Every structured field should have a source.
+
+Possible sources:
+
+applicant_conversation
+uploaded_resume
+recruiter_update
+assessment
+system
+
+Example:
+
+field:
+experience_years
+
+value:
+5
+
+source:
+applicant_conversation
+
+message_id:
+associated AVA message
+
+updated_at:
+timestamp
+
+This creates an auditable record of where applicant information originated.
+
+==================================================
+14. AVA ACTION SYSTEM
+
+AVA must not have unrestricted direct database access.
+
+AVA generates controlled actions.
+
+Example:
+
+AVA:
+
+ACTION
+update_profile
+
+field:
+experience_years
+
+value:
+5
+
+The Cloudflare Worker receives the action.
+
+Worker:
+
+1. validates action
+2. validates field
+3. validates data type
+4. validates application state
+5. verifies applicant session
+6. writes to Supabase
+7. returns approved state to frontend
+
+Possible controlled actions:
+
+update_profile
+add_experience
+update_education
+add_skill
+remove_skill
+update_availability
+complete_category
+create_application
+start_assessment
+submit_assessment_answer
+record_acknowledgement
+offer_recruitment_pool
+
+==================================================
+15. APPLICANT PROFILE CREATION
+
+When all mandatory application information is collected:
+
+AVA indicates:
+
+"Thank you. I have all the required information for your application."
+
+Then the Worker performs server-side validation.
+
+FLOW:
+
+Required information complete
+|
+v
+Worker validates required fields
+|
+v
+Create applicant
+|
+v
+Create applicant profile
+|
+v
+Create application
+|
+v
+Create profile snapshot
+|
+v
+Assessment preparation
+
+The frontend cannot independently declare:
+
+PROFILE_COMPLETE
+
+The Worker must determine this.
+
+Example application ID:
+
+OPERAVA-APP-2026-000124
+
+==================================================
+16. RECRUITMENT AVA KNOWLEDGE
+
+Recruitment AVA should have controlled knowledge covering:
+
+OPERAVA
+
+- recruitment process
+- application process
+- application requirements
+- available positions
+- assessment process
+- assessment rules
+- Recruitment Pool
+- temporary agreement
+- general applicant instructions
+
+POSITION KNOWLEDGE
+
+Operava Technology Executive
+Operava Business Operation Executive
+Operava Customer Service Executive
+
+AVA should answer applicant questions using this controlled knowledge.
+
+External search must NOT be used as the normal applicant knowledge source.
+
+==================================================
+17. EXTERNAL SEARCH RESTRICTION
+
+External search is allowed only for assessment question-generation support.
+
+External search must not receive:
+
+- applicant name
+- applicant email
+- phone number
+- private resume contents
+- private conversation details
+- application ID
+- private database information
+- internal OPERAVA credentials
+- confidential information
+
+For assessment generation, only the minimum non-sensitive topic context should be used.
+
+Example:
+
+"Generate a moderate web-development assessment question covering REST APIs."
+
+Do not send the applicant's personal information to external search.
+
+==================================================
+18. PRE-ASSESSMENT ANALYSIS
+
+After the applicant profile is complete:
+
+AVA analyzes:
+
+- position applied for
+- professional experience
+- relevant skills
+- education/training
+- position-related knowledge
+- application responses
+- resume information where applicable
+
+This analysis is used to generate a relevant assessment.
+
+The analysis is not itself a hiring decision.
+
+==================================================
+19. ASSESSMENT STRUCTURE
+
+TOTAL QUESTIONS:
+
+30
+
+STRUCTURE:
+
+15 Position-Specific Questions
+15 English-Language Questions
+
+PASSING GRADE:
+
+85%
+
+Because there are 30 whole questions:
+
+26/30 = 86.67% = PASS
+
+25/30 = 83.33% = FAIL
+
+Backend rule:
+
+correct_answers >= 26
+
+Do not rely on frontend calculations.
+
+==================================================
+20. TECHNOLOGY EXECUTIVE ASSESSMENT
+
+15 position-specific questions.
+
+Questions should be relevant to the applicant's technology experience.
+
+Possible areas:
+
+- Information Technology
+- Web development
+- Software development
+- Programming fundamentals
+- APIs
+- Databases
+- Debugging
+- Git/GitHub
+- Cloud concepts
+- Security fundamentals
+- Application architecture
+- Problem solving
+- Technical troubleshooting
+
+If the applicant has web-development experience, AVA should generate questions relevant to web development.
+
+If the applicant has software-development experience, questions should adapt toward software development.
+
+==================================================
+21. BUSINESS OPERATION EXECUTIVE ASSESSMENT
+
+15 position-specific questions.
+
+Possible areas:
+
+- Business operations
+- Process improvement
+- SOPs
+- Workflow management
+- Documentation
+- Data handling
+- Administrative processes
+- Automation
+- Business systems
+- Problem solving
+- Operational communication
+- Task prioritization
+
+Questions should adapt to the applicant's submitted experience.
+
+==================================================
+22. CUSTOMER SERVICE EXECUTIVE ASSESSMENT
+
+15 position-specific questions.
+
+Possible areas:
+
+- Customer handling
+- Customer communication
+- Complaint resolution
+- De-escalation
+- Empathy
+- Customer experience
+- Escalation
+- Documentation
+- Prioritization
+- Professional judgment
+- Service recovery
+- Workplace communication
+
+Questions should adapt to the applicant's customer-service background.
+
+==================================================
+23. ENGLISH ASSESSMENT
+
+15 English-language questions.
+
+Moderate difficulty.
+
+Possible areas:
+
+- Grammar
+- Vocabulary
+- Reading comprehension
+- Sentence construction
+- Workplace communication
+- Professional writing
+- Context interpretation
+- Written communication
+
+The assessment should be relevant to a professional workplace.
+
+==================================================
+24. REAL-TIME QUESTION GENERATION
+
+AVA should not simply display a static list of 30 generic questions.
+
+Questions should be generated dynamically.
+
+Input context:
+
+Applicant profile
++
+Position
++
+Relevant experience
++
+Previous assessment answers
++
+Current assessment progress
++
+Position-specific knowledge
++
+English assessment requirements
+
+OUTPUT:
+
+One appropriate next question.
+
+AVA should behave like an instructor or teacher creating relevant questions based on the learner's demonstrated experience and previous answers.
+
+The system must avoid revealing future questions.
+
+==================================================
+25. ONE QUESTION AT A TIME
+
+Only one assessment question is displayed.
+
+Example:
+
+ASSESSMENT
+
+Question 7 of 30
+
+"Which approach would you use to investigate a web application that suddenly begins returning HTTP 500 errors?"
+
+Answer:
+
+[ Type your answer... ]
+
+[ SUBMIT ANSWER ]
+
+After submission, the next question is generated/displayed.
+
+Do not display the full assessment.
+
+Do not display future questions.
+
+Do not expose the answer key.
+
+==================================================
+26. LIVE ASSESSMENT DISCLAIMER
+
+Before the assessment begins, show:
+
+LIVE ASSESSMENT NOTICE
+
+"This is a live assessment conducted by Recruitment AVA.
+
+Copying, copying questions or answers, using unauthorized assistance, or switching away from the assessment screen is prohibited.
+
+Your assessment session may be monitored for assessment integrity.
+
+If you leave or switch away from the assessment screen, the current question may be paused and a replacement question may be provided."
+
+Checkbox:
+
+"I understand and agree."
+
+Button:
+
+START ASSESSMENT
+
+The final wording should be reviewed against applicable employment, privacy and accessibility requirements before production launch.
+
+==================================================
+27. ASSESSMENT SCREEN
+
+Once started, the applicant remains in the assessment interface.
+
+No normal navigation should be available.
+
+Display:
+
+RECRUITMENT AVA
+
+LIVE ASSESSMENT
+
+Question 1 of 30
+
+Question text
+
+Answer field
+
+Submit Answer
+
+Assessment progress
+
+The assessment must not switch to another application page after each question.
+
+==================================================
+28. COPY / TEXT RESTRICTIONS
+
+The assessment interface should discourage normal copy/paste behavior.
+
+Controls can include:
+
+- disable normal text selection
+- disable context menu
+- disable Ctrl/Cmd+C
+- disable Ctrl/Cmd+X
+- disable Ctrl/Cmd+V where appropriate
+- disable text dragging
+- restrict copying from assessment content
+
+These controls are not absolute security.
+
+A browser cannot guarantee prevention of:
+
+- screenshots
+- camera capture
+- another device
+- external notes
+- accessibility tools
+- operating-system level capture
+
+The purpose is assessment integrity, not a claim of absolute prevention.
+
+==================================================
+29. SCREEN SWITCHING / VISIBILITY DETECTION
+
+The assessment should monitor browser visibility/focus events.
+
+Example:
+
+Assessment active
+|
+v
+Browser visibility changes
+|
+v
+Assessment event recorded
+|
+v
+Current question paused
+|
+v
+Applicant returns
+|
+v
+Replacement question generated
+|
+v
+Assessment continues
+
+The browser event is only a signal.
+
+The Cloudflare Worker must determine the official assessment state.
+
+==================================================
+30. REPLACEMENT QUESTION
+
+If the applicant leaves the assessment screen:
+
+Display:
+
+"The assessment was paused because the assessment screen was left.
+
+A replacement question will now be provided."
+
+The original question should not simply be displayed again.
+
+A replacement question is generated and stored.
+
+Example event:
+
+ASSESSMENT_SCREEN_LEFT
+
+question:
+17
+
+timestamp:
+server timestamp
+
+replacement:
+true
+
+replacement_question_id:
+new question ID
+
+==================================================
+31. ASSESSMENT EVENT LOG
+
+Store events such as:
+
+ASSESSMENT_STARTED
+QUESTION_GENERATED
+QUESTION_VIEWED
+ANSWER_STARTED
+ANSWER_SUBMITTED
+ASSESSMENT_SCREEN_LEFT
+ASSESSMENT_PAUSED
+ASSESSMENT_RESUMED
+REPLACEMENT_QUESTION_GENERATED
+ASSESSMENT_COMPLETED
+RESULT_CALCULATED
+
+Each event can contain:
+
+assessment ID
+application ID
+question ID
+event type
+server timestamp
+metadata
+replacement count
+
+==================================================
+32. ASSESSMENT ANSWER SECURITY
+
+The complete answer key must never be sent to the browser.
+
+Correct architecture:
+
+Cloudflare Worker
+|
+v
+Generate question
+|
+v
+Store secure evaluation information
+|
+v
+Send question only
+|
+v
+Applicant answers
+|
+v
+Worker receives answer
+|
+v
+Evaluate
+|
+v
+Store result
+
+The frontend must never determine the official:
+
+- score
+- pass/fail
+- assessment completion
+- question order
+- answer key
+
+==================================================
+33. ASSESSMENT SESSION DATA
+
+Recommended fields:
+
+assessment_session_id
+application_id
+applicant_id
+position
+question_number
+question_id
+question_type
+question_hash
+question_source
+started_at
+submitted_at
+answer
+evaluation_result
+visibility_events
+replacement_count
+status
+
+Assessment status values:
+
+READY
+ACTIVE
+PAUSED
+COMPLETED
+FINALIZED
+
+==================================================
+34. ASSESSMENT SCORING
+
+There are exactly 30 scored questions.
+
+15 position-specific
+15 English
+
+Passing grade:
+85%
+
+Whole-question scoring means:
+
+30/30 = 100%
+29/30 = 96.67%
+28/30 = 93.33%
+27/30 = 90%
+26/30 = 86.67%
+25/30 = 83.33%
+
+PASS:
+
+26 or more correct.
+
+FAIL:
+
+25 or fewer correct.
+
+Official score must be calculated server-side.
+
+==================================================
+35. ASSESSMENT COMPLETION
+
+After Question 30:
+
+Question 30 submitted
+|
+v
+Worker validates submission
+|
+v
+Assessment finalized
+|
+v
+Score calculated
+|
+v
+Result stored in Supabase
+|
+v
+Result email generated
+|
+v
+Applicant remains on the same screen
+
+Do not navigate the applicant away to another external page.
+
+==================================================
+36. COMPLETION MESSAGE
+
+AVA should display:
+
+"Your assessment has been completed.
+
+Your result has been recorded and submitted to the OPERAVA recruitment team.
+
+Please check your email for your assessment result and next steps."
+
+If passed:
+
+"Congratulations! Your assessment has been completed.
+
+Your result has been recorded and submitted to the OPERAVA recruitment team.
+
+Please check your email for your assessment result and next steps."
+
+==================================================
+37. RESULT EMAIL TEMPLATE
+
+Use the mandatory OPERAVA email confirmation format/template located at the project root.
+
+Do not create an unrelated email design.
+
+The existing email structure should remain consistent with OPERAVA branding.
+
+The content should be dynamically populated.
+
+==================================================
+38. FAILED ASSESSMENT EMAIL
+
+Body:
+
+"Thank you for submitting your application and completing your assessment with RECRUITMENT AVA.
+
+Unfortunately, you did not pass the assessment.
+
+85 percent is the passing grade."
+
+Then:
+
+YOUR ASSESSMENT RESULT
+
+Score:
+[XX]%
+
+Correct:
+[XX]
+
+Incorrect:
+[XX]
+
+Include a pie graph showing:
+
+Correct = green
+Incorrect = red
+
+Example:
+
+Correct: 50%
+Incorrect: 50%
+
+Then:
+
+"Your assessment has been submitted to the team for further evaluation and consideration and you'll be contacted via email if there are further updates.
+
+If you do not receive any notification, you may try to apply again after 14 days."
+
+==================================================
+39. PASSED ASSESSMENT EMAIL
+
+Body:
+
+"Thank you for submitting your application and completing your assessment with RECRUITMENT AVA.
+
+Congratulations for passing the assessment.
+
+85 percent is the passing grade."
+
+Then:
+
+YOUR ASSESSMENT RESULT
+
+Score:
+[XX]%
+
+Correct:
+[XX]
+
+Incorrect:
+[XX]
+
+Include pie graph:
+
+Correct = green
+Incorrect = red
+
+Then explain the Recruitment Pool option.
+
+==================================================
+40. RECRUITMENT POOL
+
+Applicants who pass the assessment may be offered the option to enroll in the OPERAVA Recruitment Pool.
+
+The pool is associated with the position applied for.
+
+Example:
+
+POSITION
+
+Operava Technology Executive
+
+ENGAGEMENT OPTIONS
+
+[ ] Full-Time
+[ ] Contractual
+[ ] Project-Based
+
+Multiple options may be selected.
+
+Meaning:
+
+The applicant agrees that OPERAVA may contact them when a relevant position, project, or job opportunity becomes available.
+
+Enrollment is optional.
+
+Enrollment does not guarantee employment.
+
+==================================================
+41. TEMPORARY RECRUITMENT POOL AGREEMENT
+
+Before enrollment, show:
+
+RECRUITMENT POOL AGREEMENT
+
+Position:
+
+[Selected Position]
+
+Selected engagement types:
+
+[Full-Time]
+[Contractual]
+[Project-Based]
+
+Agreement statement:
+
+"This Recruitment Pool Agreement is not an employment contract and does not guarantee employment, compensation, work assignment, placement, or a specific job opportunity.
+
+By enrolling in the Recruitment Pool, you agree that OPERAVA may contact you regarding relevant opportunities associated with the selected position and engagement types.
+
+A separate contract or engagement agreement will be presented and signed separately if a specific job, project, or position is offered by an OPERAVA team."
+
+Checkbox:
+
+"I acknowledge and agree."
+
+Button:
+
+CONTINUE
+
+==================================================
+42. SECOND EMAIL OTP
+
+After the applicant agrees to the Recruitment Pool Agreement:
+
+Agreement acknowledgement
+|
+v
+Send OTP to verified application email
+|
+v
+Applicant enters OTP
+|
+v
+Worker validates OTP
+|
+v
+Agreement acceptance finalized
+|
+v
+Recruitment Pool enrollment activated
+
+Use the same strong OTP controls:
+
+- one-time use
+- expiration
+- invalidation of previous OTP
+- resend limits
+- verification attempt limits
+- secure storage
+- no plaintext OTP logging
+
+==================================================
+43. FINAL RECRUITMENT POOL CONFIRMATION
+
+After successful OTP verification:
+
+AVA displays:
+
+"You're all set.
+
+Your Recruitment Pool enrollment has been submitted successfully.
+
+Your confirmation email has been sent.
+
+Please note that this is not an employment contract. A separate contract will be signed separately if a job or position is offered by an OPERAVA team."
+
+Then:
+
+RECRUITMENT POOL
+
+Position:
+[Position]
+
+Engagement Types:
+[Selected options]
+
+Status:
+ACTIVE
+
+==================================================
+44. FINAL EMAIL
+
+The confirmation email should include:
+
+- Recruitment Pool enrollment confirmation
+- position
+- selected engagement type(s)
+- acknowledgement confirmation
+- temporary agreement confirmation
+- email OTP verification confirmation
+- non-contract statement
+- separate contract statement
+
+Required statement:
+
+"Please note that this is not a contract. A separate contract will be signed separately once a job or position has been offered by one of the OPERAVA team."
+
+==================================================
+45. DATABASE TABLES
+
+Use a dedicated Supabase Recruitment AVA database.
+
+Recommended tables:
+
+applicants
+
+applications
+
+applicant_profiles
+
+application_answers
+
+application_categories
+
+application_questions
+
+application_events
+
+email_verifications
+
+otp_attempts
+
+ava_conversations
+
+ava_messages
+
+ava_actions
+
+assessments
+
+assessment_questions
+
+assessment_answers
+
+assessment_events
+
+assessment_results
+
+recruitment_pool
+
+pool_agreements
+
+agreement_acceptances
+
+email_events
+
+audit_logs
+
+==================================================
+46-95. [Full remaining sections covering applicants table, applications, profiles, conversations, actions, assessments, scoring, recruitment pool, state machine, API routes, security, error handling, personality, user journey, production deployment, secrets, RLS, rate limiting, prompt security, mobile, accessibility, auditability, and final production principles as in the complete specification document.]
+
+END OF OPERAVA RECRUITMENT AVA PRODUCTION SPECIFICATION
