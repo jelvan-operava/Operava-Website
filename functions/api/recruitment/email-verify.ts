@@ -45,28 +45,23 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return json({ error: 'Too many attempts. Request a new code.' }, 429)
     }
 
-    // Same hash path as /api/forms/verify — validate before purpose-specific checks
+    // Same hash path as /api/forms/verify
     const hashed = await hashOtp(secret, code)
     if (hashed !== signed.codeHash) {
-      // Soft attempt tracking. Do NOT return a new draftId (forms never rotates on fail),
-      // so the client keeps using the original draftId for retries.
-      try {
-        await issueSignedDraft(secret, {
-          email: signed.email,
-          formType: signed.formType,
-          payload: signed.payload,
-          codeHash: signed.codeHash,
-          expiresAt: signed.expiresAt,
-          attempts: Number(signed.attempts || 0) + 1,
-          resends: signed.resends,
-          lastSentAt: signed.lastSentAt,
-        })
-      } catch {
-        /* best-effort attempt bump; still reject */
-      }
+      const bumped = await issueSignedDraft(secret, {
+        email: signed.email,
+        formType: signed.formType,
+        payload: signed.payload,
+        codeHash: signed.codeHash,
+        expiresAt: signed.expiresAt,
+        attempts: Number(signed.attempts || 0) + 1,
+        resends: signed.resends,
+        lastSentAt: signed.lastSentAt,
+      })
       return json(
         {
           error: 'Invalid verification code.',
+          draftId: bumped,
           attemptsRemaining: Math.max(0, 4 - Number(signed.attempts || 0)),
         },
         401,
@@ -125,7 +120,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       )
     }
 
-    // Optional MEGA snapshot into OPERAVA APPLICANTS (never blocks verify)
     const megaTask = backupApplicantToMega(env, {
       applicationId,
       name,
