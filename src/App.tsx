@@ -24,6 +24,7 @@ import Quote from './pages/Quote'
 import Contact from './pages/Contact'
 import Contacts from './pages/Contacts'
 import Verification from './pages/Verification'
+import AiJobScreening from './pages/AiJobScreening'
 import Insights from './pages/Insights'
 import InsightCategory from './pages/InsightCategory'
 import InsightArticle from './pages/InsightArticle'
@@ -95,15 +96,18 @@ const pageTransitionVariants = {
 
 function Layout() {
   const location = useLocation()
-  /** Official verification portal lives only at /verification on the main site */
-  const isVerification =
-    location.pathname === '/verification' || location.pathname.startsWith('/verification/')
+  /** Standalone portals: no main nav / AVA / intro chrome */
+  const isStandalone =
+    location.pathname === '/verification' ||
+    location.pathname.startsWith('/verification/') ||
+    location.pathname === '/ai-job-screening' ||
+    location.pathname.startsWith('/ai-job-screening/')
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-white text-gray-900 selection:bg-violet-100 selection:text-violet-800">
       <SmoothScroll />
       <RouteManager />
-      {!isVerification && <Navigation />}
+      {!isStandalone && <Navigation />}
 
       <div className="flex-1 overflow-hidden bg-white">
         <AnimatePresence mode="wait" initial={false}>
@@ -129,6 +133,7 @@ function Layout() {
               <Route path="/industries" element={<Industries />} />
               <Route path="/careers" element={<Careers />} />
               <Route path="/apply" element={<Apply />} />
+              <Route path="/ai-job-screening" element={<AiJobScreening />} />
               <Route path="/quote" element={<Quote />} />
               <Route path="/request-a-quote" element={<Quote />} />
               <Route path="/contact" element={<Contact />} />
@@ -152,7 +157,7 @@ function Layout() {
         </AnimatePresence>
       </div>
 
-      {!isVerification && (
+      {!isStandalone && (
         <>
           <Footer />
           <ScrollToTopButton />
