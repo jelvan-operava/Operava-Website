@@ -26,6 +26,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
     (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim().length >= 16) ||
     (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim().length >= 16)
 
+  const otpLen = env.OTP_SECRET ? String(env.OTP_SECRET).trim().length : 0
+
   const body = {
     status: 'ok',
     platform: 'Cloudflare Pages Functions',
@@ -33,7 +35,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
     timestamp: new Date().toISOString(),
     bindings: {
       resendConfigured: Boolean(env.RESEND_API_KEY && String(env.RESEND_API_KEY).length > 8),
-      otpSecretConfigured: Boolean(env.OTP_SECRET && String(env.OTP_SECRET).length > 8),
+      /** True only when OTP_SECRET meets production minimum (32+ chars). */
+      otpSecretConfigured: otpLen >= 32,
       aiBound: Boolean(env.AI),
       resumesBucketBound: Boolean(env.RESUMES_BUCKET),
       submissionsDbBound: Boolean(env.SUBMISSIONS_DB),
