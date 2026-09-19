@@ -352,7 +352,8 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   if (cleanPath === '/contacts') {
     return {
       title: 'Contacts Directory | OPERAVA GLOBAL SOLUTIONS',
-      description: 'Official OPERAVA contact directory including verification and department emails.',
+      description:
+        'Official OPERAVA contact directory including verification portal at https://www.operavaglobal.com/verification and department emails.',
       canonicalUrl: `${BASE_URL}/contacts`,
       ogType: 'website',
       breadcrumbs: [
@@ -365,12 +366,21 @@ export function getMetadataForPath(pathname: string): PageMetadata {
   if (cleanPath === '/verification' || cleanPath.startsWith('/verification/')) {
     return {
       title: 'Document Verification Portal | OPERAVA GLOBAL SOLUTIONS',
-      description: 'Verify OPERAVA-issued document reference IDs. verification@operavaglobal.com',
+      description:
+        'Official OPERAVA document verification portal at https://www.operavaglobal.com/verification. Verify reference IDs issued by OPERAVA Global Solutions. For content questions: verification@operavaglobal.com.',
+      keywords:
+        'Document Verification, OPERAVA Verification Portal, Reference ID, www.operavaglobal.com/verification',
       canonicalUrl: `${BASE_URL}/verification`,
       ogType: 'website',
       breadcrumbs: [
         { name: 'Home', item: `${BASE_URL}/` },
         { name: 'Verification', item: `${BASE_URL}/verification` },
+      ],
+      faqs: [
+        {
+          q: 'Where is the OPERAVA document verification portal?',
+          a: 'The official portal is https://www.operavaglobal.com/verification. For specific document content questions, email verification@operavaglobal.com.',
+        },
       ],
     }
   }
