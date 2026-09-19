@@ -195,8 +195,10 @@ export default function Verification() {
         </div>
 
         <p className="mt-10 text-center text-xs text-white/60 max-w-md leading-relaxed">
-          Portal: {verificationPortalUrl.replace(/^https?:\/\//, '')} · Also available at{' '}
-          www.operavaglobal.com/verification
+          Official portal:{' '}
+          <a href={verificationPortalUrl} className="text-white/80 underline underline-offset-2">
+            {verificationPortalUrl.replace(/^https?:\/\//, '')}
+          </a>
         </p>
       </div>
     </main>
