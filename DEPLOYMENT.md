@@ -37,12 +37,20 @@ Set these on the production Pages project:
 
 **Secrets / vars**
 - `RESEND_API_KEY` (required for all email)
-- `RESEND_FROM` = `OPERAVA <notification@operavaglobal.com>`
+- `OTP_SECRET` (**required** for forms + recruitment OTP). Generate with `openssl rand -hex 32` (64 hex chars). Minimum length **32**. There is **no** fallback to `RESEND_API_KEY` or a hardcoded default — missing/short secret returns HTTP 503 `OTP_SECRET_MISSING`.
+- `RESEND_FROM` = `OPERAVA <notification@operavaglobal.com>` (or `RESEND_EMAIL_FROM`)
 - `CLIENT_INBOX` = `hello@operavaglobal.com`
 - `TALENT_INBOX` = `talents@operavaglobal.com`
 - `APPLICANT_CC` (optional, comma-separated extra CCs for career tickets)
-- `OTP_SECRET` (preferred for OTP hashing; falls back to RESEND_API_KEY)
 - `NODE_VERSION` = `20`
+
+**How to set `OTP_SECRET`**
+
+1. Generate locally: `openssl rand -hex 32`
+2. Cloudflare Dashboard → **Workers & Pages** → your Pages project → **Settings** → **Environment variables** (Production)
+3. Add secret: name `OTP_SECRET`, value = the generated string, type **Secret**
+4. **Redeploy** (Retry deployment or push to `main`). Secrets apply at deploy time.
+5. Confirm: `GET /api/health` → `bindings.otpSecretConfigured: true`
 
 **Bindings**
 - `AI` — Workers AI (AVA chat → `@cf/meta/llama-3.3-70b-instruct-fp8-fast`)
