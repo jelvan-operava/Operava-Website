@@ -1,0 +1,10 @@
+name = "operava-mega-backup"
+main = "src/index.ts"
+compatibility_date = "2026-08-16"
+compatibility_flags = ["nodejs_compat"]
+
+# Secrets (set via wrangler secret put — never commit):
+# MEGA_EMAIL
+# MEGA_PASSWORD
+# MEGA_TOTP (optional)
+# BACKUP_SHARED_SECRET
