@@ -1,28 +1,27 @@
 /**
- * Optional fire-and-forget webhook to the separate mega-backup Worker.
- * Secrets on operava-website: MEGA_BACKUP_URL, MEGA_BACKUP_SECRET
+ * Optional fire-and-forget MEGA backup after verified forms / recruitment.
  *
- * Folder map (must exist in MEGA):
- * - OPERAVA APPLICANTS  → CAREERS + Recruitment AVA
- * - OPERAVA CLIENTS     → SERVICES / CONTACT / quote inquiries
- * - OPERAVA EMPLOYEES   → reserved (staff systems)
- * - OPERAVA FILES AND DOCUMENTS → ACADEMY + general document-style submissions
+ * Prefer direct upload when Pages has MEGA_EMAIL + MEGA_PASSWORD.
+ * Fallback: HTTP webhook to MEGA_BACKUP_URL (separate Worker or /api/mega-backup).
  */
 
-export interface MegaBackupEnv {
+import { megaCredentialsConfigured, uploadJsonToMega, type MegaCredentialsEnv } from './megaUpload'
+import type { MegaFolderName } from './megaFolders'
+
+export interface MegaBackupEnv extends MegaCredentialsEnv {
   MEGA_BACKUP_URL?: string
   MEGA_BACKUP_SECRET?: string
+  BACKUP_SHARED_SECRET?: string
 }
 
-export type MegaFolder =
-  | 'OPERAVA APPLICANTS'
-  | 'OPERAVA CLIENTS'
-  | 'OPERAVA EMPLOYEES'
-  | 'OPERAVA FILES AND DOCUMENTS'
+export type MegaFolder = MegaFolderName
 
 export function megaBackupConfigured(env: MegaBackupEnv): boolean {
+  if (megaCredentialsConfigured(env)) return true
   const url = env.MEGA_BACKUP_URL && String(env.MEGA_BACKUP_URL).trim()
-  const secret = env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim()
+  const secret =
+    (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim()) ||
+    (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim())
   return Boolean(url && secret && url.startsWith('http') && secret.length >= 16)
 }
 
@@ -31,11 +30,16 @@ export function folderForFormType(formType: string): MegaFolder {
   if (t === 'CAREERS' || t === 'RECRUITMENT' || t === 'APPLICANT') return 'OPERAVA APPLICANTS'
   if (t === 'ACADEMY') return 'OPERAVA FILES AND DOCUMENTS'
   if (t === 'EMPLOYEE') return 'OPERAVA EMPLOYEES'
-  // SERVICES, CONTACT, QUOTE, and default inquiries
   return 'OPERAVA CLIENTS'
 }
 
-async function postMegaBackup(
+function safeFilePart(value: string, max = 80): string {
+  return String(value || 'item')
+    .replace(/[^a-zA-Z0-9._-]/g, '_')
+    .slice(0, max)
+}
+
+async function postMegaWebhook(
   env: MegaBackupEnv,
   opts: {
     folder: MegaFolder
@@ -44,13 +48,15 @@ async function postMegaBackup(
     payload: Record<string, unknown>
   },
 ): Promise<void> {
-  if (!megaBackupConfigured(env)) return
-
-  const url = String(env.MEGA_BACKUP_URL).trim().replace(/\/$/, '')
-  const secret = String(env.MEGA_BACKUP_SECRET).trim()
+  const url = String(env.MEGA_BACKUP_URL || '').trim().replace(/\/$/, '')
+  const secret =
+    (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim()) ||
+    (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim()) ||
+    ''
+  if (!url || !secret) return
 
   try {
-    const res = await fetch(url + '/', {
+    const res = await fetch(url + (url.endsWith('/api/mega-backup') ? '' : url.includes('/api/') ? '' : '/'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,13 +78,32 @@ async function postMegaBackup(
   }
 }
 
-function safeFilePart(value: string, max = 80): string {
-  return String(value || 'item')
-    .replace(/[^a-zA-Z0-9._-]/g, '_')
-    .slice(0, max)
+async function runBackup(
+  env: MegaBackupEnv,
+  opts: {
+    folder: MegaFolder
+    kind: string
+    fileName: string
+    payload: Record<string, unknown>
+  },
+): Promise<void> {
+  if (!megaBackupConfigured(env)) return
+
+  // Direct path (Pages secrets MEGA_EMAIL / MEGA_PASSWORD)
+  if (megaCredentialsConfigured(env)) {
+    try {
+      await uploadJsonToMega(env, opts)
+      return
+    } catch (err) {
+      console.error('mega direct upload failed', err instanceof Error ? err.message : 'unknown')
+      // fall through to webhook if configured
+    }
+  }
+
+  await postMegaWebhook(env, opts)
 }
 
-/** Recruitment AVA applicant snapshot → OPERAVA APPLICANTS */
+/** Recruitment AVA → OPERAVA APPLICANTS */
 export async function backupApplicantToMega(
   env: MegaBackupEnv,
   payload: {
@@ -90,9 +115,8 @@ export async function backupApplicantToMega(
     emailVerifiedAt?: string
   },
 ): Promise<void> {
-  const fileName =
-    safeFilePart(payload.applicationId) + '_' + Date.now() + '.json'
-  await postMegaBackup(env, {
+  const fileName = safeFilePart(payload.applicationId) + '_' + Date.now() + '.json'
+  await runBackup(env, {
     folder: 'OPERAVA APPLICANTS',
     kind: 'applicant',
     fileName,
@@ -100,7 +124,7 @@ export async function backupApplicantToMega(
   })
 }
 
-/** Verified website form (SERVICES / CAREERS / CONTACT / ACADEMY) → mapped folder */
+/** Verified website forms → mapped folder */
 export async function backupFormSubmissionToMega(
   env: MegaBackupEnv,
   args: {
@@ -130,7 +154,7 @@ export async function backupFormSubmissionToMega(
     Date.now() +
     '.json'
 
-  await postMegaBackup(env, {
+  await runBackup(env, {
     folder,
     kind,
     fileName,
