@@ -1,13 +1,19 @@
 import { json, type FormEnv } from '../../lib/formCore'
 import { readVerifiedSession } from '../../lib/recruitmentSession'
 import {
+  getApplicantByApplicationId,
   recruitmentConfigured,
   updateApplicantProfile,
   type RecruitmentEnv,
 } from '../../lib/recruitmentDb'
 import { PASS_CORRECT, TOTAL_QUESTIONS } from '../../lib/assessmentBank'
+import {
+  backupRecruitmentAssessmentToMega,
+  type MegaBackupEnv,
+} from '../../lib/megaBackupHook'
+import { sendRecruitmentPoolEmails } from '../../lib/recruitmentEmails'
 
-type Env = FormEnv & RecruitmentEnv & { AI?: Ai }
+type Env = FormEnv & RecruitmentEnv & MegaBackupEnv & { AI?: Ai; TALENT_INBOX?: string }
 
 async function rest(
   env: RecruitmentEnv,
@@ -66,7 +72,8 @@ async function scoreAnswer(env: Env, question: string, answer: string): Promise<
   return trimmed.split(/\s+/).length >= 6 && trimmed.length >= 24
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  const { request, env } = context
   try {
     if (!recruitmentConfigured(env)) {
       return json({ error: 'Applicant database is not configured.' }, 503)
@@ -123,6 +130,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     if (done) {
       const passed = correctCount >= PASS_CORRECT
       const scorePercent = Math.round((correctCount / TOTAL_QUESTIONS) * 1000) / 10
+      const completedAt = new Date().toISOString()
       await rest(
         env,
         '/rest/v1/assessments?application_id=eq.' + encodeURIComponent(session.applicationId),
@@ -136,13 +144,78 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
             answers,
             score_percent: scorePercent,
             passed,
-            completed_at: new Date().toISOString(),
+            completed_at: completedAt,
           }),
         },
       )
       await updateApplicantProfile(env, session.applicationId, {
         status: passed ? 'IN_POOL' : 'ASSESSMENT_COMPLETE',
       })
+
+      const applicant = await getApplicantByApplicationId(env, session.applicationId)
+      const fullName = applicant?.full_name || session.name || 'Applicant'
+      const email = applicant?.email || session.email
+      const positionTitle = applicant?.position_title || session.position || ''
+      const skills = Array.isArray(applicant?.skills)
+        ? (applicant!.skills as string[])
+        : []
+
+      // Always archive text record to OPERAVA APPLICANTS as {applicationID_Fullname}.txt
+      const megaTask = backupRecruitmentAssessmentToMega(env, {
+        applicationId: session.applicationId,
+        fullName,
+        email,
+        phone: applicant?.phone || '',
+        positionTitle,
+        positionCode: applicant?.position_code || session.positionCode || '',
+        education: applicant?.education || '',
+        experienceYears: applicant?.experience_years || '',
+        experienceSummary: applicant?.experience_summary || '',
+        skills,
+        positionSpecific: applicant?.position_specific || '',
+        availability: applicant?.availability || '',
+        startDate: applicant?.start_date || '',
+        additional: applicant?.additional || '',
+        status: passed ? 'IN_POOL' : 'ASSESSMENT_COMPLETE',
+        assessment: {
+          correctCount,
+          total: TOTAL_QUESTIONS,
+          scorePercent,
+          passed,
+          completedAt,
+        },
+      })
+
+      // On PASS → recruitment pool confirmation to applicant + BCC talents@
+      let mailTask: Promise<void> = Promise.resolve()
+      if (passed && email) {
+        mailTask = sendRecruitmentPoolEmails(env, {
+          name: fullName,
+          email,
+          applicationId: session.applicationId,
+          positionTitle,
+          scorePercent,
+          correctCount,
+          total: TOTAL_QUESTIONS,
+        }).catch((err) => {
+          console.error(
+            'pool confirmation email failed',
+            err instanceof Error ? err.message : 'unknown',
+          )
+        })
+      }
+
+      try {
+        const ctx = context as { waitUntil?: (p: Promise<unknown>) => void }
+        if (typeof ctx.waitUntil === 'function') {
+          ctx.waitUntil(Promise.all([megaTask, mailTask]))
+        } else {
+          void Promise.all([megaTask, mailTask])
+        }
+      } catch {
+        void Promise.all([megaTask, mailTask])
+      }
+
       return json({
         ok: true,
         done: true,
@@ -152,8 +225,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
         scorePercent,
         passed,
         passMark: PASS_CORRECT,
+        applicationId: session.applicationId,
+        name: fullName,
         message: passed
-          ? 'Assessment complete. You passed and are eligible for the recruitment pool subject to Talent Acquisition review.'
+          ? 'Assessment complete. You passed and are eligible for the recruitment pool. A confirmation email has been sent (Talent Acquisition is notified).'
           : 'Assessment complete. Score below the 85% pass mark. Talent Acquisition may still review your application for further evaluation.',
       })
     }
