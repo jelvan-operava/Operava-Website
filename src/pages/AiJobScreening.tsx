@@ -23,8 +23,6 @@ import { generateScreeningResponse } from '../utils/jobScreeningEngine'
 import { SCREENING_GUIDELINES } from '../data/jobScreeningKnowledge'
 import { CAREER_OPENINGS, type CareerOpening } from '../data/careersData'
 
-/* ── Types ─────────────────────────────────────────────────────────────── */
-
 type CategoryKey =
   | 'personal'
   | 'education'
@@ -110,21 +108,17 @@ function extractFromAnswer(text: string, profile: ApplicantProfile): Partial<App
   const lower = t.toLowerCase()
   const next: Partial<ApplicantProfile> = {}
 
-  // Name patterns
   const nameMatch =
     t.match(/^(?:my name is|i am|i'm)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)/i) ||
     t.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,2})$/)
   if (nameMatch && !profile.name) next.name = nameMatch[1].trim()
 
-  // Email
   const emailMatch = t.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/)
   if (emailMatch) next.email = emailMatch[0]
 
-  // Phone (loose)
   const phoneMatch = t.match(/(?:\+?\d[\d\s().-]{7,}\d)/)
   if (phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 8) next.phone = phoneMatch[0].trim()
 
-  // Years of experience
   const yearsMatch = lower.match(/(\d+(?:\.\d+)?)\s*(?:\+\s*)?(?:years?|yrs?)\b/)
   if (yearsMatch) {
     next.experienceYears = yearsMatch[1]
@@ -136,67 +130,25 @@ function extractFromAnswer(text: string, profile: ApplicantProfile): Partial<App
     next.experienceSummary = t.slice(0, 280)
   }
 
-  // Education keywords
-  if (\b(degree|bachelor|master|bs|ba|bsit|bscs|college|university|graduated|diploma)\b/i.test(t)) {
+  if (/\b(degree|bachelor|master|bs|ba|bsit|bscs|college|university|graduated|diploma)\b/i.test(t)) {
     next.education = t.slice(0, 200)
   }
 
-  // Skills: comma / "and" lists with known tools
   const skillHints = [
-    'react',
-    'typescript',
-    'javascript',
-    'node',
-    'python',
-    'java',
-    'aws',
-    'azure',
-    'gcp',
-    'docker',
-    'kubernetes',
-    'sql',
-    'postgresql',
-    'mongodb',
-    'salesforce',
-    'zendesk',
-    'hubspot',
-    'excel',
-    'sap',
-    'figma',
-    'git',
-    'github',
-    'next.js',
-    'nextjs',
-    'go',
-    'golang',
-    'php',
-    'laravel',
-    'django',
-    'fastapi',
-    'rest',
-    'graphql',
-    'customer service',
-    'help desk',
-    'chat support',
-    'voice',
-    'bpo',
-    'payroll',
-    'accounting',
-    'recruitment',
-    'hr',
+    'react', 'typescript', 'javascript', 'node', 'python', 'java', 'aws', 'azure', 'gcp',
+    'docker', 'kubernetes', 'sql', 'postgresql', 'mongodb', 'salesforce', 'zendesk', 'hubspot',
+    'excel', 'sap', 'figma', 'git', 'github', 'next.js', 'nextjs', 'go', 'golang', 'php',
+    'laravel', 'django', 'fastapi', 'rest', 'graphql', 'customer service', 'help desk',
+    'chat support', 'voice', 'bpo', 'payroll', 'accounting', 'recruitment', 'hr',
   ]
   const found = skillHints.filter((s) => lower.includes(s))
   if (found.length) {
     const labeled = found.map((s) =>
-      s
-        .split(' ')
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ')
+      s.split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
     )
     next.skills = Array.from(new Set([...(profile.skills || []), ...labeled])).slice(0, 12)
   }
 
-  // Availability
   if (/\b(night\s*shift|graveyard|overnight)\b/i.test(t)) next.availability = 'Night shift'
   else if (/\b(day\s*shift|morning)\b/i.test(t)) next.availability = 'Day shift'
   else if (/\b(mid\s*shift|afternoon)\b/i.test(t)) next.availability = 'Mid shift'
@@ -204,7 +156,9 @@ function extractFromAnswer(text: string, profile: ApplicantProfile): Partial<App
     next.availability = t.slice(0, 120)
   }
 
-  const startMatch = t.match(/\b(?:start|available)\s+(?:on|from|by)?\s*([A-Za-z]+\s+\d{1,2}(?:,?\s*\d{4})?|\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|immediately|asap)\b/i)
+  const startMatch = t.match(
+    /\b(?:start|available)\s+(?:on|from|by)?\s*([A-Za-z]+\s+\d{1,2}(?:,?\s*\d{4})?|\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|immediately|asap)\b/i
+  )
   if (startMatch) next.startDate = startMatch[1]
 
   return next
@@ -226,7 +180,8 @@ function computeCategories(profile: ApplicantProfile): CategoryState[] {
         else if (profile.experienceYears || profile.experienceSummary) status = 'partial'
         break
       case 'skills':
-        status = profile.skills.length >= 2 ? 'complete' : profile.skills.length === 1 ? 'partial' : 'empty'
+        status =
+          profile.skills.length >= 2 ? 'complete' : profile.skills.length === 1 ? 'partial' : 'empty'
         break
       case 'position':
         status = profile.positionSpecific ? 'complete' : 'empty'
@@ -266,13 +221,11 @@ function StatusIcon({ status }: { status: CategoryStatus }) {
 function welcomeFor(position: CareerOpening) {
   return (
     `Welcome to OPERAVA Recruitment AVA.\n\n` +
-    `I'll guide you through your application for **${position.title}**, gather the required information, and help prepare your application for assessment.\n\n` +
+    `I'll guide you through your application for ${position.title}, gather the required information, and help prepare your application for assessment.\n\n` +
     `This is a guided conversation — not a long form. Your profile on the left updates as we go.\n\n` +
     `To begin, what is your full name?`
   )
 }
-
-/* ── Component ─────────────────────────────────────────────────────────── */
 
 export default function AiJobScreening() {
   const [stage, setStage] = useState<Stage>('position')
@@ -327,7 +280,6 @@ export default function AiJobScreening() {
         ...prev,
         ...partial,
         skills,
-        // Prefer longer experience summary
         experienceSummary:
           partial.experienceSummary &&
           (!prev.experienceSummary || partial.experienceSummary.length > prev.experienceSummary.length)
@@ -351,18 +303,15 @@ export default function AiJobScreening() {
     setInput('')
     setThinking(true)
 
-    // Session-only profile extraction from the answer
     const extracted = extractFromAnswer(text, profile)
     if (Object.keys(extracted).length) mergeProfile(extracted)
 
-    // If user just gave a short name answer to the opening question
     if (!profile.name && messages.length <= 2 && text.split(/\s+/).length <= 4 && !/[@\d]/.test(text)) {
       mergeProfile({ name: text.replace(/^(my name is|i am|i'm)\s+/i, '').trim() })
     }
 
     let reply = generateScreeningResponse(text).text
 
-    // Enrich prompt context with selected position + partial profile for API
     const contextPrefix =
       `[Position: ${position.title}] ` +
       (profile.name ? `[Applicant name so far: ${profile.name}] ` : '') +
@@ -386,16 +335,14 @@ export default function AiJobScreening() {
         if (data?.text && !data.fallback) reply = data.text as string
       }
     } catch {
-      // local engine fallback already set
+      // local engine fallback
     }
 
-    // Soft follow-ups for structured gathering when reply is generic
     if (messages.length < 12) {
-      if (!profile.name && !extracted.name) {
-        // keep engine reply
-      } else if (!profile.email && messages.length >= 2) {
+      if (!profile.email && !extracted.email && messages.length >= 2) {
         if (!/email/i.test(reply)) {
-          reply +=\n\nWhen you are ready, please share the email you want associated with this application. (Session only for now — permanent save requires verification in a later step.)`
+          reply +=
+            '\n\nWhen you are ready, please share the email you want associated with this application. (Session only for now — permanent save requires verification in a later step.)'
         }
       }
     }
@@ -413,7 +360,6 @@ export default function AiJobScreening() {
     setTimeout(() => inputRef.current?.focus(), 50)
   }
 
-  /* ── Position selection ──────────────────────────────────────────────── */
   if (stage === 'position') {
     return (
       <main className="min-h-screen bg-white text-slate-900 flex flex-col">
@@ -450,7 +396,7 @@ export default function AiJobScreening() {
               Select the position you are applying for
             </h1>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Welcome to OPERAVA Recruitment AVA. I'll guide you through your application, gather the required
+              Welcome to OPERAVA Recruitment AVA. I will guide you through your application, gather the required
               information, and help prepare your application for assessment. Choose one track to begin.
             </p>
           </div>
@@ -490,7 +436,6 @@ export default function AiJobScreening() {
     )
   }
 
-  /* ── Session: two-panel ──────────────────────────────────────────────── */
   const profilePanel = (
     <div className="h-full flex flex-col bg-slate-50 border-r border-slate-200">
       <div className="px-4 py-4 border-b border-slate-200 bg-white">
@@ -510,7 +455,9 @@ export default function AiJobScreening() {
             <Mail className="w-3 h-3" /> Contact
           </p>
           <div className="space-y-1 text-xs text-slate-700">
-            <p className="truncate">{profile.email || <span className="text-slate-400">Email not yet provided</span>}</p>
+            <p className="truncate">
+              {profile.email || <span className="text-slate-400">Email not yet provided</span>}
+            </p>
             <p className="text-[10px] text-amber-700">Unverified · session only</p>
             {profile.phone && (
               <p className="flex items-center gap-1.5 pt-1">
@@ -521,30 +468,27 @@ export default function AiJobScreening() {
           </div>
         </section>
 
-        {(profile.education || profile.experienceYears || profile.experienceSummary) && (
-          <>
-            {profile.education && (
-              <section>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
-                  <GraduationCap className="w-3 h-3" /> Education
-                </p>
-                <p className="text-xs text-slate-700 leading-relaxed">{profile.education}</p>
-              </section>
+        {profile.education && (
+          <section>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <GraduationCap className="w-3 h-3" /> Education
+            </p>
+            <p className="text-xs text-slate-700 leading-relaxed">{profile.education}</p>
+          </section>
+        )}
+
+        {(profile.experienceYears || profile.experienceSummary) && (
+          <section>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
+              <User className="w-3 h-3" /> Experience
+            </p>
+            {profile.experienceYears && (
+              <p className="text-xs font-semibold text-slate-900 mb-1">{profile.experienceYears} years</p>
             )}
-            {(profile.experienceYears || profile.experienceSummary) && (
-              <section>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center gap-1.5">
-                  <User className="w-3 h-3" /> Experience
-                </p>
-                {profile.experienceYears && (
-                  <p className="text-xs font-semibold text-slate-900 mb-1">{profile.experienceYears} years</p>
-                )}
-                {profile.experienceSummary && (
-                  <p className="text-xs text-slate-600 leading-relaxed">{profile.experienceSummary}</p>
-                )}
-              </section>
+            {profile.experienceSummary && (
+              <p className="text-xs text-slate-600 leading-relaxed">{profile.experienceSummary}</p>
             )}
-          </>
+          </section>
         )}
 
         {profile.skills.length > 0 && (
@@ -603,7 +547,6 @@ export default function AiJobScreening() {
 
   return (
     <main className="h-[100dvh] bg-white text-slate-900 flex flex-col overflow-hidden">
-      {/* Top bar */}
       <header className="border-b border-slate-200 bg-white shrink-0 z-20">
         <div className="px-3 sm:px-5 py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -644,10 +587,8 @@ export default function AiJobScreening() {
       </header>
 
       <div className="flex-1 flex min-h-0">
-        {/* Desktop left panel */}
         <aside className="hidden lg:flex w-[320px] xl:w-[360px] shrink-0 flex-col">{profilePanel}</aside>
 
-        {/* Mobile drawer */}
         {profileOpen && (
           <div className="lg:hidden fixed inset-0 z-40">
             <button
@@ -673,13 +614,11 @@ export default function AiJobScreening() {
           </div>
         )}
 
-        {/* Right: chat */}
         <section className="flex-1 flex flex-col min-w-0 bg-white">
           <div className="px-4 sm:px-6 py-2 border-b border-slate-100 bg-violet-50/60">
             <p className="text-[11px] text-violet-900/80 leading-snug">
               <span className="font-semibold">{position?.shortTitle}</span>
-              {' · '}
-              Guided application conversation. Not a final hiring decision.
+              {' · '}Guided application conversation. Not a final hiring decision.
             </p>
           </div>
 
@@ -700,7 +639,9 @@ export default function AiJobScreening() {
                     </div>
                   )}
                   <div>{renderText(m.text.replace(/\*\*/g, ''))}</div>
-                  <p className={`mt-2 text-[10px] ${m.role === 'user' ? 'text-violet-200' : 'text-slate-400'}`}>{m.time}</p>
+                  <p className={`mt-2 text-[10px] ${m.role === 'user' ? 'text-violet-200' : 'text-slate-400'}`}>
+                    {m.time}
+                  </p>
                 </div>
               </div>
             ))}
