@@ -18,11 +18,6 @@ export interface FormEnv {
   ACADEMY_INBOX?: string
 }
 
-/**
- * Resend from format: "Display Name <email@verified-domain.com>"
- * Default verified OPERAVA sender: noreply@operavaglobal.com
- * Aliases (notification@, no-reply@) map to noreply@operavaglobal.com.
- */
 export const DEFAULT_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
 export const OTP_RESEND_FROM = 'Operava <noreply@operavaglobal.com>'
 export const NOTIFICATION_NOREPLY_FROM = 'Operava <noreply@operavaglobal.com>'
@@ -34,7 +29,6 @@ export const SUPPORT_INBOX = 'hello@operavaglobal.com'
 export const ACADEMY_INBOX_DEFAULT = 'academy@operavaglobal.com'
 export const DEFAULT_OTP_SECRET = 'operava-form-secret'
 
-/** Plain email only — Resend rejects display-name formats in to/reply_to. */
 const PLAIN_EMAIL_RE =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
 
@@ -143,7 +137,6 @@ export async function readSignedDraft(secret: string, draftId: string) {
 
 export const EMAIL_RE = PLAIN_EMAIL_RE
 
-/** Extract plain email from "Name <email@x.com>" or return trimmed input. */
 export function extractPlainEmail(value: string): string {
   const raw = String(value || '').trim()
   const angle = raw.match(/<([^>]+)>/)
@@ -151,7 +144,6 @@ export function extractPlainEmail(value: string): string {
   return raw.toLowerCase()
 }
 
-/** Map known aliases to the verified Resend mailbox: noreply@operavaglobal.com */
 function mapVerifiedMailbox(email: string): string {
   const e = email.toLowerCase()
   if (
@@ -165,7 +157,6 @@ function mapVerifiedMailbox(email: string): string {
   return e
 }
 
-/** Ensure Resend-compatible From: "Name <email@domain>". */
 export function normalizeFromAddress(value: string | undefined | null): string {
   const raw = String(value || '').trim()
   if (!raw) return DEFAULT_RESEND_FROM
@@ -243,34 +234,35 @@ export function renderEmailTemplate(template: string, replacements: Record<strin
   return html
 }
 
-export function otpEmailHtml(_name: string, purpose: string, code: string) {
+/** Mandatory shell: Hi {full_name}, then body. */
+export function otpEmailHtml(name: string, purpose: string, code: string) {
+  const display = name && name.trim() ? name.trim() : 'there'
   return renderEmailTemplate(otpEmailTemplate, {
+    NAME: escapeHtml(display),
     PURPOSE: escapeHtml(purpose),
     OTP_CODE: escapeHtml(code),
   })
 }
 
-export function otpEmailText(_name: string, purpose: string, code: string) {
+export function otpEmailText(name: string, purpose: string, code: string) {
+  const display = name && name.trim() ? name.trim() : 'there'
   return (
+    'Hi ' +
+    display +
+    ',\n\n' +
     'Your verification code for ' +
     purpose +
     ' is: ' +
     code +
-    '\n\nThis code expires in 10 minutes.\n\nDo not share this code. If you did not request it, ignore this email.\nOPERAVA · www.operavaglobal.com'
+    '\n\nThis code expires in 10 minutes.\n\nDo not share this code. If you did not request it, ignore this email.\n\nOperava Team,\nNote: This is an email generated email, please do not reply.\n\nOPERAVA · www.operavaglobal.com'
   )
 }
 
 export type SendResendResult = { id: string; status: number }
 
-/**
- * Send via Resend with normalized from/to/reply_to/bcc to avoid
- * "The string did not match the expected pattern." validation errors.
- */
 export async function sendResend(env: FormEnv, payload: Record<string, unknown>): Promise<SendResendResult> {
   const apiKey = env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim()
   if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
-
-  // Resend keys are typically re_...
   if (apiKey.length < 20) {
     console.error('Resend API key looks truncated')
     throw new Error('EMAIL_API_KEY_INVALID')
@@ -334,18 +326,10 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
   const raw = await res.text().catch(() => '')
   if (!res.ok) {
     console.error('Resend API error', res.status, raw.slice(0, 400), 'from=', from)
-    if (res.status === 401 || res.status === 403) {
-      throw new Error('EMAIL_API_KEY_INVALID')
-    }
-    if (/pattern/i.test(raw)) {
-      throw new Error('EMAIL_ADDRESS_PATTERN')
-    }
-    if (/not verified|domain/i.test(raw)) {
-      throw new Error('EMAIL_DOMAIN_NOT_VERIFIED')
-    }
-    if (/invalid.*api.?key|unauthorized/i.test(raw)) {
-      throw new Error('EMAIL_API_KEY_INVALID')
-    }
+    if (res.status === 401 || res.status === 403) throw new Error('EMAIL_API_KEY_INVALID')
+    if (/pattern/i.test(raw)) throw new Error('EMAIL_ADDRESS_PATTERN')
+    if (/not verified|domain/i.test(raw)) throw new Error('EMAIL_DOMAIN_NOT_VERIFIED')
+    if (/invalid.*api.?key|unauthorized/i.test(raw)) throw new Error('EMAIL_API_KEY_INVALID')
     throw new Error('EMAIL_SEND_FAILED')
   }
 
@@ -396,11 +380,11 @@ function submissionListHtml(
     ['Reference Number', referenceId],
   ]
   return (
-    '<ul style="margin:8px 0 0 0;padding-left:18px;font-size:15px;line-height:25px;color:#333333;">' +
+    '<ul style="margin:8px 0 0 0;padding-left:18px;font-size:11px;line-height:1.45;color:#111111;">' +
     values
       .map(function (pair) {
         return (
-          '<li style="margin-bottom:6px;"><strong style="color:#333333;">' +
+          '<li style="margin-bottom:6px;"><strong style="color:#111111;">' +
           escapeHtml(pair[0]) +
           ':</strong> ' +
           escapeHtml(pair[1]) +
@@ -483,7 +467,7 @@ export function staffNotificationEmail(opts: {
   const isApplicant = opts.formType === 'CAREERS'
   const isAcademy = opts.formType === 'ACADEMY'
   const rowsHtml =
-    '<ul style="margin:8px 0 0 0;padding-left:18px;font-size:15px;line-height:25px;color:#333333;">' +
+    '<ul style="margin:8px 0 0 0;padding-left:18px;font-size:11px;line-height:1.45;color:#111111;">' +
     opts.rows
       .map(function (r) {
         return (
