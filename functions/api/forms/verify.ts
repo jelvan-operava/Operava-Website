@@ -8,6 +8,7 @@ import {
   sendResend,
   resolveSecret,
   readSignedDraft,
+  issueSignedDraft,
   staffNotificationEmail,
   senderFor,
   extractPlainEmail,
@@ -67,8 +68,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     } catch {
       return json({ error: 'Invalid request body.' }, 400)
     }
-    const draftId = String(body.draftId || '')
-    const code = String(body.code || '').replace(/\D/g, '')
+    const draftId = String(body.draftId || '').trim()
+    const code = String(body.code || '').replace(/\D/g, '').slice(0, 6)
     if (!draftId || code.length !== 6) return json({ error: 'Enter the 6-digit code.' }, 400)
 
     const signed = await readSignedDraft(secret, draftId)
@@ -78,7 +79,24 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
     const hashed = await hashOtp(secret, code)
     if (hashed !== signed.codeHash) {
-      return json({ error: 'Invalid verification code.' }, 401)
+      const bumped = await issueSignedDraft(secret, {
+        email: signed.email,
+        formType: signed.formType,
+        payload: signed.payload,
+        codeHash: signed.codeHash,
+        expiresAt: signed.expiresAt,
+        attempts: Number(signed.attempts || 0) + 1,
+        resends: signed.resends,
+        lastSentAt: signed.lastSentAt,
+      })
+      return json(
+        {
+          error: 'Invalid verification code.',
+          draftId: bumped,
+          attemptsRemaining: Math.max(0, 4 - Number(signed.attempts || 0)),
+        },
+        401,
+      )
     }
 
     let payload: Record<string, unknown> = {}
