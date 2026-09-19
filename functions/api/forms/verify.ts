@@ -15,6 +15,12 @@ import {
   type FormEnv,
   type FormType,
 } from '../../lib/formCore'
+import {
+  backupFormSubmissionToMega,
+  type MegaBackupEnv,
+} from '../../lib/megaBackupHook'
+
+type Env = FormEnv & MegaBackupEnv
 
 const LABEL_MAP: Record<string, string> = {
   name: 'Name',
@@ -48,7 +54,8 @@ function payloadRows(payload: Record<string, unknown>): Array<{ label: string; v
     }))
 }
 
-export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
+export const onRequestPost: PagesFunction<Env> = async (context) => {
+  const { request, env } = context
   try {
     if (!env.RESEND_API_KEY || String(env.RESEND_API_KEY).trim().length < 8) {
       return json({ error: 'Email delivery is not configured.' }, 503)
@@ -97,6 +104,23 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       } catch {
         console.error('D1 insert optional failed')
       }
+    }
+
+    // MEGA backup by form type → OPERAVA APPLICANTS | CLIENTS | FILES (non-blocking)
+    const megaTask = backupFormSubmissionToMega(env, {
+      formType,
+      referenceId,
+      name,
+      email,
+      payload,
+      verifiedAt: nowIso,
+    })
+    try {
+      const ctx = context as { waitUntil?: (p: Promise<unknown>) => void }
+      if (typeof ctx.waitUntil === 'function') ctx.waitUntil(megaTask)
+      else void megaTask
+    } catch {
+      void megaTask
     }
 
     const rows = payloadRows(payload)
@@ -180,14 +204,12 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       ' directly.\n'
 
     let emailWarning: string | undefined
-    // From noreply/notification@operavaglobal.com (verified Resend sender)
     const from = senderFor(formType, env)
 
     try {
       await sendResend(env, {
         from,
         to: [email],
-        // Learner confirmation BCC to Academy inbox
         ...(isAcademy ? { bcc: [env.ACADEMY_INBOX || ACADEMY_INBOX_DEFAULT] } : {}),
         subject,
         html,
