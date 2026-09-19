@@ -9,6 +9,7 @@ import {
   purposeLabel,
   readSignedDraft,
   resolveSecret,
+  otpSecretMissingResponse,
   issueSignedDraft,
   sendResend,
   senderFor,
@@ -43,6 +44,8 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
 
     const secret = resolveSecret(env)
+    if (!secret) return otpSecretMissingResponse()
+
     let body: Record<string, unknown>
     try {
       body = (await request.json()) as Record<string, unknown>
