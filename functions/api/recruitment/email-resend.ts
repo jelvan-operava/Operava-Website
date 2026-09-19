@@ -7,6 +7,7 @@ import {
   otpEmailText,
   sendResend,
   resolveSecret,
+  otpSecretMissingResponse,
   readSignedDraft,
   issueSignedDraft,
   senderFor,
@@ -25,6 +26,8 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     }
 
     const secret = resolveSecret(env)
+    if (!secret) return otpSecretMissingResponse()
+
     let body: { draftId?: string }
     try {
       body = (await request.json()) as { draftId?: string }
