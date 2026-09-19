@@ -13,6 +13,11 @@ interface ServiceCardProps {
   showCapabilities?: boolean
   maxCapabilities?: number
   className?: string
+  /**
+   * Services tab listings only: number uses the same color treatment as the title
+   * (solid gray-900 hierarchy). Home and other contexts keep the gradient number.
+   */
+  matchTitleTheme?: boolean
 }
 
 const GRADIENT = 'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)'
@@ -25,6 +30,7 @@ export default function ServiceCard({
   showCapabilities = false,
   maxCapabilities = 3,
   className = '',
+  matchTitleTheme = false,
 }: ServiceCardProps) {
   const { t } = useLanguage()
   const [imgError, setImgError] = useState(false)
@@ -37,6 +43,8 @@ export default function ServiceCard({
     : service.category === 'bpo'
       ? 'Outsourcing'
       : 'Technology'
+
+  const displayNumber = service.number || String(index + 1).padStart(2, '0')
 
   return (
     <motion.div
@@ -79,26 +87,39 @@ export default function ServiceCard({
       </div>
 
       <div className="relative flex flex-col flex-1 px-5 pb-5 pt-1">
-        <div className="flex items-center gap-2 mb-2">
-          <span
-            className="text-[10px] font-bold tracking-wider"
-            style={{
-              backgroundImage: GRADIENT,
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent',
-            }}
-          >
-            {service.number}
-          </span>
+        {/* Category label */}
+        <div className="mb-2">
           <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">
             {categoryLabel}
           </span>
         </div>
 
-        <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight leading-snug mb-2 line-clamp-2 min-h-[2.5rem]">
-          {service.name}
-        </h3>
+        {/* Number + title: same color hierarchy when matchTitleTheme (services tabs) */}
+        <div className="flex items-start gap-2.5 mb-2">
+          <span
+            className={
+              matchTitleTheme
+                ? 'text-base sm:text-lg font-black text-gray-900 tracking-tight leading-snug shrink-0 tabular-nums'
+                : 'text-[10px] font-bold tracking-wider shrink-0 pt-0.5'
+            }
+            style={
+              matchTitleTheme
+                ? undefined
+                : {
+                    backgroundImage: GRADIENT,
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                  }
+            }
+            aria-hidden={!matchTitleTheme}
+          >
+            {displayNumber}
+          </span>
+          <h3 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight leading-snug line-clamp-2 min-h-[2.5rem]">
+            {service.name}
+          </h3>
+        </div>
 
         <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-4 flex-1">
           {service.shortDescription || service.description}
