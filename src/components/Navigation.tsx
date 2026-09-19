@@ -26,20 +26,20 @@ const BPO_LINKS = [
 ]
 
 const AUTOMATION_LINKS = [
-  { label: 'Workflow Automation', href: '/services/it/workflow-automation' },
-  { label: 'Business Process Automation', href: '/services/it/business-process-automation' },
-  { label: 'AI Automation', href: '/services/it/ai-automation' },
-  { label: 'Customer Service Automation', href: '/services/it/customer-service-automation' },
-  { label: 'Email Automation', href: '/services/it/email-automation' },
-  { label: 'Lead & Sales Automation', href: '/services/it/lead-sales-automation' },
-  { label: 'Data & Reporting Automation', href: '/services/it/data-reporting-automation' },
-  { label: 'Document Automation', href: '/services/it/document-automation' },
-  { label: 'HR & Workforce Automation', href: '/services/it/hr-workforce-automation' },
-  { label: 'Finance & Invoicing Automation', href: '/services/it/finance-invoicing-automation' },
-  { label: 'System & Application Integration', href: '/services/it/system-application-integration' },
-  { label: 'Notification & Alert Automation', href: '/services/it/notification-alert-automation' },
-  { label: 'Scheduling & Recurring Ops', href: '/services/it/scheduling-recurring-operations' },
-  { label: 'Custom Automation Solutions', href: '/services/it/custom-automation-solutions' },
+  { label: 'Workflow Automation', href: '/services/automation/workflow-automation' },
+  { label: 'Business Process Automation', href: '/services/automation/business-process-automation' },
+  { label: 'AI Automation', href: '/services/automation/ai-automation' },
+  { label: 'Customer Service Automation', href: '/services/automation/customer-service-automation' },
+  { label: 'Email Automation', href: '/services/automation/email-automation' },
+  { label: 'Lead & Sales Automation', href: '/services/automation/lead-sales-automation' },
+  { label: 'Data & Reporting Automation', href: '/services/automation/data-reporting-automation' },
+  { label: 'Document Automation', href: '/services/automation/document-automation' },
+  { label: 'HR & Workforce Automation', href: '/services/automation/hr-workforce-automation' },
+  { label: 'Finance & Invoicing Automation', href: '/services/automation/finance-invoicing-automation' },
+  { label: 'System & Application Integration', href: '/services/automation/system-application-integration' },
+  { label: 'Notification & Alert Automation', href: '/services/automation/notification-alert-automation' },
+  { label: 'Scheduling & Recurring Ops', href: '/services/automation/scheduling-recurring-operations' },
+  { label: 'Custom Automation Solutions', href: '/services/automation/custom-automation-solutions' },
 ]
 
 export default function Navigation() {
@@ -60,6 +60,7 @@ export default function Navigation() {
     { label: t('section.services.badge', 'Capabilities'), href: '/#services' },
     { label: t('nav.industries', 'Industries'), href: '/industries' },
     { label: t('nav.about', 'About'), href: '/about' },
+    { label: t('nav.academy', 'Operava Academy'), href: '/academy' },
     { label: t('nav.careers', 'Careers'), href: '/careers' },
     { label: t('nav.insights', 'Insights'), href: '/insights' },
     { label: t('nav.contacts', 'Contacts'), href: '/contacts' },
