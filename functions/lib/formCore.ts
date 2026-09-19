@@ -5,7 +5,7 @@ import {
   staffNotificationTemplate,
 } from './emailTemplates'
 
-export type FormType = 'SERVICES' | 'CAREERS' | 'CONTACT'
+export type FormType = 'SERVICES' | 'CAREERS' | 'CONTACT' | 'ACADEMY'
 
 export interface FormEnv {
   SUBMISSIONS_DB?: D1Database
@@ -15,19 +15,23 @@ export interface FormEnv {
   OTP_SECRET?: string
   CLIENT_INBOX?: string
   TALENT_INBOX?: string
+  ACADEMY_INBOX?: string
 }
 
 /**
  * Resend from format: "Display Name <email@verified-domain.com>"
  * Verified OPERAVA sender on Resend: notification@operavaglobal.com
+ * noreply@operavaglobal.com is mapped to the verified notification mailbox.
  */
 export const DEFAULT_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
 export const OTP_RESEND_FROM = 'OPERAVA <notification@operavaglobal.com>'
 export const NOTIFICATION_NOREPLY_FROM = 'OPERAVA <notification@operavaglobal.com>'
 export const CLIENT_RESEND_FROM = 'hello@operavaglobal.com'
 export const TALENT_RESEND_FROM = 'talents@operavaglobal.com'
+export const ACADEMY_RESEND_FROM = 'academy@operavaglobal.com'
 export const APPLICANT_CONFIRMATION_FROM = 'OPERAVA <notification@operavaglobal.com>'
 export const SUPPORT_INBOX = 'hello@operavaglobal.com'
+export const ACADEMY_INBOX_DEFAULT = 'academy@operavaglobal.com'
 export const DEFAULT_OTP_SECRET = 'operava-form-secret'
 
 /** Plain email only — Resend rejects display-name formats in to/reply_to. */
@@ -205,7 +209,8 @@ export function maskEmail(email: string) {
 
 export function makeReference(type: FormType) {
   const n = crypto.getRandomValues(new Uint32Array(1))[0] % 90000000
-  return 'OPERAVA-' + type.slice(0, 3) + '-' + String(10000000 + n).slice(0, 8)
+  const prefix = type === 'ACADEMY' ? 'ACA' : type.slice(0, 3)
+  return 'OPERAVA-' + prefix + '-' + String(10000000 + n).slice(0, 8)
 }
 
 export function generateOtp() {
@@ -257,7 +262,7 @@ export function otpEmailText(_name: string, purpose: string, code: string) {
 export type SendResendResult = { id: string; status: number }
 
 /**
- * Send via Resend with normalized from/to/reply_to to avoid
+ * Send via Resend with normalized from/to/reply_to/bcc to avoid
  * "The string did not match the expected pattern." validation errors.
  */
 export async function sendResend(env: FormEnv, payload: Record<string, unknown>): Promise<SendResendResult> {
@@ -285,6 +290,15 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     if (PLAIN_EMAIL_RE.test(e)) replyTo = e
   }
 
+  let bcc: string[] | undefined
+  if (Array.isArray(payload.bcc)) {
+    bcc = payload.bcc.map((v) => extractPlainEmail(String(v))).filter((e) => PLAIN_EMAIL_RE.test(e))
+    if (bcc.length === 0) bcc = undefined
+  } else if (typeof payload.bcc === 'string' && payload.bcc.trim()) {
+    const e = extractPlainEmail(payload.bcc)
+    if (PLAIN_EMAIL_RE.test(e)) bcc = [e]
+  }
+
   const body: Record<string, unknown> = {
     from,
     to,
@@ -293,6 +307,7 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
     text: typeof payload.text === 'string' ? payload.text : undefined,
   }
   if (replyTo) body.reply_to = replyTo
+  if (bcc) body.bcc = bcc
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -328,6 +343,7 @@ export async function sendResend(env: FormEnv, payload: Record<string, unknown>)
 
 export function inboxFor(type: FormType, env: FormEnv) {
   if (type === 'CAREERS') return [env.TALENT_INBOX || 'talents@operavaglobal.com']
+  if (type === 'ACADEMY') return [env.ACADEMY_INBOX || ACADEMY_INBOX_DEFAULT]
   return [env.CLIENT_INBOX || 'hello@operavaglobal.com']
 }
 
@@ -338,6 +354,7 @@ export function senderFor(_type: FormType, env: FormEnv) {
 export function purposeLabel(type: FormType) {
   if (type === 'SERVICES') return 'SERVICE INQUIRY'
   if (type === 'CAREERS') return 'JOB APPLICATION'
+  if (type === 'ACADEMY') return 'ACADEMY ENROLLMENT / INQUIRY'
   return 'GENERAL INQUIRY'
 }
 
@@ -393,8 +410,8 @@ export function clientConfirmationEmail(opts: {
         { label: 'Phone', keys: ['Phone'] },
         { label: 'Country / Location', keys: ['Country / Location', 'Country'] },
         { label: 'Company / Organization', keys: ['Company'] },
-        { label: 'Inquiry Category', keys: ['Category'] },
-        { label: 'Service Interested In', keys: ['Service'] },
+        { label: 'Inquiry Category', keys: ['Category', 'Inquiry Type'] },
+        { label: 'Service / Program', keys: ['Service', 'Program', 'Track'] },
         { label: 'Project Requirements', keys: ['Description', 'Message', 'Requirements'] },
         { label: 'Estimated Budget', keys: ['Budget'] },
         { label: 'Website / System URL', keys: ['Website / System URL', 'WebsiteUrl', 'Website'] },
@@ -445,6 +462,7 @@ export function staffNotificationEmail(opts: {
   rows: Array<{ label: string; value: string }>
 }): string {
   const isApplicant = opts.formType === 'CAREERS'
+  const isAcademy = opts.formType === 'ACADEMY'
   const rowsHtml =
     '<ul style="margin:8px 0 0 0;padding-left:18px;font-size:15px;line-height:25px;color:#333333;">' +
     opts.rows
@@ -461,12 +479,14 @@ export function staffNotificationEmail(opts: {
     '</ul>'
 
   return renderEmailTemplate(staffNotificationTemplate, {
-    TITLE: escapeHtml(isApplicant ? 'Application Received' : 'Inquiry Received'),
+    TITLE: escapeHtml(
+      isApplicant ? 'Application Received' : isAcademy ? 'Academy Enrollment / Inquiry' : 'Inquiry Received',
+    ),
     REFERENCE_ID: escapeHtml(opts.referenceId),
     EMAIL: escapeHtml(opts.email),
     SUBMITTED_AT: escapeHtml(opts.submittedAt),
     ROWS_HTML: rowsHtml,
-    PARTY_LABEL: escapeHtml(isApplicant ? 'applicant' : 'customer'),
+    PARTY_LABEL: escapeHtml(isApplicant ? 'applicant' : isAcademy ? 'learner' : 'customer'),
   })
 }
 
