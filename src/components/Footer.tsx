@@ -5,15 +5,51 @@ import EmailDirectoryCarousel from './EmailDirectoryCarousel'
 export default function Footer() {
   const { t } = useLanguage()
 
-  const footerServices = [
-    { label: t('nav.services.it', 'Information Technology'), href: '/services/it' },
-    { label: t('nav.services.bpo', 'Outsourcing / Offshoring'), href: '/services/bpo' },
-    { label: 'Software Development', href: '/services/it/software-development' },
-    { label: 'Web & Mobile Apps', href: '/services/it/web-mobile-development' },
-    { label: 'Cloud Services & Infrastructure', href: '/services/it/cloud-services' },
-    { label: 'Customer Service', href: '/services/bpo/customer-service' },
-    { label: 'Technical Support', href: '/services/bpo/technical-support' },
-    { label: 'Back-Office Operations', href: '/services/bpo/back-office-operations' },
+  /** Services organized in three categories: Automation, Technology, Outsourcing */
+  const serviceCategories: {
+    title: string
+    hub: { label: string; href: string }
+    items: { label: string; href: string }[]
+  }[] = [
+    {
+      title: 'Automation',
+      hub: { label: 'All Automation Services', href: '/services/automation' },
+      items: [
+        { label: 'Workflow Automation', href: '/services/automation/workflow-automation' },
+        { label: 'Business Process Automation', href: '/services/automation/business-process-automation' },
+        { label: 'AI Automation', href: '/services/automation/ai-automation' },
+        { label: 'Customer Service Automation', href: '/services/automation/customer-service-automation' },
+        { label: 'Lead & Sales Automation', href: '/services/automation/lead-sales-automation' },
+        { label: 'Document Automation', href: '/services/automation/document-automation' },
+        { label: 'Custom Automation Solutions', href: '/services/automation/custom-automation-solutions' },
+      ],
+    },
+    {
+      title: 'Technology',
+      hub: { label: 'All Technology Services', href: '/services/it' },
+      items: [
+        { label: 'Software Development', href: '/services/it/software-development' },
+        { label: 'Web & Mobile Apps', href: '/services/it/web-mobile-development' },
+        { label: 'SaaS & Platform Development', href: '/services/it/saas-platform-development' },
+        { label: 'IT Systems Development', href: '/services/it/it-systems-development' },
+        { label: 'IT Consulting', href: '/services/it/it-consulting' },
+        { label: 'Systems Integration', href: '/services/it/systems-integration' },
+        { label: 'Database Services', href: '/services/it/database-services' },
+      ],
+    },
+    {
+      title: 'Outsourcing',
+      hub: { label: 'All Outsourcing Services', href: '/services/bpo' },
+      items: [
+        { label: 'Customer Service', href: '/services/bpo/customer-service' },
+        { label: 'Technical Support', href: '/services/bpo/technical-support' },
+        { label: 'Help Desk', href: '/services/bpo/help-desk' },
+        { label: 'Back-Office Operations', href: '/services/bpo/back-office-operations' },
+        { label: 'Data Processing', href: '/services/bpo/data-processing' },
+        { label: 'Document Processing', href: '/services/bpo/document-processing' },
+        { label: 'Virtual Assistance', href: '/services/bpo/virtual-assistance' },
+      ],
+    },
   ]
 
   const footerCompany = [
@@ -31,8 +67,9 @@ export default function Footer() {
     { label: t('footer.refund', 'Refund Policy'), href: '/refund-policy' },
   ]
 
-  const renderFooterLink = (item: { label: string; href: string }) => {
-    const className = 'text-sm text-white hover:text-white/80 transition-colors duration-200'
+  const linkClass = 'text-sm text-white/90 hover:text-white transition-colors duration-200'
+
+  const renderFooterLink = (item: { label: string; href: string }, className = linkClass) => {
     if (item.href.startsWith('http')) {
       return (
         <a href={item.href} target="_blank" rel="noopener noreferrer" className={className}>
@@ -57,6 +94,7 @@ export default function Footer() {
 
       <footer className="bg-gray-950 text-white border-t border-white/10">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16 pt-16 pb-8">
+          {/* Top: brand + company + legal */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12 border-b border-white/10">
             <div className="lg:col-span-1">
               <Link to="/" className="inline-flex flex-col leading-none mb-5 group" aria-label="OPERAVA Global Solutions — Home">
@@ -70,8 +108,8 @@ export default function Footer() {
               <p className="text-sm text-white leading-relaxed mb-4">
                 {t('brand.slogan', 'Operating in Advance.')}
               </p>
-              <p className="text-xs text-white mb-6">
-                {t('brand.sub', 'Technology • Workforce • Outsourcing / Offshoring')}
+              <p className="text-xs text-white/80 mb-6">
+                {t('brand.sub', 'Automation • Technology • Outsourcing')}
               </p>
 
               <div>
@@ -100,11 +138,6 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-4">{t('footer.services', 'Services')}</h3>
-              <ul className="space-y-3">{footerServices.map((item) => (<li key={item.href}>{renderFooterLink(item)}</li>))}</ul>
-            </div>
-
-            <div>
               <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-4">{t('footer.company', 'Company')}</h3>
               <ul className="space-y-3">{footerCompany.map((item) => (<li key={item.href}>{renderFooterLink(item)}</li>))}</ul>
             </div>
@@ -114,6 +147,64 @@ export default function Footer() {
               <ul className="space-y-3 mb-8">{footerLegal.map((item) => (<li key={item.href}>{renderFooterLink(item)}</li>))}</ul>
               <Link to="/contact" className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-violet-700 rounded-xl hover:bg-violet-600 transition-colors duration-200">{t('nav.talkToUs', 'Talk to Us')}</Link>
             </div>
+
+            <div className="hidden lg:block">
+              <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-4">Contacts</h3>
+              <ul className="space-y-3">
+                <li>{renderFooterLink({ label: 'All Contacts', href: '/contacts' })}</li>
+                <li>{renderFooterLink({ label: 'Contact Form', href: '/contact' })}</li>
+                <li>{renderFooterLink({ label: 'Verification Portal', href: '/verification' })}</li>
+                <li>
+                  <a href="mailto:hello@operavaglobal.com" className={linkClass}>
+                    hello@operavaglobal.com
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Services — 3 categories */}
+          <div className="py-12 border-b border-white/10">
+            <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-8">
+              {t('footer.services', 'Services')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
+              {serviceCategories.map((cat) => (
+                <div key={cat.title}>
+                  <div className="mb-4 pb-2 border-b border-white/10">
+                    <Link
+                      to={cat.hub.href}
+                      className="text-sm font-semibold text-white hover:text-violet-300 transition-colors"
+                    >
+                      {cat.title}
+                    </Link>
+                  </div>
+                  <ul className="space-y-2.5">
+                    <li>
+                      {renderFooterLink(cat.hub, 'text-sm text-violet-300 hover:text-violet-200 transition-colors duration-200')}
+                    </li>
+                    {cat.items.map((item) => (
+                      <li key={item.href}>{renderFooterLink(item)}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile Contacts (shown under services on small screens) */}
+          <div className="lg:hidden py-8 border-b border-white/10">
+            <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-4">Contacts</h3>
+            <ul className="space-y-3">
+              <li>{renderFooterLink({ label: 'All Contacts', href: '/contacts' })}</li>
+              <li>{renderFooterLink({ label: 'Contact Form', href: '/contact' })}</li>
+              <li>{renderFooterLink({ label: 'Verification Portal', href: '/verification' })}</li>
+              <li>
+                <a href="mailto:hello@operavaglobal.com" className={linkClass}>
+                  hello@operavaglobal.com
+                </a>
+              </li>
+            </ul>
           </div>
 
           <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
