@@ -12,6 +12,7 @@ import OperavaIntroOverlay from './components/OperavaIntroOverlay'
 import { RouteLoadingProgress } from './components/Skeleton'
 import Home from './pages/Home'
 import About from './pages/About'
+import Academy from './pages/Academy'
 import ITServices from './pages/ITServices'
 import BPOServices from './pages/BPOServices'
 import AutomationServices from './pages/AutomationServices'
@@ -150,9 +151,9 @@ function Layout() {
             className="w-full flex-1 bg-white"
           >
             <Routes location={location} key={location.pathname}>
-              {/* On verification host, root also renders the portal (guard navigates to /verification) */}
               <Route path="/" element={onVerificationHost ? <Verification /> : <Home />} />
               <Route path="/about" element={<About />} />
+              <Route path="/academy" element={<Academy />} />
               <Route path="/services/automation" element={<AutomationServices />} />
               <Route path="/services/it" element={<ITServices />} />
               <Route path="/services/bpo" element={<BPOServices />} />
