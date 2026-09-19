@@ -1,29 +1,26 @@
+import { nextInterviewPrompt } from '../lib/recruitmentGuide'
+
 interface Env {
   AI: Ai
 }
 
-const SYSTEM = `You are OPERAVA AI Job Screening — an initial interview assistant for OPERAVA Global Solutions careers.
-You are NOT AVA (the business/services assistant). Stay only in hiring and career-screening scope.
+const SYSTEM = `You are OPERAVA Recruitment AVA — the official hiring conversation assistant for OPERAVA Global Solutions.
+You are NOT the main-site AVA for sales. Stay only in recruitment and careers scope.
 
 PERSONALITY
-Professional, calm, concise. Sound like a structured screening interviewer.
+Professional, calm, friendly, concise (1–3 short paragraphs).
 
-LENGTH
-1–3 short paragraphs or a short numbered list. No asterisks as bullets.
-
-SCOPE
-- Three tracks: Technology Executive, Business Operations Executive, Customer Experience Executive
-- Hiring steps: application review → AI initial interview → human screening → skills assessment → interview → offer
-- Remote / hybrid PH & global; full-time (CX may involve shifts)
-- Formal apply: https://www.operavaglobal.com/apply — careers: https://www.operavaglobal.com/careers
-- Talent email: talents@operavaglobal.com
+MISSION
+Guide the verified applicant through application categories: experience, education, skills, position-specific examples, availability, start date, phone, additional notes.
+Acknowledge answers, extract what they shared, ask the single next missing question.
+When information is complete, tell them they can start the 30-question live assessment (pass mark 26/30 = 85%).
 
 RULES
 1. Do not invent salaries, headcount, or guarantees of hire.
-2. Do not answer general IT/BPO sales questions — redirect to www.operavaglobal.com or AVA on the main site.
-3. Encourage formal application for real consideration.
-4. Ask clarifying fit questions when the candidate shares experience.
-5. State clearly this AI session is not a final hiring decision.
+2. Do not answer general IT/BPO sales questions — redirect to www.operavaglobal.com.
+3. This AI session is not a final hiring decision.
+4. Do not reveal assessment answer keys.
+5. Prefer one clear next question over long lists.
 `
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
@@ -32,6 +29,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const body = (await request.json()) as {
       message?: string
       history?: Array<{ role: 'user' | 'model'; text: string }>
+      profile?: Record<string, unknown>
+      positionTitle?: string
     }
     const message = body.message
     if (!message || typeof message !== 'string') {
@@ -41,8 +40,30 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       })
     }
 
+    const profile = (body.profile || {}) as {
+      experienceYears?: string
+      experienceSummary?: string
+      education?: string
+      skills?: string[]
+      positionSpecific?: string
+      availability?: string
+      startDate?: string
+      phone?: string
+      additional?: string
+    }
+    const guide = nextInterviewPrompt(profile, String(body.positionTitle || 'this role'))
+
     if (env.AI) {
-      const messages: Array<{ role: string; content: string }> = [{ role: 'system', content: SYSTEM }]
+      const messages: Array<{ role: string; content: string }> = [
+        { role: 'system', content: SYSTEM },
+        {
+          role: 'system',
+          content:
+            'Current profile completeness guide: ' +
+            JSON.stringify(guide) +
+            '. Prefer ending with the suggested next prompt if the applicant has not finished.',
+        },
+      ]
       if (Array.isArray(body.history)) {
         for (const item of body.history.slice(-8)) {
           if (item.text && (item.role === 'user' || item.role === 'model')) {
@@ -58,7 +79,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       try {
         const result = (await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
           messages,
-          temperature: 0.4,
+          temperature: 0.35,
           max_tokens: 420,
         })) as { response?: string; result?: string }
 
@@ -68,18 +89,25 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           ''
 
         if (text) {
-          return new Response(JSON.stringify({ text }), {
-            headers: { 'Content-Type': 'application/json' },
-          })
+          return new Response(
+            JSON.stringify({ text, guideComplete: guide.complete, nextCategory: guide.category }),
+            { headers: { 'Content-Type': 'application/json' } },
+          )
         }
       } catch {
         // fall through
       }
     }
 
-    return new Response(JSON.stringify({ fallback: true }), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({
+        text: guide.prompt,
+        guideComplete: guide.complete,
+        nextCategory: guide.category,
+        fallback: true,
+      }),
+      { headers: { 'Content-Type': 'application/json' } },
+    )
   } catch {
     return new Response(JSON.stringify({ fallback: true }), {
       headers: { 'Content-Type': 'application/json' },
