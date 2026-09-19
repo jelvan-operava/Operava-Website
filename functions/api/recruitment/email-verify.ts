@@ -1,7 +1,9 @@
 import {
   json,
   hashOtp,
+  otpHashMatches,
   resolveSecret,
+  otpSecretMissingResponse,
   readSignedDraft,
   issueSignedDraft,
   b64urlEncode,
@@ -27,6 +29,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context
   try {
     const secret = resolveSecret(env)
+    if (!secret) return otpSecretMissingResponse()
+
     let body: { draftId?: string; code?: string }
     try {
       body = (await request.json()) as { draftId?: string; code?: string }
@@ -45,9 +49,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return json({ error: 'Too many attempts. Request a new code.' }, 429)
     }
 
-    // Same hash path as /api/forms/verify
     const hashed = await hashOtp(secret, code)
-    if (hashed !== signed.codeHash) {
+    if (!otpHashMatches(signed.codeHash, hashed)) {
       const bumped = await issueSignedDraft(secret, {
         email: signed.email,
         formType: signed.formType,
