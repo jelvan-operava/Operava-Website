@@ -11,7 +11,6 @@ import {
   purposeLabel,
   sendResend,
   resolveSecret,
-  isProductionRuntime,
   issueSignedDraft,
   senderFor,
   type FormEnv,
@@ -20,14 +19,40 @@ import {
 
 const TYPES = new Set(['SERVICES', 'CAREERS', 'CONTACT', 'ACADEMY'])
 
+function mailErrorResponse(msg: string) {
+  let error =
+    'Unable to send verification email right now. Please try again in a moment, or contact hello@operavaglobal.com.'
+  let code = 'EMAIL_SEND_FAILED'
+  if (msg === 'EMAIL_DOMAIN_NOT_VERIFIED') {
+    error =
+      'Email sender domain is not verified with Resend. Verify operavaglobal.com (or the From address domain) in the Resend dashboard, then retry.'
+    code = msg
+  } else if (msg === 'EMAIL_ADDRESS_PATTERN') {
+    error =
+      'Email address was rejected by the mail provider. Check the email format and try again.'
+    code = msg
+  } else if (msg === 'EMAIL_INVALID_TO') {
+    error = 'A valid email is required.'
+    code = msg
+  } else if (msg === 'RESEND_API_KEY is not configured') {
+    error = 'Email delivery is not configured. Please contact hello@operavaglobal.com.'
+    code = 'RESEND_NOT_CONFIGURED'
+  } else if (msg === 'EMAIL_UNAUTHORIZED' || msg === 'EMAIL_API_KEY_INVALID') {
+    error =
+      'Email service authentication failed. Update RESEND_API_KEY in Cloudflare Pages secrets (full re_ key from Resend).'
+    code = msg
+  }
+  return json({ error, code }, 502)
+}
+
 export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) => {
   try {
     if (!env.RESEND_API_KEY || String(env.RESEND_API_KEY).trim().length < 8) {
       console.error('forms/start: RESEND_API_KEY missing')
       return json(
         {
-          error:
-            'Email delivery is not configured. Please contact hello@operavaglobal.com.',
+          error: 'Email delivery is not configured. Please contact hello@operavaglobal.com.',
+          code: 'RESEND_NOT_CONFIGURED',
         },
         503,
       )
@@ -42,7 +67,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       return json({ error: 'Invalid request body.' }, 400)
     }
 
-    // Honeypot
     if (clean(body.website, 80)) {
       return json({ ok: true, draftId: 'filtered', maskedEmail: 'hidden' })
     }
@@ -130,13 +154,7 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
     } catch (mailErr) {
       const msg = mailErr instanceof Error ? mailErr.message : 'unknown'
       console.error('OTP email send failed', msg)
-      return json(
-        {
-          error:
-            'Unable to send verification email right now. Please try again in a moment, or contact hello@operavaglobal.com.',
-        },
-        502,
-      )
+      return mailErrorResponse(msg)
     }
 
     return json({
@@ -144,7 +162,6 @@ export const onRequestPost: PagesFunction<FormEnv> = async ({ request, env }) =>
       draftId,
       maskedEmail: maskEmail(email),
       expiresInSec: 600,
-      ...(!isProductionRuntime() ? {} : {}),
     })
   } catch (err) {
     console.error('form start failed', err instanceof Error ? err.message : 'unknown')
