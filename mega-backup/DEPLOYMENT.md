@@ -44,7 +44,7 @@ npm install
 # Required secrets
 npx wrangler secret put MEGA_EMAIL
 npx wrangler secret put MEGA_PASSWORD
-npx wrangler secret put BACKUP_SHARED_SECRET
+npx wrangler secret put MEGA_BACKUP_SHARED_SECRET
 
 # Optional if using TOTP-capable login
 # npx wrangler secret put MEGA_TOTP
@@ -65,7 +65,7 @@ curl -sS "https://operava-mega-backup....workers.dev/"
 # → { "service": "operava-mega-backup", "status": "ok", "folders": [...], "megaConfigured": true }
 
 curl -sS -X POST "https://operava-mega-backup....workers.dev/" \
-  -H "Authorization: Bearer <BACKUP_SHARED_SECRET>" \
+  -H "Authorization: Bearer <MEGA_BACKUP_SHARED_SECRET>" \
   -H "Content-Type: application/json" \
   -d '{
     "folder": "OPERAVA CLIENTS",
@@ -86,13 +86,14 @@ Project: **operava-website** → Settings → Environment variables (Production)
 | Secret | Value |
 |--------|--------|
 | `MEGA_BACKUP_URL` | Worker base URL (https://…) |
-| `MEGA_BACKUP_SECRET` | **Same** string as `BACKUP_SHARED_SECRET` |
+| `MEGA_BACKUP_SHARED_SECRET` | **Same** string as Worker secret |
 
 After deploy, health should show:
 
 ```text
 GET https://www.operavaglobal.com/api/health
 → bindings.megaBackupWebhookConfigured: true
+→ bindings.megaBackupSecretConfigured: true
 ```
 
 ---
@@ -123,7 +124,7 @@ OPERAVA FILES AND DOCUMENTS/ACA-2026-….json
 ## 6. API contract (Worker)
 
 `POST /`  
-Header: `Authorization: Bearer <BACKUP_SHARED_SECRET>`
+Header: `Authorization: Bearer <MEGA_BACKUP_SHARED_SECRET>`
 
 ```json
 {
@@ -146,7 +147,7 @@ Allowed `folder` values only:
 ## 7. Security checklist
 
 - [ ] MEGA service account credentials only in Cloudflare secrets
-- [ ] `BACKUP_SHARED_SECRET` ≥ 16 characters, random
+- [ ] `MEGA_BACKUP_SHARED_SECRET` ≥ 16 characters, random
 - [ ] Same secret on Worker and Pages
 - [ ] No passwords in GitHub, chat, or tickets
 - [ ] Folders pre-created in MEGA (Worker does not auto-create top-level folders)
