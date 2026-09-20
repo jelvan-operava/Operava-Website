@@ -21,6 +21,7 @@ import {
   backupFormSubmissionToMega,
   type MegaBackupEnv,
 } from '../../lib/megaBackupHook'
+import { getResumeByKey, mergeResumeIntoPayload, ensureResumeTables } from '../../lib/resumeDb'
 
 type Env = FormEnv & MegaBackupEnv
 
@@ -47,12 +48,20 @@ const LABEL_MAP: Record<string, string> = {
 }
 
 function payloadRows(payload: Record<string, unknown>): Array<{ label: string; value: string }> {
-  const skip = new Set(['website', 'accurate', 'privacy', 'formType', 'resumeKey'])
+  const skip = new Set([
+    'website',
+    'accurate',
+    'privacy',
+    'formType',
+    'resumeKey',
+    'resumeText',
+    'resumeDataMandatory',
+  ])
   return Object.entries(payload)
     .filter(([key, value]) => !skip.has(key) && value != null && String(value).trim() !== '')
     .map(([key, value]) => ({
       label: LABEL_MAP[key] || key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()),
-      value: String(value),
+      value: typeof value === 'object' ? JSON.stringify(value) : String(value),
     }))
 }
 
@@ -107,20 +116,50 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     } catch {
       payload = {}
     }
+
+    const resumeKey = String(payload.resumeKey || '').trim()
+    if (resumeKey && env.SUBMISSIONS_DB) {
+      try {
+        const resume = await getResumeByKey(env.SUBMISSIONS_DB, resumeKey)
+        payload = mergeResumeIntoPayload(payload, resume)
+      } catch (resumeErr) {
+        console.error('resume merge failed', resumeErr instanceof Error ? resumeErr.message : 'unknown')
+      }
+    }
+
     const name = String(payload.name || '')
     const email = extractPlainEmail(signed.email)
     const formType = signed.formType as FormType
     const referenceId = makeReference(formType)
     const nowIso = new Date().toISOString()
+    const payloadJson = JSON.stringify(payload)
 
     if (env.SUBMISSIONS_DB) {
       try {
         await ensureTables(env.SUBMISSIONS_DB)
+        await ensureResumeTables(env.SUBMISSIONS_DB)
         await env.SUBMISSIONS_DB.prepare(
           "INSERT INTO form_submissions (reference_id, form_type, name, email, payload, verification_status, status, resume_key, created_at, verified_at) VALUES (?, ?, ?, ?, ?, 'VERIFIED', 'VERIFIED', ?, ?, ?)",
         )
-          .bind(referenceId, formType, name, email, signed.payload, String(payload.resumeKey || ''), nowIso, nowIso)
+          .bind(referenceId, formType, name, email, payloadJson, resumeKey, nowIso, nowIso)
           .run()
+
+        // Best-effort: also set resume_text / resume_parsed columns when present
+        if (payload.resumeText) {
+          try {
+            await env.SUBMISSIONS_DB.prepare(
+              'UPDATE form_submissions SET resume_text = ?, resume_parsed = ? WHERE reference_id = ?',
+            )
+              .bind(
+                String(payload.resumeText).slice(0, 200000),
+                JSON.stringify(payload.resumeDataMandatory || {}),
+                referenceId,
+              )
+              .run()
+          } catch {
+            /* columns may not exist yet */
+          }
+        }
       } catch {
         console.error('D1 insert optional failed')
       }
