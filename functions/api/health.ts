@@ -7,7 +7,10 @@ interface Env {
   MEGA_EMAIL?: string
   MEGA_PASSWORD?: string
   MEGA_BACKUP_URL?: string
+  MEGA_BACKUP_SHARED_SECRET?: string
+  /** @deprecated use MEGA_BACKUP_SHARED_SECRET */
   MEGA_BACKUP_SECRET?: string
+  /** @deprecated use MEGA_BACKUP_SHARED_SECRET */
   BACKUP_SHARED_SECRET?: string
 }
 
@@ -16,6 +19,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   const megaPassword = env.MEGA_PASSWORD && String(env.MEGA_PASSWORD).trim().length >= 4
   const megaUrl = env.MEGA_BACKUP_URL && String(env.MEGA_BACKUP_URL).trim().startsWith('http')
   const megaSecret =
+    (env.MEGA_BACKUP_SHARED_SECRET && String(env.MEGA_BACKUP_SHARED_SECRET).trim().length >= 16) ||
     (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim().length >= 16) ||
     (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim().length >= 16)
 
@@ -33,6 +37,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
       submissionsDbBound: Boolean(env.SUBMISSIONS_DB),
       megaCredentialsConfigured: Boolean(megaEmail && megaPassword),
       megaBackupWebhookConfigured: Boolean(megaUrl && megaSecret),
+      megaBackupSecretConfigured: Boolean(megaSecret),
     },
   }
 
