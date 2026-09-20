@@ -2,8 +2,7 @@ import {
   applicantConfirmationEmail,
   clientConfirmationEmail,
   ensureTables,
-  hashOtp,
-  otpHashMatches,
+  otpCodeMatches,
   json,
   makeReference,
   sendResend,
@@ -81,8 +80,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (Date.now() > Number(signed.expiresAt)) return json({ error: 'This code has expired.' }, 400)
     if (Number(signed.attempts) >= 5) return json({ error: 'Too many attempts. Request a new code.' }, 429)
 
-    const hashed = await hashOtp(secret, code)
-    if (!otpHashMatches(signed.codeHash, hashed)) {
+    if (!(await otpCodeMatches(secret, code, String(signed.codeHash || '')))) {
       const bumped = await issueSignedDraft(secret, {
         email: signed.email,
         formType: signed.formType,
