@@ -17,16 +17,16 @@ echo "MEGA_EMAIL:"
 npx wrangler secret put MEGA_EMAIL || true
 echo "MEGA_PASSWORD:"
 npx wrangler secret put MEGA_PASSWORD || true
-echo "BACKUP_SHARED_SECRET (use a long random string; same value goes on Pages as MEGA_BACKUP_SECRET):"
-npx wrangler secret put BACKUP_SHARED_SECRET || true
+echo "MEGA_BACKUP_SHARED_SECRET (long random string; same value on Pages):"
+npx wrangler secret put MEGA_BACKUP_SHARED_SECRET || true
 
 echo "==> Deploying Worker operava-mega-backup"
 npx wrangler deploy
 
 echo ""
 echo "Done. Copy the workers.dev URL above into Cloudflare Pages secret:"
-echo "  MEGA_BACKUP_URL    = https://operava-mega-backup.<account>.workers.dev"
-echo "  MEGA_BACKUP_SECRET = <same as BACKUP_SHARED_SECRET>"
+echo "  MEGA_BACKUP_URL             = https://operava-mega-backup.<account>.workers.dev"
+echo "  MEGA_BACKUP_SHARED_SECRET    = <same as Worker secret>"
 echo ""
 echo "Smoke test:"
 echo "  curl -sS \"https://operava-mega-backup.<account>.workers.dev/\""
