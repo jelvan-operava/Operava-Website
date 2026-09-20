@@ -15,18 +15,29 @@ import type { MegaFolderName } from './megaFolders'
 
 export interface MegaBackupEnv extends MegaCredentialsEnv {
   MEGA_BACKUP_URL?: string
+  /** Preferred shared secret for webhook auth */
+  MEGA_BACKUP_SHARED_SECRET?: string
+  /** @deprecated use MEGA_BACKUP_SHARED_SECRET */
   MEGA_BACKUP_SECRET?: string
+  /** @deprecated use MEGA_BACKUP_SHARED_SECRET */
   BACKUP_SHARED_SECRET?: string
 }
 
 export type MegaFolder = MegaFolderName
 
+function resolveBackupSecret(env: MegaBackupEnv): string {
+  return (
+    (env.MEGA_BACKUP_SHARED_SECRET && String(env.MEGA_BACKUP_SHARED_SECRET).trim()) ||
+    (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim()) ||
+    (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim()) ||
+    ''
+  )
+}
+
 export function megaBackupConfigured(env: MegaBackupEnv): boolean {
   if (megaCredentialsConfigured(env)) return true
   const url = env.MEGA_BACKUP_URL && String(env.MEGA_BACKUP_URL).trim()
-  const secret =
-    (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim()) ||
-    (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim())
+  const secret = resolveBackupSecret(env)
   return Boolean(url && secret && url.startsWith('http') && secret.length >= 16)
 }
 
@@ -123,10 +134,7 @@ async function postMegaWebhook(
   },
 ): Promise<void> {
   const url = String(env.MEGA_BACKUP_URL || '').trim().replace(/\/$/, '')
-  const secret =
-    (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim()) ||
-    (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim()) ||
-    ''
+  const secret = resolveBackupSecret(env)
   if (!url || !secret) return
 
   try {
