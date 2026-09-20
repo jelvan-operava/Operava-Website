@@ -23,6 +23,11 @@ export default function AiJobScreening() {
   const draftIdRef = useRef('')
   const otpRefs = useRef<Array<HTMLInputElement | null>>([])
 
+  const clearDraft = () => {
+    draftIdRef.current = ''
+    setDraftId('')
+  }
+
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(SESSION_KEY)
@@ -44,6 +49,7 @@ export default function AiJobScreening() {
       setPosition(pos)
       setSessionToken(data.sessionToken)
       setProfileName(data.name || '')
+      if (data.email) setEmailValue(data.email)
       setStage('session')
     } catch {
       sessionStorage.removeItem(SESSION_KEY)
@@ -73,6 +79,9 @@ export default function AiJobScreening() {
       const data = await res.json().catch(() => ({}))
       if (!res.ok) return setError(String(data.error || 'Unable to send code.'))
       const nextDraft = String(data.draftId || '')
+      if (!nextDraft || !nextDraft.startsWith('s1.')) {
+        return setError('Verification session did not start correctly. Please try again.')
+      }
       draftIdRef.current = nextDraft
       setDraftId(nextDraft)
       setMaskedEmail(String(data.maskedEmail || email))
@@ -99,6 +108,9 @@ export default function AiJobScreening() {
       const data = await res.json().catch(() => ({}))
       if (!res.ok) return setError(String(data.error || 'Unable to resend code.'))
       const nextDraft = String(data.draftId || currentDraft)
+      if (!nextDraft || !nextDraft.startsWith('s1.')) {
+        return setError('Verification session is invalid. Please request a new code.')
+      }
       draftIdRef.current = nextDraft
       setDraftId(nextDraft)
       if (data.maskedEmail) setMaskedEmail(String(data.maskedEmail))
@@ -117,7 +129,9 @@ export default function AiJobScreening() {
     const code = (forcedCode ?? otpDigits.join('')).replace(/\D/g, '').slice(0, 6)
     if (code.length !== 6) return setError('Enter the 6-digit code from your email.')
     const currentDraft = draftIdRef.current || draftId
-    if (!currentDraft) return setError('Verification session missing. Go back and request a new code.')
+    if (!currentDraft || !currentDraft.startsWith('s1.')) {
+      return setError('Verification session missing. Go back and request a new code.')
+    }
     setBusy(true)
     try {
       const res = await fetch('/api/recruitment/email-verify', {
@@ -128,8 +142,10 @@ export default function AiJobScreening() {
       const data = await res.json().catch(() => ({}))
       if (data.draftId) {
         const rotated = String(data.draftId)
-        draftIdRef.current = rotated
-        setDraftId(rotated)
+        if (rotated.startsWith('s1.')) {
+          draftIdRef.current = rotated
+          setDraftId(rotated)
+        }
       }
       if (!res.ok) {
         const remaining = data.attemptsRemaining
@@ -208,6 +224,7 @@ export default function AiJobScreening() {
                   setPosition(p)
                   setStage('email')
                   setError('')
+                  clearDraft()
                 }}
                 className="text-left p-4 rounded-2xl border border-slate-200 bg-white hover:border-violet-300 hover:shadow-sm transition"
               >
@@ -267,6 +284,7 @@ export default function AiJobScreening() {
                 onClick={() => {
                   setStage('position')
                   setError('')
+                  clearDraft()
                 }}
               >
                 Back to positions
@@ -345,6 +363,7 @@ export default function AiJobScreening() {
                   setStage('email')
                   setOtpDigits(['', '', '', '', '', ''])
                   setError('')
+                  clearDraft()
                 }}
                 className="w-full py-1 text-xs text-slate-500 hover:underline"
               >
@@ -387,6 +406,7 @@ export default function AiJobScreening() {
               setSessionToken('')
               setStage('position')
               setPosition(null)
+              clearDraft()
             }}
           >
             Start over
