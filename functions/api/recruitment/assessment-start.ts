@@ -2,7 +2,9 @@ import { json, type FormEnv } from '../../lib/formCore'
 import { readVerifiedSession } from '../../lib/recruitmentSession'
 import {
   getApplicantByApplicationId,
+  getAssessment,
   recruitmentConfigured,
+  saveAssessment,
   updateApplicantProfile,
   type RecruitmentEnv,
 } from '../../lib/recruitmentDb'
@@ -15,41 +17,19 @@ import {
 
 type Env = FormEnv & RecruitmentEnv
 
-async function rest(
-  env: RecruitmentEnv,
-  path: string,
-  init: RequestInit & { prefer?: string } = {},
-) {
-  const url = String(env.RECRUITMENT_SUPABASE_URL || '').replace(/\/$/, '')
-  const key = String(env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY || '')
-  const headers: Record<string, string> = {
-    apikey: key,
-    Authorization: 'Bearer ' + key,
-    'Content-Type': 'application/json',
-  }
-  if (init.prefer) headers.Prefer = init.prefer
-  const res = await fetch(url + path, { method: init.method || 'GET', headers, body: init.body })
-  const raw = await res.text()
-  let data: unknown = null
-  try {
-    data = raw ? JSON.parse(raw) : null
-  } catch {
-    data = null
-  }
-  return { ok: res.ok, status: res.status, data, raw }
-}
-
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   try {
     if (!recruitmentConfigured(env)) {
       return json({ error: 'Applicant database is not configured.' }, 503)
     }
+
     let body: { sessionToken?: string }
     try {
       body = (await request.json()) as { sessionToken?: string }
     } catch {
       return json({ error: 'Invalid request body.' }, 400)
     }
+
     const session = await readVerifiedSession(env, String(body.sessionToken || ''))
     if (!session) return json({ error: 'Session expired. Verify your email again.' }, 401)
 
@@ -79,26 +59,21 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       return json({ error: 'Assessment bank is misconfigured.' }, 500)
     }
 
-    const existing = await rest(
-      env,
-      '/rest/v1/assessments?application_id=eq.' +
-        encodeURIComponent(session.applicationId) +
-        '&select=*&limit=1',
-    )
-    if (existing.ok && Array.isArray(existing.data) && existing.data[0]?.status === 'COMPLETE') {
+    const existing = await getAssessment(env, session.applicationId)
+    if (existing && existing.status === 'COMPLETE') {
       return json(
         {
           error: 'Assessment already completed for this application.',
           status: 'COMPLETE',
-          passed: existing.data[0].passed,
-          scorePercent: existing.data[0].score_percent,
-          correctCount: existing.data[0].correct_count,
+          passed: existing.passed,
+          scorePercent: existing.score_percent,
+          correctCount: existing.correct_count,
         },
         409,
       )
     }
 
-    const payload = {
+    const assessment = {
       application_id: session.applicationId,
       position_code: positionCode,
       status: 'IN_PROGRESS',
@@ -112,30 +87,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       completed_at: null,
     }
 
-    if (existing.ok && Array.isArray(existing.data) && existing.data[0]) {
-      await rest(
-        env,
-        '/rest/v1/assessments?application_id=eq.' + encodeURIComponent(session.applicationId),
-        { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify(payload) },
-      )
-    } else {
-      const ins = await rest(env, '/rest/v1/assessments', {
-        method: 'POST',
-        prefer: 'return=minimal',
-        body: JSON.stringify(payload),
-      })
-      if (!ins.ok) {
-        console.error('assessment insert', ins.status, ins.raw.slice(0, 300))
-        return json(
-          {
-            error:
-              'Could not create assessment. Ensure supabase/recruitment/002_assessments.sql has been applied.',
-          },
-          502,
-        )
-      }
-    }
-
+    await saveAssessment(env, assessment)
     await updateApplicantProfile(env, session.applicationId, { status: 'ASSESSMENT_IN_PROGRESS' })
 
     const q0 = questions[0]

@@ -81,8 +81,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (!recruitmentConfigured(env)) {
       return json(
         {
-          error:
-            'Applicant database is not configured. Contact talents@operavaglobal.com.',
+          error: 'Applicant database is not configured. Contact talents@operavaglobal.com.',
         },
         503,
       )
@@ -114,7 +113,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return json(
         {
           error:
-            'Email verified locally but applicant record could not be saved. Ensure the recruitment schema is applied in Supabase, then try again.',
+            'Email verified locally but applicant record could not be saved. Ensure the D1 recruitment tables are created and the SUBMISSIONS_DB binding is enabled.',
         },
         502,
       )

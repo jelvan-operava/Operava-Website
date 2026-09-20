@@ -2,7 +2,9 @@ import { json, type FormEnv } from '../../lib/formCore'
 import { readVerifiedSession } from '../../lib/recruitmentSession'
 import {
   getApplicantByApplicationId,
+  getAssessment,
   recruitmentConfigured,
+  saveAssessment,
   updateApplicantProfile,
   type RecruitmentEnv,
 } from '../../lib/recruitmentDb'
@@ -14,30 +16,6 @@ import {
 import { sendRecruitmentPoolEmails } from '../../lib/recruitmentEmails'
 
 type Env = FormEnv & RecruitmentEnv & MegaBackupEnv & { AI?: Ai; TALENT_INBOX?: string }
-
-async function rest(
-  env: RecruitmentEnv,
-  path: string,
-  init: RequestInit & { prefer?: string } = {},
-) {
-  const url = String(env.RECRUITMENT_SUPABASE_URL || '').replace(/\/$/, '')
-  const key = String(env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY || '')
-  const headers: Record<string, string> = {
-    apikey: key,
-    Authorization: 'Bearer ' + key,
-    'Content-Type': 'application/json',
-  }
-  if (init.prefer) headers.Prefer = init.prefer
-  const res = await fetch(url + path, { method: init.method || 'GET', headers, body: init.body })
-  const raw = await res.text()
-  let data: unknown = null
-  try {
-    data = raw ? JSON.parse(raw) : null
-  } catch {
-    data = null
-  }
-  return { ok: res.ok, status: res.status, data, raw }
-}
 
 async function scoreAnswer(env: Env, question: string, answer: string): Promise<boolean> {
   const trimmed = answer.trim()
@@ -84,36 +62,25 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     } catch {
       return json({ error: 'Invalid request body.' }, 400)
     }
+
     const session = await readVerifiedSession(env, String(body.sessionToken || ''))
     if (!session) return json({ error: 'Session expired.' }, 401)
     const answer = String(body.answer || '').trim()
     if (!answer) return json({ error: 'Enter an answer before submitting.' }, 400)
 
-    const found = await rest(
-      env,
-      '/rest/v1/assessments?application_id=eq.' +
-        encodeURIComponent(session.applicationId) +
-        '&select=*&limit=1',
-    )
-    if (!found.ok || !Array.isArray(found.data) || !found.data[0]) {
-      return json({ error: 'No active assessment. Start the assessment first.' }, 400)
-    }
-    const row = found.data[0] as {
-      status: string
-      current_index: number
-      correct_count: number
-      answers: unknown
-      questions: Array<{ id: string; section: string; prompt: string }>
-    }
+    const row = await getAssessment(env, session.applicationId)
+    if (!row) return json({ error: 'No active assessment. Start the assessment first.' }, 400)
+
     if (row.status === 'COMPLETE') {
       return json({ error: 'Assessment already completed.', status: 'COMPLETE' }, 409)
     }
 
+    const questions = Array.isArray(row.questions) ? (row.questions as Array<{ id: string; section: string; prompt: string }>) : []
     const idx = Number(row.current_index) || 0
-    const questions = Array.isArray(row.questions) ? row.questions : []
     if (idx < 0 || idx >= questions.length) {
       return json({ error: 'Assessment index error.' }, 500)
     }
+
     const current = questions[idx]
     const correct = await scoreAnswer(env, current.prompt, answer)
     const answers = Array.isArray(row.answers) ? [...(row.answers as unknown[])] : []
@@ -123,6 +90,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       answer: answer.slice(0, 4000),
       at: new Date().toISOString(),
     })
+
     const correctCount = (Number(row.correct_count) || 0) + (correct ? 1 : 0)
     const nextIndex = idx + 1
     const done = nextIndex >= TOTAL_QUESTIONS || nextIndex >= questions.length
@@ -131,23 +99,18 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       const passed = correctCount >= PASS_CORRECT
       const scorePercent = Math.round((correctCount / TOTAL_QUESTIONS) * 1000) / 10
       const completedAt = new Date().toISOString()
-      await rest(
-        env,
-        '/rest/v1/assessments?application_id=eq.' + encodeURIComponent(session.applicationId),
-        {
-          method: 'PATCH',
-          prefer: 'return=minimal',
-          body: JSON.stringify({
-            status: 'COMPLETE',
-            current_index: nextIndex,
-            correct_count: correctCount,
-            answers,
-            score_percent: scorePercent,
-            passed,
-            completed_at: completedAt,
-          }),
-        },
-      )
+
+      await saveAssessment(env, {
+        ...row,
+        status: 'COMPLETE',
+        current_index: nextIndex,
+        correct_count: correctCount,
+        answers,
+        score_percent: scorePercent,
+        passed,
+        completed_at: completedAt,
+      })
+
       await updateApplicantProfile(env, session.applicationId, {
         status: passed ? 'IN_POOL' : 'ASSESSMENT_COMPLETE',
       })
@@ -156,11 +119,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       const fullName = applicant?.full_name || session.name || 'Applicant'
       const email = applicant?.email || session.email
       const positionTitle = applicant?.position_title || session.position || ''
-      const skills = Array.isArray(applicant?.skills)
-        ? (applicant!.skills as string[])
-        : []
+      const skills = Array.isArray(applicant?.skills) ? (applicant!.skills as string[]) : []
 
-      // Always archive text record to OPERAVA APPLICANTS as {applicationID_Fullname}.txt
       const megaTask = backupRecruitmentAssessmentToMega(env, {
         applicationId: session.applicationId,
         fullName,
@@ -186,7 +146,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         },
       })
 
-      // On PASS → recruitment pool confirmation to applicant + BCC talents@
       let mailTask: Promise<void> = Promise.resolve()
       if (passed && email) {
         mailTask = sendRecruitmentPoolEmails(env, {
@@ -198,10 +157,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
           correctCount,
           total: TOTAL_QUESTIONS,
         }).catch((err) => {
-          console.error(
-            'pool confirmation email failed',
-            err instanceof Error ? err.message : 'unknown',
-          )
+          console.error('pool confirmation email failed', err instanceof Error ? err.message : 'unknown')
         })
       }
 
@@ -233,19 +189,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       })
     }
 
-    await rest(
-      env,
-      '/rest/v1/assessments?application_id=eq.' + encodeURIComponent(session.applicationId),
-      {
-        method: 'PATCH',
-        prefer: 'return=minimal',
-        body: JSON.stringify({
-          current_index: nextIndex,
-          correct_count: correctCount,
-          answers,
-        }),
-      },
-    )
+    await saveAssessment(env, {
+      ...row,
+      current_index: nextIndex,
+      correct_count: correctCount,
+      answers,
+    })
 
     const next = questions[nextIndex]
     return json({
