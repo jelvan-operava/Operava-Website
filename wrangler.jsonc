@@ -9,7 +9,7 @@
     {
       "binding": "SUBMISSIONS_DB",
       "database_name": "operava-submissions",
-      "database_id": "SET_IN_CLOUDFLARE_DASHBOARD_OR_WRANGLER"
+      "database_id": "249fe1d2-ce2c-4333-bd9c-1e0fa42ececa"
     }
   ],
   "vars": {
