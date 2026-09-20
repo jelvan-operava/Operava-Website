@@ -27,7 +27,7 @@ npm install
 npx wrangler login
 npx wrangler secret put MEGA_EMAIL
 npx wrangler secret put MEGA_PASSWORD
-npx wrangler secret put BACKUP_SHARED_SECRET
+npx wrangler secret put MEGA_BACKUP_SHARED_SECRET
 npx wrangler deploy
 ```
 
@@ -39,7 +39,7 @@ URL shape: `https://operava-mega-backup.<your-subdomain>.workers.dev`
 | Secret | Value |
 |--------|--------|
 | `MEGA_BACKUP_URL` | Worker URL |
-| `MEGA_BACKUP_SECRET` | Same as Worker `BACKUP_SHARED_SECRET` |
+| `MEGA_BACKUP_SHARED_SECRET` | Same as Worker `MEGA_BACKUP_SHARED_SECRET` |
 
 Then `/api/health` → `megaBackupWebhookConfigured: true`.
 
