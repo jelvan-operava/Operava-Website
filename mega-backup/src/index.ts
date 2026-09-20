@@ -10,7 +10,7 @@
  *   payload: object
  * }
  *
- * Header: Authorization: Bearer <BACKUP_SHARED_SECRET>
+ * Header: Authorization: Bearer <MEGA_BACKUP_SHARED_SECRET>
  */
 
 import { Storage } from 'megajs'
@@ -20,6 +20,9 @@ export interface Env {
   MEGA_EMAIL?: string
   MEGA_PASSWORD?: string
   MEGA_TOTP?: string
+  /** Preferred auth secret */
+  MEGA_BACKUP_SHARED_SECRET?: string
+  /** @deprecated use MEGA_BACKUP_SHARED_SECRET */
   BACKUP_SHARED_SECRET?: string
 }
 
@@ -30,8 +33,16 @@ function json(body: Record<string, unknown>, status = 200) {
   })
 }
 
+function resolveSharedSecret(env: Env): string {
+  return (
+    (env.MEGA_BACKUP_SHARED_SECRET && String(env.MEGA_BACKUP_SHARED_SECRET).trim()) ||
+    (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim()) ||
+    ''
+  )
+}
+
 function authorized(request: Request, env: Env): boolean {
-  const secret = env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim()
+  const secret = resolveSharedSecret(env)
   if (!secret || secret.length < 16) return false
   const header = request.headers.get('Authorization') || ''
   const expected = 'Bearer ' + secret
@@ -54,7 +65,13 @@ export default {
     }
 
     if (!authorized(request, env)) {
-      return json({ success: false, error: 'Unauthorized.' }, 401)
+      return json(
+        {
+          success: false,
+          error: 'Unauthorized. Use Bearer MEGA_BACKUP_SHARED_SECRET.',
+        },
+        401,
+      )
     }
 
     const email = env.MEGA_EMAIL && String(env.MEGA_EMAIL).trim()
