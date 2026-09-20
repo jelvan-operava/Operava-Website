@@ -2,7 +2,7 @@
  * POST /api/mega-backup
  * Pages Function — JSON or plain-text uploads to OPERAVA MEGA folders.
  * Secrets: MEGA_EMAIL, MEGA_PASSWORD
- * Auth: BACKUP_SHARED_SECRET / MEGA_BACKUP_SECRET, or OTP_SECRET (admin)
+ * Auth: MEGA_BACKUP_SHARED_SECRET (preferred), or legacy BACKUP_SHARED_SECRET / MEGA_BACKUP_SECRET, or OTP_SECRET (admin)
  */
 
 import { MEGA_FOLDERS } from '../lib/megaFolders'
@@ -14,7 +14,10 @@ import {
 } from '../lib/megaUpload'
 
 interface Env extends MegaCredentialsEnv {
+  MEGA_BACKUP_SHARED_SECRET?: string
+  /** @deprecated use MEGA_BACKUP_SHARED_SECRET */
   BACKUP_SHARED_SECRET?: string
+  /** @deprecated use MEGA_BACKUP_SHARED_SECRET */
   MEGA_BACKUP_SECRET?: string
   OTP_SECRET?: string
 }
@@ -33,6 +36,7 @@ function authorized(request: Request, env: Env): boolean {
   if (!token || token.length < 16) return false
 
   const candidates = [
+    env.MEGA_BACKUP_SHARED_SECRET && String(env.MEGA_BACKUP_SHARED_SECRET).trim(),
     env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim(),
     env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim(),
     env.OTP_SECRET && String(env.OTP_SECRET).trim(),
@@ -57,7 +61,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       {
         success: false,
         error:
-          'Unauthorized. Set Authorization: Bearer <BACKUP_SHARED_SECRET or OTP_SECRET>.',
+          'Unauthorized. Set Authorization: Bearer <MEGA_BACKUP_SHARED_SECRET or OTP_SECRET>.',
       },
       401,
     )
