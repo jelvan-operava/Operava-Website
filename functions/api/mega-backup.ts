@@ -1,7 +1,8 @@
 /**
  * POST /api/mega-backup
  * Pages Function — JSON or plain-text uploads to OPERAVA MEGA folders.
- * Secrets: MEGA_EMAIL, MEGA_PASSWORD, BACKUP_SHARED_SECRET / MEGA_BACKUP_SECRET
+ * Secrets: MEGA_EMAIL, MEGA_PASSWORD
+ * Auth: BACKUP_SHARED_SECRET / MEGA_BACKUP_SECRET, or OTP_SECRET (admin)
  */
 
 import { MEGA_FOLDERS } from '../lib/megaFolders'
@@ -15,6 +16,7 @@ import {
 interface Env extends MegaCredentialsEnv {
   BACKUP_SHARED_SECRET?: string
   MEGA_BACKUP_SECRET?: string
+  OTP_SECRET?: string
 }
 
 function json(body: Record<string, unknown>, status = 200) {
@@ -25,13 +27,18 @@ function json(body: Record<string, unknown>, status = 200) {
 }
 
 function authorized(request: Request, env: Env): boolean {
-  const secret =
-    (env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim()) ||
-    (env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim()) ||
-    ''
-  if (!secret || secret.length < 16) return false
   const header = request.headers.get('Authorization') || ''
-  return header === 'Bearer ' + secret
+  if (!header.startsWith('Bearer ')) return false
+  const token = header.slice('Bearer '.length).trim()
+  if (!token || token.length < 16) return false
+
+  const candidates = [
+    env.BACKUP_SHARED_SECRET && String(env.BACKUP_SHARED_SECRET).trim(),
+    env.MEGA_BACKUP_SECRET && String(env.MEGA_BACKUP_SECRET).trim(),
+    env.OTP_SECRET && String(env.OTP_SECRET).trim(),
+  ].filter((s): s is string => Boolean(s && s.length >= 16))
+
+  return candidates.some((s) => s === token)
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
@@ -46,7 +53,14 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   if (!authorized(request, env)) {
-    return json({ success: false, error: 'Unauthorized.' }, 401)
+    return json(
+      {
+        success: false,
+        error:
+          'Unauthorized. Set Authorization: Bearer <BACKUP_SHARED_SECRET or OTP_SECRET>.',
+      },
+      401,
+    )
   }
 
   if (!megaCredentialsConfigured(env)) {
