@@ -1,22 +1,21 @@
 /**
- * Recruitment AVA — Supabase PostgREST client (service_role only).
- * Secrets: RECRUITMENT_SUPABASE_URL, RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY
+ * Recruitment AVA persistence backed exclusively by Cloudflare D1.
+ * The Pages binding is SUBMISSIONS_DB; no Supabase credentials or API calls are used.
  */
 
 export interface RecruitmentEnv {
-  RECRUITMENT_SUPABASE_URL?: string
-  RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY?: string
+  SUBMISSIONS_DB?: D1Database
   OTP_SECRET?: string
   RESEND_API_KEY?: string
   RESEND_FROM?: string
 }
 
 export interface ApplicantRow {
-  id?: string
+  id?: number
   application_id: string
   full_name: string
   email: string
-  email_verified: boolean
+  email_verified: boolean | number
   email_verified_at?: string | null
   phone?: string | null
   position_title: string
@@ -24,7 +23,7 @@ export interface ApplicantRow {
   education?: string | null
   experience_years?: string | null
   experience_summary?: string | null
-  skills?: string[] | unknown
+  skills?: string[] | string | unknown
   position_specific?: string | null
   availability?: string | null
   start_date?: string | null
@@ -35,201 +34,146 @@ export interface ApplicantRow {
   updated_at?: string
 }
 
+export interface AssessmentRow {
+  id?: number
+  application_id: string
+  position_code: string
+  status: string
+  current_index: number
+  correct_count: number
+  answers: unknown
+  questions: unknown
+  score_percent?: number | null
+  passed?: boolean | number | null
+  started_at?: string
+  completed_at?: string | null
+}
+
 export function recruitmentConfigured(env: RecruitmentEnv): boolean {
-  const url = env.RECRUITMENT_SUPABASE_URL && String(env.RECRUITMENT_SUPABASE_URL).trim()
-  const key =
-    env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY &&
-    String(env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY).trim()
-  return Boolean(url && key && url.startsWith('http') && key.length > 20)
+  return Boolean(env.SUBMISSIONS_DB)
 }
 
-function base(env: RecruitmentEnv) {
-  const url = String(env.RECRUITMENT_SUPABASE_URL || '')
-    .trim()
-    .replace(/\/$/, '')
-  const key = String(env.RECRUITMENT_SUPABASE_SERVICE_ROLE_KEY || '').trim()
-  if (!url || !key) throw new Error('RECRUITMENT_DB_NOT_CONFIGURED')
-  return { url, key }
+export async function ensureRecruitmentTables(db: D1Database): Promise<void> {
+  await db.batch([
+    db.prepare(`CREATE TABLE IF NOT EXISTS applicants (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      application_id TEXT NOT NULL UNIQUE,
+      full_name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      email_verified INTEGER NOT NULL DEFAULT 0,
+      email_verified_at TEXT,
+      phone TEXT,
+      position_title TEXT NOT NULL,
+      position_code TEXT NOT NULL,
+      education TEXT,
+      experience_years TEXT,
+      experience_summary TEXT,
+      skills TEXT NOT NULL DEFAULT '[]',
+      position_specific TEXT,
+      availability TEXT,
+      start_date TEXT,
+      additional TEXT,
+      status TEXT NOT NULL DEFAULT 'APPLICATION_IN_PROGRESS',
+      source TEXT NOT NULL DEFAULT 'recruitment_ava',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )`),
+    db.prepare(`CREATE UNIQUE INDEX IF NOT EXISTS applicants_email_position_uidx ON applicants(email, position_code)`),
+    db.prepare(`CREATE INDEX IF NOT EXISTS applicants_status_idx ON applicants(status)`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS applicant_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      application_id TEXT NOT NULL,
+      role TEXT NOT NULL,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS assessments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      application_id TEXT NOT NULL UNIQUE,
+      position_code TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'IN_PROGRESS',
+      current_index INTEGER NOT NULL DEFAULT 0,
+      correct_count INTEGER NOT NULL DEFAULT 0,
+      answers TEXT NOT NULL DEFAULT '[]',
+      questions TEXT NOT NULL DEFAULT '[]',
+      score_percent REAL,
+      passed INTEGER,
+      started_at TEXT NOT NULL,
+      completed_at TEXT
+    )`),
+  ])
 }
 
-async function rest<T>(
-  env: RecruitmentEnv,
-  path: string,
-  init: RequestInit & { prefer?: string } = {},
-): Promise<{ ok: boolean; status: number; data: T | null; raw: string }> {
-  const { url, key } = base(env)
-  const headers: Record<string, string> = {
-    apikey: key,
-    Authorization: 'Bearer ' + key,
-    'Content-Type': 'application/json',
-    ...(init.headers as Record<string, string> | undefined),
-  }
-  if (init.prefer) headers.Prefer = init.prefer
-
-  const res = await fetch(url + path, {
-    method: init.method || 'GET',
-    headers,
-    body: init.body,
-  })
-  const raw = await res.text().catch(() => '')
-  let data: T | null = null
-  if (raw) {
-    try {
-      data = JSON.parse(raw) as T
-    } catch {
-      data = null
-    }
-  }
-  return { ok: res.ok, status: res.status, data, raw }
+function db(env: RecruitmentEnv): D1Database {
+  if (!env.SUBMISSIONS_DB) throw new Error('RECRUITMENT_DB_NOT_CONFIGURED')
+  return env.SUBMISSIONS_DB
 }
 
-export async function upsertApplicantOnVerify(
-  env: RecruitmentEnv,
-  row: {
-    application_id: string
-    full_name: string
-    email: string
-    position_title: string
-    position_code: string
-    email_verified_at: string
-  },
-): Promise<ApplicantRow> {
-  // Prefer existing row for same email+position (update verification + name)
+function decodeJson(value: unknown): unknown {
+  if (typeof value !== 'string') return value
+  try { return JSON.parse(value) } catch { return value }
+}
+
+function applicant(row: ApplicantRow): ApplicantRow {
+  return { ...row, email_verified: Boolean(row.email_verified), skills: decodeJson(row.skills) }
+}
+
+function assessment(row: AssessmentRow): AssessmentRow {
+  return { ...row, answers: decodeJson(row.answers), questions: decodeJson(row.questions), passed: row.passed == null ? row.passed : Boolean(row.passed) }
+}
+
+export async function upsertApplicantOnVerify(env: RecruitmentEnv, row: {
+  application_id: string; full_name: string; email: string; position_title: string; position_code: string; email_verified_at: string
+}): Promise<ApplicantRow> {
+  const database = db(env); await ensureRecruitmentTables(database)
   const email = row.email.toLowerCase()
-  const existing = await rest<ApplicantRow[]>(
-    env,
-    '/rest/v1/applicants?email=eq.' +
-      encodeURIComponent(email) +
-      '&position_code=eq.' +
-      encodeURIComponent(row.position_code) +
-      '&select=*&limit=1',
-  )
-
-  if (existing.ok && Array.isArray(existing.data) && existing.data[0]) {
-    const id = existing.data[0].application_id
-    const patch = await rest<ApplicantRow[]>(env, '/rest/v1/applicants?application_id=eq.' + encodeURIComponent(id), {
-      method: 'PATCH',
-      prefer: 'return=representation',
-      body: JSON.stringify({
-        full_name: row.full_name,
-        email_verified: true,
-        email_verified_at: row.email_verified_at,
-        status: existing.data[0].status || 'APPLICATION_IN_PROGRESS',
-      }),
-    })
-    if (!patch.ok || !Array.isArray(patch.data) || !patch.data[0]) {
-      console.error('applicant patch failed', patch.status, patch.raw.slice(0, 300))
-      throw new Error('APPLICANT_UPSERT_FAILED')
-    }
-    return patch.data[0]
+  const now = new Date().toISOString()
+  const existing = await database.prepare('SELECT * FROM applicants WHERE email = ? AND position_code = ? LIMIT 1').bind(email, row.position_code).first<ApplicantRow>()
+  if (existing) {
+    await database.prepare('UPDATE applicants SET full_name = ?, email_verified = 1, email_verified_at = ?, updated_at = ? WHERE application_id = ?').bind(row.full_name, row.email_verified_at, now, existing.application_id).run()
+    return applicant({ ...existing, full_name: row.full_name, email_verified: 1, email_verified_at: row.email_verified_at, updated_at: now })
   }
-
-  const insert = await rest<ApplicantRow[]>(env, '/rest/v1/applicants', {
-    method: 'POST',
-    prefer: 'return=representation',
-    body: JSON.stringify({
-      application_id: row.application_id,
-      full_name: row.full_name,
-      email,
-      email_verified: true,
-      email_verified_at: row.email_verified_at,
-      position_title: row.position_title,
-      position_code: row.position_code,
-      status: 'APPLICATION_IN_PROGRESS',
-      source: 'recruitment_ava',
-      skills: [],
-    }),
-  })
-
-  if (!insert.ok || !Array.isArray(insert.data) || !insert.data[0]) {
-    console.error('applicant insert failed', insert.status, insert.raw.slice(0, 300))
-    throw new Error('APPLICANT_UPSERT_FAILED')
-  }
-  return insert.data[0]
+  await database.prepare(`INSERT INTO applicants (application_id, full_name, email, email_verified, email_verified_at, position_title, position_code, skills, status, source, created_at, updated_at) VALUES (?, ?, ?, 1, ?, ?, ?, '[]', 'APPLICATION_IN_PROGRESS', 'recruitment_ava', ?, ?)`).bind(row.application_id, row.full_name, email, row.email_verified_at, row.position_title, row.position_code, now, now).run()
+  const created = await database.prepare('SELECT * FROM applicants WHERE application_id = ?').bind(row.application_id).first<ApplicantRow>()
+  if (!created) throw new Error('APPLICANT_UPSERT_FAILED')
+  return applicant(created)
 }
 
-export async function getApplicantByApplicationId(
-  env: RecruitmentEnv,
-  applicationId: string,
-): Promise<ApplicantRow | null> {
-  const res = await rest<ApplicantRow[]>(
-    env,
-    '/rest/v1/applicants?application_id=eq.' +
-      encodeURIComponent(applicationId) +
-      '&select=*&limit=1',
-  )
-  if (!res.ok || !Array.isArray(res.data) || !res.data[0]) return null
-  return res.data[0]
+export async function getApplicantByApplicationId(env: RecruitmentEnv, applicationId: string): Promise<ApplicantRow | null> {
+  const database = db(env); await ensureRecruitmentTables(database)
+  const row = await database.prepare('SELECT * FROM applicants WHERE application_id = ? LIMIT 1').bind(applicationId).first<ApplicantRow>()
+  return row ? applicant(row) : null
 }
 
-export async function updateApplicantProfile(
-  env: RecruitmentEnv,
-  applicationId: string,
-  fields: Partial<{
-    full_name: string
-    phone: string
-    education: string
-    experience_years: string
-    experience_summary: string
-    skills: string[]
-    position_specific: string
-    availability: string
-    start_date: string
-    additional: string
-    status: string
-  }>,
-): Promise<ApplicantRow> {
-  const body: Record<string, unknown> = {}
-  if (fields.full_name !== undefined) body.full_name = fields.full_name
-  if (fields.phone !== undefined) body.phone = fields.phone
-  if (fields.education !== undefined) body.education = fields.education
-  if (fields.experience_years !== undefined) body.experience_years = fields.experience_years
-  if (fields.experience_summary !== undefined) body.experience_summary = fields.experience_summary
-  if (fields.skills !== undefined) body.skills = fields.skills
-  if (fields.position_specific !== undefined) body.position_specific = fields.position_specific
-  if (fields.availability !== undefined) body.availability = fields.availability
-  if (fields.start_date !== undefined) body.start_date = fields.start_date
-  if (fields.additional !== undefined) body.additional = fields.additional
-  if (fields.status !== undefined) body.status = fields.status
-
-  if (Object.keys(body).length === 0) {
-    const current = await getApplicantByApplicationId(env, applicationId)
-    if (!current) throw new Error('APPLICANT_NOT_FOUND')
-    return current
+export async function updateApplicantProfile(env: RecruitmentEnv, applicationId: string, fields: Partial<Record<'full_name'|'phone'|'education'|'experience_years'|'experience_summary'|'skills'|'position_specific'|'availability'|'start_date'|'additional'|'status', string | string[]>>): Promise<ApplicantRow> {
+  const database = db(env); await ensureRecruitmentTables(database)
+  const allowed = ['full_name','phone','education','experience_years','experience_summary','skills','position_specific','availability','start_date','additional','status'] as const
+  const entries = allowed.filter((key) => fields[key] !== undefined)
+  if (entries.length) {
+    const values = entries.map((key) => key === 'skills' ? JSON.stringify(fields[key]) : fields[key])
+    await database.prepare(`UPDATE applicants SET ${entries.map((key) => `${key} = ?`).join(', ')}, updated_at = ? WHERE application_id = ?`).bind(...values, new Date().toISOString(), applicationId).run()
   }
-
-  const res = await rest<ApplicantRow[]>(
-    env,
-    '/rest/v1/applicants?application_id=eq.' + encodeURIComponent(applicationId),
-    {
-      method: 'PATCH',
-      prefer: 'return=representation',
-      body: JSON.stringify(body),
-    },
-  )
-  if (!res.ok || !Array.isArray(res.data) || !res.data[0]) {
-    console.error('applicant update failed', res.status, res.raw.slice(0, 300))
-    throw new Error('APPLICANT_UPDATE_FAILED')
-  }
-  return res.data[0]
+  const row = await getApplicantByApplicationId(env, applicationId)
+  if (!row) throw new Error('APPLICANT_NOT_FOUND')
+  return row
 }
 
-export async function appendApplicantMessage(
-  env: RecruitmentEnv,
-  applicationId: string,
-  role: 'user' | 'assistant' | 'system',
-  body: string,
-): Promise<void> {
-  const res = await rest(env, '/rest/v1/applicant_messages', {
-    method: 'POST',
-    prefer: 'return=minimal',
-    body: JSON.stringify({
-      application_id: applicationId,
-      role,
-      body: body.slice(0, 8000),
-    }),
-  })
-  if (!res.ok) {
-    console.error('message append failed', res.status, res.raw.slice(0, 200))
-  }
+export async function appendApplicantMessage(env: RecruitmentEnv, applicationId: string, role: 'user'|'assistant'|'system', body: string): Promise<void> {
+  const database = db(env); await ensureRecruitmentTables(database)
+  await database.prepare('INSERT INTO applicant_messages (application_id, role, body, created_at) VALUES (?, ?, ?, ?)').bind(applicationId, role, body.slice(0, 8000), new Date().toISOString()).run()
+}
+
+export async function getAssessment(env: RecruitmentEnv, applicationId: string): Promise<AssessmentRow | null> {
+  const database = db(env); await ensureRecruitmentTables(database)
+  const row = await database.prepare('SELECT * FROM assessments WHERE application_id = ? LIMIT 1').bind(applicationId).first<AssessmentRow>()
+  return row ? assessment(row) : null
+}
+
+export async function saveAssessment(env: RecruitmentEnv, row: AssessmentRow): Promise<AssessmentRow> {
+  const database = db(env); await ensureRecruitmentTables(database)
+  const values = [row.application_id, row.position_code, row.status, row.current_index, row.correct_count, JSON.stringify(row.answers ?? []), JSON.stringify(row.questions ?? []), row.score_percent ?? null, row.passed == null ? null : (row.passed ? 1 : 0), row.started_at || new Date().toISOString(), row.completed_at ?? null]
+  await database.prepare(`INSERT INTO assessments (application_id, position_code, status, current_index, correct_count, answers, questions, score_percent, passed, started_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(application_id) DO UPDATE SET position_code=excluded.position_code, status=excluded.status, current_index=excluded.current_index, correct_count=excluded.correct_count, answers=excluded.answers, questions=excluded.questions, score_percent=excluded.score_percent, passed=excluded.passed, started_at=excluded.started_at, completed_at=excluded.completed_at`).bind(...values).run()
+  const saved = await getAssessment(env, row.application_id)
+  if (!saved) throw new Error('ASSESSMENT_SAVE_FAILED')
+  return saved
 }
