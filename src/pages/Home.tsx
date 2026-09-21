@@ -55,7 +55,6 @@ function filterTalent(services: Service[]): Service[] {
   return matched.length >= 3 ? matched : services.slice(0, 8)
 }
 
-/** Single-line section titles: fluid size that fits the viewport width */
 const SECTION_TITLE =
   'reveal whitespace-nowrap font-bold text-gray-900 tracking-tight leading-none ' +
   'text-[clamp(1.05rem,3.6vw,2.35rem)]'
@@ -196,7 +195,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+            {/* Larger tiles: 1 col phone · 2 tablet · 3 desktop */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
               {detailServices.slice(0, activeCategory === 'automation' ? 14 : 8).map((s, i) => (
                 <ServiceCard key={`${activeCategory}-${s.id}`} service={getLocalizedService(s, language)} index={i} />
               ))}
