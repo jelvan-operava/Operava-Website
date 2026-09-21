@@ -4,7 +4,6 @@ import { motion } from 'motion/react'
 import type { Service } from '../data/services'
 import { automationServices } from '../data/automationServices'
 import ServiceAnimatedIcon from './ServiceAnimatedIcon'
-import { OPERAVA_LOGO_CDN } from './AvaVideoAvatar'
 
 interface ServiceCardProps {
   service: Service
@@ -18,8 +17,7 @@ interface ServiceCardProps {
 const automationSlugSet = new Set(automationServices.map((s) => s.slug))
 
 /**
- * Pure Cloudinary diagram tile — no frame / border / chrome.
- * Larger on phone and desktop; AVA AI logo mark (bottom-right).
+ * Pure Cloudinary diagram tile — no frame / border / chrome / logo.
  */
 export default function ServiceCard({
   service,
@@ -63,18 +61,6 @@ export default function ServiceCard({
               <ServiceAnimatedIcon icon={service.icon} size="lg" interactive={false} />
             </div>
           )}
-
-          {/* AVA AI logo — official Operava mark */}
-          <img
-            src={OPERAVA_LOGO_CDN}
-            alt="AVA"
-            width={36}
-            height={36}
-            className="absolute bottom-3 right-3 w-8 h-8 sm:w-9 sm:h-9 object-contain pointer-events-none select-none opacity-90"
-            decoding="async"
-            loading="lazy"
-            draggable={false}
-          />
         </div>
       </Link>
     </motion.div>
