@@ -1,6 +1,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @import 'tailwindcss';
+@plugin "daisyui" {
+  themes: operava --default, light --preferslight, dark --prefersdark;
+}
+
+/* ── Operava brand theme (logo gradient: orange → magenta → violet → blue) ── */
+@plugin "daisyui/theme" {
+  name: "operava";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #ffffff;
+  --color-base-200: #fafafc;
+  --color-base-300: #f0f0f5;
+  --color-base-content: #111111;
+
+  --color-primary: #6d28d9;
+  --color-primary-content: #ffffff;
+  --color-secondary: #c44dff;
+  --color-secondary-content: #ffffff;
+  --color-accent: #ff8b4a;
+  --color-accent-content: #1a0a00;
+  --color-neutral: #1f1f2e;
+  --color-neutral-content: #f5f5f7;
+
+  --color-info: #3b6bff;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  --radius-selector: 0.75rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
 
 @theme inline {
   --color-violet-50: #F5F3FF;
@@ -217,19 +256,13 @@ video {
   animation: lightWave 8s ease-in-out infinite;
 }
 
-/* Smooth left → right → left, indefinite */
 @keyframes lightWave {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
+/* Premium service card shell — minimal, logo-accent */
 .operava-card-frame {
   position: relative;
   background-color: transparent;
