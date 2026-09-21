@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPERAVA — Connected Solutions</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root{
+    --navy:#101936;
+    --muted:#667085;
+    --line:#e8ebf2;
+    --blue:#4f7df3;
+    --pink:#ef73b5;
+    --orange:#f2a15a;
+    --purple:#8b63ee;
+  }
+
+  html,body{
+    margin:0;
+    min-height:100%;
+    background:#fff;
+    font-family:Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color:var(--navy);
+  }
+
+  body{
+    display:flex;
+    justify-content:center;
+    overflow-x:hidden;
+  }
+
+  .page{
+    width:100%;
+    min-width:1180px;
+    min-height:820px;
+    padding:14px 38px 36px;
+    background:
+      radial-gradient(circle at 50% 73%, rgba(113,143,255,.075), transparent 29%),
+      #fff;
+  }
+
+  .intro{
+    width:760px;
+    margin:0 auto;
+    text-align:center;
+  }
+
+  .intro h1{
+    margin:0;
+    font-size:42px;
+    line-height:1.12;
+    letter-spacing:-1.8px;
+    font-weight:500;
+    color:#101936;
+  }
+
+  .intro h1 .gradient{
+    font-weight:650;
+    background:linear-gradient(90deg,#ed8a62 0%,#dc73c4 52%,#467ce9 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .intro p{
+    margin:17px auto 0;
+    width:660px;
+    font-size:15px;
+    line-height:1.55;
+    color:#6b7286;
+    letter-spacing:.05px;
+  }
+
+  .stage{
+    position:relative;
+    width:100%;
+    height:455px;
+    margin-top:31px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    perspective:1700px;
+  }
+
+  .cards{
+    position:relative;
+    width:1470px;
+    height:410px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .card{
+    position:absolute;
+    width:250px;
+    height:340px;
+    padding:24px 25px;
+    border:1px solid rgba(215,220,232,.88);
+    border-radius:13px;
+    background:linear-gradient(145deg,rgba(255,255,255,.99),rgba(250,251,254,.94));
+    box-shadow:0 18px 42px rgba(41,55,91,.08), inset 0 1px 0 rgba(255,255,255,.9);
+    overflow:hidden;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+
+  .card::after{
+    content:"";
+    position:absolute;
+    inset:auto -15% -38% -15%;
+    height:180px;
+    background:radial-gradient(ellipse,rgba(90,112,202,.08),transparent 68%);
+    pointer-events:none;
+  }
+
+  .card.side{
+    width:250px;
+    height:330px;
+  }
+
+  .card.left2{
+    left:8px;
+    transform:translateY(-7px) rotateY(7deg) rotateZ(-.2deg);
+    opacity:.92;
+  }
+
+  .card.left1{
+    left:270px;
+    transform:translateY(8px) rotateY(3deg) rotateZ(.1deg);
+  }
+
+  .card.active{
+    left:50%;
+    width:475px;
+    height:426px;
+    padding:24px 29px 22px;
+    transform:translateX(-50%);
+    border:1.4px solid transparent;
+    background:
+      linear-gradient(#fff,#fff) padding-box,
+      linear-gradient(125deg,#ef9a66,#d978c4 48%,#4e88ef) border-box;
+    box-shadow:0 25px 55px rgba(53,69,116,.12);
+    z-index:5;
+  }
+
+  .card.right1{
+    right:270px;
+    transform:translateY(8px) rotateY(-3deg) rotateZ(-.1deg);
+  }
+
+  .card.right2{
+    right:8px;
+    transform:translateY(-7px) rotateY(-7deg) rotateZ(.2deg);
+    opacity:.92;
+  }
+
+  .number{
+    font-size:17px;
+    font-weight:500;
+    letter-spacing:-.3px;
+    margin-bottom:17px;
+    background:linear-gradient(90deg,#e99c6c,#b96ee0,#5189ec);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .icon{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    margin-bottom:14px;
+    background:radial-gradient(circle at 30% 25%,#fff 2%,#f9e8f1 35%,#e8e8fb 68%,#e4edff 100%);
+    box-shadow:0 5px 17px rgba(94,103,174,.12);
+  }
+
+  .icon svg{
+    width:27px;
+    height:27px;
+    stroke:url(#iconGradient);
+  }
+
+  .card h2{
+    margin:0;
+    font-size:20px;
+    line-height:1.2;
+    letter-spacing:-.6px;
+    color:#111a38;
+    font-weight:650;
+  }
+
+  .card p{
+    margin:13px 0 0;
+    font-size:12.7px;
+    line-height:1.52;
+    color:#697186;
+  }
+
+  .card .link{
+    position:absolute;
+    left:25px;
+    bottom:24px;
+    color:#3157ad;
+    font-size:12.5px;
+    text-decoration:none;
+    font-weight:500;
+  }
+
+  .card .link span{ margin-left:4px; }
+
+  .active .number{ margin-bottom:13px; }
+  .active .icon{ margin-bottom:13px; }
+  .active h2{ font-size:20px; }
+  .active p{
+    margin-top:8px;
+    max-width:385px;
+    font-size:12.2px;
+    line-height:1.45;
+  }
+
+  .services{
+    margin-top:15px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:27px;
+    row-gap:3px;
+    padding-right:2px;
+  }
+
+  .service{
+    position:relative;
+    padding-left:16px;
+    color:#596177;
+    font-size:11.5px;
+    line-height:1.48;
+    white-space:nowrap;
+  }
+
+  .service::before{
+    content:"";
+    position:absolute;
+    left:1px;
+    top:6px;
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#9d5ee9,#c76fd6);
+  }
+
+  .active .link{
+    left:29px;
+    bottom:20px;
+  }
+
+  .divider{
+    position:absolute;
+    left:29px;
+    right:29px;
+    bottom:45px;
+    height:1px;
+    background:#edf0f5;
+  }
+
+  .tabs{
+    width:770px;
+    margin:3px auto 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:relative;
+    padding:0 4px;
+  }
+
+  .tabs::before{
+    content:"";
+    position:absolute;
+    left:6px;
+    right:6px;
+    bottom:0;
+    height:1px;
+    background:transparent;
+  }
+
+  .tab{
+    position:relative;
+    height:53px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:0 13px;
+    color:#7b8293;
+    font-size:12px;
+    white-space:nowrap;
+  }
+
+  .tab .bubble{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(145deg,#fff,#f4f5fa);
+    border:1px solid #edf0f5;
+    font-size:12px;
+    color:#687086;
+  }
+
+  .tab.active{
+    color:#252f4c;
+    font-weight:550;
+  }
+
+  .tab.active .bubble{
+    color:#dd6fba;
+    border-color:#ed8cc7;
+    box-shadow:0 3px 11px rgba(222,105,179,.13);
+    background:linear-gradient(145deg,#fff,#faf1f7);
+  }
+
+  .tab.active::after{
+    content:"";
+    position:absolute;
+    left:5px;
+    right:0;
+    bottom:0;
+    height:2px;
+    border-radius:3px;
+    background:linear-gradient(90deg,#efa15e,#d976c1,#4d83ef);
+  }
+
+  @media (max-width:1250px){
+    .page{ min-width:1100px; padding-left:20px; padding-right:20px; }
+    .cards{ transform:scale(.88); transform-origin:center; }
+    .tabs{ transform:scale(.9); transform-origin:center top; }
+  }
+</style>
+</head>
+
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="iconGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ee7d83"/>
+      <stop offset="50%" stop-color="#9c62e7"/>
+      <stop offset="100%" stop-color="#3e7fe9"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<main class="page">
+  <section class="intro">
+    <h1>Technology, people and<br>operations — <span class="gradient">connected.</span></h1>
+    <p>
+      From intelligent automation and digital infrastructure to workforce operations
+      and global talent, OPERAVA connects technology, people and processes
+      to help businesses operate, scale and move forward.
+    </p>
+  </section>
+
+  <section class="stage">
+    <div class="cards">
+
+      <article class="card side left2">
+        <div class="number">04</div>
+        <div class="icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke-width="1.8">
+            <circle cx="16" cy="11" r="4"></circle>
+            <path d="M8.5 23c.5-4 3.1-6 7.5-6s7 2 7.5 6"></path>
+            <circle cx="7" cy="14" r="2.7"></circle>
+            <circle cx="25" cy="14" r="2.7"></circle>
+            <path d="M3.8 23c.4-2.8 1.5-4.1 3.8-4.4M28.2 23c-.4-2.8-1.5-4.1-3.8-4.4"></path>
+          </svg>
+        </div>
+        <h2>Talent Solutions</h2>
+        <p>Global talent solutions connecting businesses with skilled professionals through sourcing, screening, matching, onboarding and workforce administration.</p>
+        <a class="link" href="#">View services <span>→</span></a>
+      </article>
+
+      <article class="card side left1">
+        <div class="number">03</div>
+        <div class="icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke-width="1.8">
+            <circle cx="12" cy="11" r="4"></circle>
+            <circle cx="21.5" cy="12.5" r="3.3"></circle>
+            <path d="M4.5 24c.5-4.1 3.1-6.3 7.5-6.3s7 2.2 7.5 6.3"></path>
+            <path d="M18.5 19.3c4.4-.1 6.9 1.5 7.5 4.7"></path>
+          </svg>
+        </div>
+        <h2>Workforce Solutions</h2>
+        <p>Flexible workforce and business process solutions that extend operational capacity across customer service, administration, back-office processes and business operations.</p>
+        <a class="link" href="#">View services <span>→</span></a>
+      </article>
+
+      <article class="card active">
+        <div class="number">01</div>
+        <div class="icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke-width="1.8">
+            <path d="M16 4.2l2 2.8 3.4-.2.9 3.3 3 1.7-1.5 3.1 1.5 3.1-3 1.7-.9 3.3-3.4-.2-2 2.8-2-2.8-3.4.2-.9-3.3-3-1.7 1.5-3.1-1.5-3.1 3-1.7.9-3.3 3.4.2z"></path>
+            <circle cx="16" cy="16" r="4"></circle>
+          </svg>
+        </div>
+        <h2>Automation</h2>
+        <p>Intelligent automation that connects workflows, systems and people to reduce repetitive work, improve efficiency and create scalable business processes.</p>
+
+        <div class="services">
+          <div class="service">AI Automation</div>
+          <div class="service">Document &amp; Data Automation</div>
+          <div class="service">Workflow Automation</div>
+          <div class="service">Reporting &amp; Dashboard Automation</div>
+          <div class="service">Business Process Automation</div>
+          <div class="service">API &amp; System Integrations</div>
+          <div class="service">RPA &amp; Task Automation</div>
+          <div class="service">AI Agents &amp; Chatbots</div>
+          <div class="service">CRM Automation</div>
+          <div class="service">Scheduling Automation</div>
+          <div class="service">Marketing Automation</div>
+          <div class="service">Approval &amp; Notification Workflows</div>
+          <div class="service">Email Automation</div>
+          <div class="service">n8n / Make / Zapier Automation</div>
+          <div class="service">Lead &amp; Customer Journey Automation</div>
+        </div>
+
+        <div class="divider"></div>
+        <a class="link" href="#">View services <span>→</span></a>
+      </article>
+
+      <article class="card side right1">
+        <div class="number">02</div>
+        <div class="icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke-width="1.8">
+            <rect x="5" y="7" width="22" height="15" rx="1.5"></rect>
+            <path d="M12 26h8M16 22v4"></path>
+          </svg>
+        </div>
+        <h2>Information Technology</h2>
+        <p>Modern digital systems, software and infrastructure designed to support reliable operations, connected workflows and long-term business growth.</p>
+        <a class="link" href="#">View services <span>→</span></a>
+      </article>
+
+      <article class="card side right2">
+        <div class="number">04</div>
+        <div class="icon">
+          <svg viewBox="0 0 32 32" fill="none" stroke-width="1.8">
+            <circle cx="16" cy="11" r="4"></circle>
+            <path d="M8.5 23c.5-4 3.1-6 7.5-6s7 2 7.5 6"></path>
+            <circle cx="7" cy="14" r="2.7"></circle>
+            <circle cx="25" cy="14" r="2.7"></circle>
+            <path d="M3.8 23c.4-2.8 1.5-4.1 3.8-4.4M28.2 23c-.4-2.8-1.5-4.1-3.8-4.4"></path>
+          </svg>
+        </div>
+        <h2>Talent Solutions</h2>
+        <p>Global talent solutions connecting businesses with skilled professionals through sourcing, screening, matching, onboarding and workforce administration.</p>
+        <a class="link" href="#">View services <span>→</span></a>
+      </article>
+
+    </div>
+  </section>
+
+  <nav class="tabs" aria-label="Solution categories">
+    <a class="tab active" href="#">
+      <span class="bubble">01</span><span>Automation</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="bubble">02</span><span>Information Technology</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="bubble">03</span><span>Workforce Solutions</span>
+    </a>
+    <a class="tab" href="#">
+      <span class="bubble">04</span><span>Talent Solutions</span>
+    </a>
+  </nav>
+</main>
+</body>
+</html>
