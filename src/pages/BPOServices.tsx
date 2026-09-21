@@ -42,7 +42,7 @@ export default function BPOServices() {
 
       <section ref={ref} className="py-16 lg:py-24 bg-white">
         <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
             {bpoServices.map((rawService, i) => {
               const service = getLocalizedService(rawService, language)
               return (
