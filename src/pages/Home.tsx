@@ -188,10 +188,10 @@ export default function Home() {
               <div className="reveal reveal-delay-3 shrink-0">
                 <Link
                   to={meta.href}
-                  className="group inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+                  className="group inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 text-sm font-semibold text-violet-800 bg-violet-50 border border-violet-100 rounded-xl hover:bg-violet-100 hover:border-violet-200 transition-all duration-200"
                 >
                   <span>{meta.cta}</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
             </div>
@@ -246,11 +246,11 @@ export default function Home() {
                 {t('industries.subtitle', 'Tailored technology and operations delivery for the industries that define modern business.')}
               </p>
             </div>
-            <div className="reveal reveal-delay-2 flex flex-wrap gap-3">
+            <div className="reveal reveal-delay-2 flex flex-wrap gap-2.5 sm:gap-3">
               {industries.map((name) => (
                 <span
                   key={name}
-                  className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-200 rounded-full hover:border-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 cursor-default"
+                  className="px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-medium text-gray-700 border border-[#EDEDF2] rounded-full hover:border-violet-200 hover:bg-violet-50/60 hover:text-violet-900 transition-all duration-200 cursor-default"
                 >
                   {name}
                 </span>
