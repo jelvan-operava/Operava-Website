@@ -3,12 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import {
   X,
   Send,
-  Sparkles,
   RotateCcw,
   Volume2,
   VolumeX,
   Briefcase,
-  ShieldCheck,
   Copy,
   Check,
   Cpu,
@@ -41,7 +39,7 @@ export interface ChatMessage {
 interface QuickTopic {
   label: string
   query: string
-  icon: typeof Sparkles
+  icon: typeof Cpu
 }
 
 const QUICK_TOPICS: QuickTopic[] = [
@@ -264,7 +262,6 @@ export default function AvaAssistant() {
     setInputText('')
     playNotificationSound()
 
-    // Document verification — paste reference ID in chat
     if (wantsDocumentVerification(query)) {
       const docId = extractDocumentReferenceId(query)
       if (!docId) {
@@ -348,11 +345,11 @@ export default function AvaAssistant() {
         <button
           type="button"
           onClick={handleOpen}
-          className="relative h-14 w-14 rounded-full bg-violet-700 text-white shadow-xl hover:bg-violet-800 flex items-center justify-center"
+          className="relative h-14 w-14 rounded-full bg-white border border-gray-200 shadow-xl hover:border-violet-200 hover:shadow-2xl flex items-center justify-center transition-all"
           aria-label="Open AVA assistant"
         >
-          <Sparkles className="w-6 h-6" />
-          {hasUnread && <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-fuchsia-400" />}
+          <AvaVideoAvatar size={40} />
+          {hasUnread && <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-fuchsia-400 ring-2 ring-white" />}
         </button>
       </div>
     )
