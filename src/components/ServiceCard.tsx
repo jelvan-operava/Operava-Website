@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import type { Service } from '../data/services'
 import { automationServices } from '../data/automationServices'
 import ServiceAnimatedIcon from './ServiceAnimatedIcon'
+import { OPERAVA_LOGO_CDN } from './AvaVideoAvatar'
 
 interface ServiceCardProps {
   service: Service
@@ -18,7 +19,7 @@ const automationSlugSet = new Set(automationServices.map((s) => s.slug))
 
 /**
  * Pure Cloudinary diagram tile — no frame / border / chrome.
- * Sized large for phone (full-width) and desktop (fewer grid columns).
+ * Larger on phone and desktop; AVA AI logo mark (bottom-right).
  */
 export default function ServiceCard({
   service,
@@ -46,11 +47,7 @@ export default function ServiceCard({
         className="block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
         aria-label={service.name}
       >
-        {/*
-          Aspect matches Cloudinary circular-card assets (near-square / slight portrait).
-          min-heights keep tiles large on phone and desktop.
-        */}
-        <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] min-h-[280px] sm:min-h-[320px] lg:min-h-[380px] xl:min-h-[420px] overflow-hidden bg-transparent">
+        <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] min-h-[320px] sm:min-h-[360px] lg:min-h-[420px] xl:min-h-[460px] overflow-hidden bg-transparent">
           {service.image && !imgError ? (
             <img
               src={service.image}
@@ -66,6 +63,18 @@ export default function ServiceCard({
               <ServiceAnimatedIcon icon={service.icon} size="lg" interactive={false} />
             </div>
           )}
+
+          {/* AVA AI logo — official Operava mark */}
+          <img
+            src={OPERAVA_LOGO_CDN}
+            alt="AVA"
+            width={36}
+            height={36}
+            className="absolute bottom-3 right-3 w-8 h-8 sm:w-9 sm:h-9 object-contain pointer-events-none select-none opacity-90"
+            decoding="async"
+            loading="lazy"
+            draggable={false}
+          />
         </div>
       </Link>
     </motion.div>
