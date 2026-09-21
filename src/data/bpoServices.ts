@@ -1,5 +1,23 @@
 import type { Service } from './itServices'
 
+/** New circular service diagrams — cloud b5i5bwwa (2026-09 collections) */
+const IMG = {
+  customerService:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883179/818075191_1115987964333249_1393699877683613432_n.jpg',
+  techSupport:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883178/817119009_1762774298296778_2130815206440634014_n.jpg',
+  helpDesk:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883178/817903856_2113990625898878_7353958690165926414_n.jpg',
+  backOffice:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883178/796416585_965166426625013_4800177678967912496_n.jpg',
+  dataProcessing:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883178/816394333_4717468435148344_6455644252070295893_n.jpg',
+  documentProcessing:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883178/818133246_2111726673554111_7094790966613170147_n.jpg',
+  virtualAssistance:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883183/818141051_1620650286129991_540465980055236401_n.jpg',
+} as const
+
 export const bpoServices: Service[] = [
   {
     id: 'customer-service',
@@ -7,11 +25,25 @@ export const bpoServices: Service[] = [
     category: 'bpo',
     number: '01',
     name: 'Customer Service',
-    shortDescription: 'Professional customer support teams handling inquiries, orders, and service requests across channels.',
-    description: 'Professional customer support teams handling inquiries, orders, complaints, and service requests across phone, email, chat, and other channels.',
-    serviceMessage: 'Give your customers consistent, professional support without building every seat in-house.',
-    capabilities: ['Omnichannel customer support', 'Order and account assistance', 'Complaint handling and escalation', 'Quality monitoring and coaching'],
-    benefits: ['Consistent customer experience', 'Scalable support capacity', 'Lower cost per interaction', 'Measurable service levels'],
+    image: IMG.customerService,
+    shortDescription:
+      'Professional customer support teams handling inquiries, orders, and service requests across channels.',
+    description:
+      'Professional customer support teams handling inquiries, orders, complaints, and service requests across phone, email, chat, and other channels.',
+    serviceMessage:
+      'Give your customers consistent, professional support without building every seat in-house.',
+    capabilities: [
+      'Omnichannel customer support',
+      'Order and account assistance',
+      'Complaint handling and escalation',
+      'Quality monitoring and coaching',
+    ],
+    benefits: [
+      'Consistent customer experience',
+      'Scalable support capacity',
+      'Lower cost per interaction',
+      'Measurable service levels',
+    ],
     relatedPositions: ['Customer Service Representative', 'Team Lead', 'Quality Analyst'],
     industries: ['Retail', 'E-commerce', 'Telecom', 'Financial Services'],
     icon: 'headphones',
@@ -23,11 +55,24 @@ export const bpoServices: Service[] = [
     category: 'bpo',
     number: '02',
     name: 'Technical Support',
+    image: IMG.techSupport,
     shortDescription: 'Tiered technical support for products, platforms, and end users.',
-    description: 'Tiered technical support for products, platforms, and end users—from first-line troubleshooting to escalated technical resolution.',
-    serviceMessage: 'Resolve technical issues faster with structured support tiers and clear escalation paths.',
-    capabilities: ['Tier 1–3 technical support', 'Product and platform troubleshooting', 'Ticket management and knowledge base use', 'Escalation to engineering when required'],
-    benefits: ['Faster issue resolution', 'Protected engineering time', 'Documented support processes', 'Improved customer technical confidence'],
+    description:
+      'Tiered technical support for products, platforms, and end users—from first-line troubleshooting to escalated technical resolution.',
+    serviceMessage:
+      'Resolve technical issues faster with structured support tiers and clear escalation paths.',
+    capabilities: [
+      'Tier 1–3 technical support',
+      'Product and platform troubleshooting',
+      'Ticket management and knowledge base use',
+      'Escalation to engineering when required',
+    ],
+    benefits: [
+      'Faster issue resolution',
+      'Protected engineering time',
+      'Documented support processes',
+      'Improved customer technical confidence',
+    ],
     relatedPositions: ['Technical Support Specialist', 'Support Engineer', 'Knowledge Manager'],
     industries: ['SaaS', 'Technology', 'Telecom', 'Hardware'],
     icon: 'life-buoy',
@@ -39,11 +84,24 @@ export const bpoServices: Service[] = [
     category: 'bpo',
     number: '03',
     name: 'Help Desk',
+    image: IMG.helpDesk,
     shortDescription: 'Internal or external help desk operations for IT and business support requests.',
-    description: 'Internal or external help desk operations for IT and business support requests with structured intake, prioritization, and resolution tracking.',
-    serviceMessage: 'Centralize support requests so issues are logged, prioritized, and resolved with clear ownership.',
-    capabilities: ['Request intake and ticketing', 'Prioritization and SLA tracking', 'Password and access support', 'Coordination with IT and operations teams'],
-    benefits: ['Single point of contact for support', 'Visible request backlog', 'Faster routine resolution', 'Better IT and business coordination'],
+    description:
+      'Internal or external help desk operations for IT and business support requests with structured intake, prioritization, and resolution tracking.',
+    serviceMessage:
+      'Centralize support requests so issues are logged, prioritized, and resolved with clear ownership.',
+    capabilities: [
+      'Request intake and ticketing',
+      'Prioritization and SLA tracking',
+      'Password and access support',
+      'Coordination with IT and operations teams',
+    ],
+    benefits: [
+      'Single point of contact for support',
+      'Visible request backlog',
+      'Faster routine resolution',
+      'Better IT and business coordination',
+    ],
     relatedPositions: ['Help Desk Analyst', 'Service Desk Agent', 'IT Support Specialist'],
     industries: ['Corporate', 'Healthcare', 'Education', 'Technology'],
     icon: 'headphones',
@@ -55,11 +113,25 @@ export const bpoServices: Service[] = [
     category: 'bpo',
     number: '04',
     name: 'Back-Office Operations',
-    shortDescription: 'Remote operational teams for administrative, processing, and business support functions.',
-    description: 'Remote operational teams for administrative, processing, and business support functions that keep daily operations moving.',
-    serviceMessage: 'Extend your operations team with structured back-office capacity for routine and specialized work.',
-    capabilities: ['Administrative and clerical support', 'Transaction and process handling', 'Records and compliance support', 'Cross-functional operational coverage'],
-    benefits: ['Lower operational overhead', 'Consistent process execution', 'Flexible capacity', 'Focus internal teams on higher-value work'],
+    image: IMG.backOffice,
+    shortDescription:
+      'Remote operational teams for administrative, processing, and business support functions.',
+    description:
+      'Remote operational teams for administrative, processing, and business support functions that keep daily operations moving.',
+    serviceMessage:
+      'Extend your operations team with structured back-office capacity for routine and specialized work.',
+    capabilities: [
+      'Administrative and clerical support',
+      'Transaction and process handling',
+      'Records and compliance support',
+      'Cross-functional operational coverage',
+    ],
+    benefits: [
+      'Lower operational overhead',
+      'Consistent process execution',
+      'Flexible capacity',
+      'Focus internal teams on higher-value work',
+    ],
     relatedPositions: ['Operations Specialist', 'Process Associate', 'Back-Office Analyst'],
     industries: ['Finance', 'Insurance', 'Healthcare', 'Professional Services'],
     icon: 'briefcase',
@@ -71,11 +143,24 @@ export const bpoServices: Service[] = [
     category: 'bpo',
     number: '05',
     name: 'Data Processing',
-    shortDescription: 'Structured data processing, validation, and transformation for operational and analytical use.',
-    description: 'Structured data processing, validation, and transformation so information is accurate, complete, and ready for use.',
+    image: IMG.dataProcessing,
+    shortDescription:
+      'Structured data processing, validation, and transformation for operational and analytical use.',
+    description:
+      'Structured data processing, validation, and transformation so information is accurate, complete, and ready for use.',
     serviceMessage: 'Turn raw inputs into clean, usable data with consistent processing standards.',
-    capabilities: ['Data capture and validation', 'Cleansing and standardization', 'Batch and ongoing processing', 'Quality checks and exception handling'],
-    benefits: ['Higher data accuracy', 'Faster processing cycles', 'Reduced manual rework', 'Reliable inputs for systems and reporting'],
+    capabilities: [
+      'Data capture and validation',
+      'Cleansing and standardization',
+      'Batch and ongoing processing',
+      'Quality checks and exception handling',
+    ],
+    benefits: [
+      'Higher data accuracy',
+      'Faster processing cycles',
+      'Reduced manual rework',
+      'Reliable inputs for systems and reporting',
+    ],
     relatedPositions: ['Data Processing Specialist', 'Data Quality Analyst'],
     industries: ['Finance', 'Healthcare', 'Retail', 'Logistics'],
     icon: 'database',
@@ -87,11 +172,23 @@ export const bpoServices: Service[] = [
     category: 'bpo',
     number: '06',
     name: 'Data Entry',
+    image: IMG.dataProcessing,
     shortDescription: 'Accurate data entry from forms, documents, and systems into target platforms.',
-    description: 'Accurate data entry from forms, documents, and systems into target platforms with defined quality controls.',
+    description:
+      'Accurate data entry from forms, documents, and systems into target platforms with defined quality controls.',
     serviceMessage: 'Keep records complete and current with disciplined data entry capacity.',
-    capabilities: ['Form and document data entry', 'System-to-system transcription', 'Double-entry and quality sampling', 'Volume and deadline management'],
-    benefits: ['Complete and timely records', 'Lower error rates', 'Scalable entry capacity', 'Clear quality metrics'],
+    capabilities: [
+      'Form and document data entry',
+      'System-to-system transcription',
+      'Double-entry and quality sampling',
+      'Volume and deadline management',
+    ],
+    benefits: [
+      'Complete and timely records',
+      'Lower error rates',
+      'Scalable entry capacity',
+      'Clear quality metrics',
+    ],
     relatedPositions: ['Data Entry Specialist', 'Records Associate'],
     industries: ['Healthcare', 'Legal', 'Insurance', 'Government'],
     icon: 'edit',
@@ -103,11 +200,24 @@ export const bpoServices: Service[] = [
     category: 'bpo',
     number: '07',
     name: 'Document Processing',
+    image: IMG.documentProcessing,
     shortDescription: 'Intake, classification, extraction, and filing of business documents.',
-    description: 'Intake, classification, extraction, and filing of business documents so information is searchable and process-ready.',
-    serviceMessage: 'Move document-heavy work from piles and inboxes into structured digital workflows.',
-    capabilities: ['Document intake and sorting', 'Classification and indexing', 'Data extraction and validation', 'Digital filing and retrieval support'],
-    benefits: ['Faster document turnaround', 'Searchable records', 'Fewer lost documents', 'Lower handling cost'],
+    description:
+      'Intake, classification, extraction, and filing of business documents so information is searchable and process-ready.',
+    serviceMessage:
+      'Move document-heavy work from piles and inboxes into structured digital workflows.',
+    capabilities: [
+      'Document intake and sorting',
+      'Classification and indexing',
+      'Data extraction and validation',
+      'Digital filing and retrieval support',
+    ],
+    benefits: [
+      'Faster document turnaround',
+      'Searchable records',
+      'Fewer lost documents',
+      'Lower handling cost',
+    ],
     relatedPositions: ['Document Processor', 'Document Controller'],
     industries: ['Legal', 'Insurance', 'Real Estate', 'Healthcare'],
     icon: 'file-text',
@@ -119,11 +229,25 @@ export const bpoServices: Service[] = [
     category: 'bpo',
     number: '08',
     name: 'Virtual Assistance',
-    shortDescription: 'Remote administrative and executive support professionals for day-to-day business tasks.',
-    description: 'Remote administrative and executive support professionals for scheduling, communication, research, and day-to-day business tasks.',
-    serviceMessage: 'Add reliable remote support for the administrative work that consumes leadership and team time.',
-    capabilities: ['Calendar and email management', 'Travel and meeting coordination', 'Research and light project support', 'CRM and tool administration'],
-    benefits: ['More focused leadership time', 'Consistent administrative coverage', 'Flexible support hours', 'Cost-effective assistance'],
+    image: IMG.virtualAssistance,
+    shortDescription:
+      'Remote administrative and executive support professionals for day-to-day business tasks.',
+    description:
+      'Remote administrative and executive support professionals for scheduling, communication, research, and day-to-day business tasks.',
+    serviceMessage:
+      'Add reliable remote support for the administrative work that consumes leadership and team time.',
+    capabilities: [
+      'Calendar and email management',
+      'Travel and meeting coordination',
+      'Research and light project support',
+      'CRM and tool administration',
+    ],
+    benefits: [
+      'More focused leadership time',
+      'Consistent administrative coverage',
+      'Flexible support hours',
+      'Cost-effective assistance',
+    ],
     relatedPositions: ['Virtual Assistant', 'Executive Assistant', 'Administrative Specialist'],
     industries: ['Professional Services', 'Real Estate', 'Technology', 'Consulting'],
     icon: 'user-check',
