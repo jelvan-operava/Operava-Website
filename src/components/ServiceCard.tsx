@@ -53,15 +53,17 @@ export default function ServiceCard({
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.4, delay: (index % 4) * 0.06 }}
       id={`service-card-${service.slug}`}
-      className={`group relative flex flex-col w-full h-full rounded-2xl bg-white border border-[#E8E8EC] overflow-hidden transition-all duration-300 hover:border-violet-200 hover:shadow-[0_20px_40px_rgba(15,15,30,0.08)] ${className}`}
+      className={`group relative flex flex-col w-full h-full rounded-2xl bg-white border border-[#EDEDF2] overflow-hidden transition-all duration-300 hover:border-violet-200/80 hover:shadow-[0_24px_48px_rgba(15,15,30,0.07)] ${className}`}
     >
+      {/* Brand gradient accent line */}
       <div
         className="h-[2px] w-full shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{ background: GRADIENT }}
         aria-hidden
       />
 
-      <div className="relative w-full aspect-[16/10] bg-gradient-to-b from-[#FAFAFC] to-white flex items-center justify-center overflow-hidden">
+      {/* Image — circular diagrams sit cleanly on soft base */}
+      <div className="relative w-full aspect-[16/10] bg-gradient-to-b from-[#FAFAFC] via-white to-white flex items-center justify-center overflow-hidden">
         {service.image && !imgError ? (
           <img
             src={service.image}
@@ -69,7 +71,7 @@ export default function ServiceCard({
             onError={() => setImgError(true)}
             referrerPolicy="no-referrer"
             loading="lazy"
-            className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-[1.03]"
+            className="w-full h-full object-contain p-3 sm:p-4 transition-transform duration-500 group-hover:scale-[1.04]"
           />
         ) : (
           <div className="flex items-center justify-center p-6">
@@ -87,14 +89,12 @@ export default function ServiceCard({
       </div>
 
       <div className="relative flex flex-col flex-1 px-5 pb-5 pt-1">
-        {/* Category label */}
         <div className="mb-2">
           <span className="text-[10px] font-medium uppercase tracking-wide text-gray-400">
             {categoryLabel}
           </span>
         </div>
 
-        {/* Number + title: same color hierarchy when matchTitleTheme (services tabs) */}
         <div className="flex items-start gap-2.5 mb-2">
           <span
             className={
