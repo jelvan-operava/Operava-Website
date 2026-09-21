@@ -22,7 +22,7 @@ const automationSlugSet = new Set(automationServices.map((s) => s.slug))
 
 /**
  * Service card — Cloudinary diagram + brand accent line + Learn More.
- * Soft fade-in only (no blink / flash).
+ * Card + image area share the same pure white background.
  */
 export default function ServiceCard({
   service,
@@ -53,8 +53,8 @@ export default function ServiceCard({
         aria-hidden
       />
 
-      {/* Cloudinary diagram — soft opacity fade when loaded */}
-      <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] min-h-[260px] sm:min-h-[300px] lg:min-h-[340px] overflow-hidden bg-[#FAFAFC]">
+      {/* Cloudinary diagram — same pure white as card shell */}
+      <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] min-h-[260px] sm:min-h-[300px] lg:min-h-[340px] overflow-hidden bg-white">
         {service.image && !imgError ? (
           <img
             src={service.image}
@@ -64,20 +64,20 @@ export default function ServiceCard({
             referrerPolicy="no-referrer"
             loading="lazy"
             decoding="async"
-            className={`absolute inset-0 w-full h-full object-contain object-center select-none p-2 sm:p-3 transition-opacity duration-700 ease-out ${
+            className={`absolute inset-0 w-full h-full object-contain object-center select-none p-2 sm:p-3 bg-white transition-opacity duration-700 ease-out ${
               imgLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             draggable={false}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center opacity-60">
+          <div className="flex h-full w-full items-center justify-center bg-white opacity-60">
             <ServiceAnimatedIcon icon={service.icon} size="lg" interactive={false} />
           </div>
         )}
       </div>
 
       {/* Learn More only */}
-      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-1">
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-1 bg-white">
         <Link
           to={href}
           id={`btn-explore-${service.slug}`}
