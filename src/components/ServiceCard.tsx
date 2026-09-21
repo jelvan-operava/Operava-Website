@@ -17,8 +17,8 @@ interface ServiceCardProps {
 const automationSlugSet = new Set(automationServices.map((s) => s.slug))
 
 /**
- * Service tile = Cloudinary diagram only.
- * Same footprint as before (aspect 16/10), no frame, border, gradient, or chrome.
+ * Pure Cloudinary diagram tile — no frame / border / chrome.
+ * Sized large for phone (full-width) and desktop (fewer grid columns).
  */
 export default function ServiceCard({
   service,
@@ -43,10 +43,14 @@ export default function ServiceCard({
       <Link
         to={href}
         id={`btn-explore-${service.slug}`}
-        className="block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 rounded-none"
+        className="block w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
         aria-label={service.name}
       >
-        <div className="relative w-full aspect-[16/10] overflow-hidden bg-transparent">
+        {/*
+          Aspect matches Cloudinary circular-card assets (near-square / slight portrait).
+          min-heights keep tiles large on phone and desktop.
+        */}
+        <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] lg:aspect-[4/5] min-h-[280px] sm:min-h-[320px] lg:min-h-[380px] xl:min-h-[420px] overflow-hidden bg-transparent">
           {service.image && !imgError ? (
             <img
               src={service.image}
@@ -54,7 +58,7 @@ export default function ServiceCard({
               onError={() => setImgError(true)}
               referrerPolicy="no-referrer"
               loading="lazy"
-              className="w-full h-full object-contain object-center select-none"
+              className="absolute inset-0 w-full h-full object-contain object-center select-none"
               draggable={false}
             />
           ) : (
