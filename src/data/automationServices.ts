@@ -1,5 +1,21 @@
 import type { Service } from './services'
 
+/** New circular service diagrams — cloud b5i5bwwa (2026-09 collections) */
+const IMG = {
+  aiAutomation:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883998/795188595_1550334969738376_2629002611050598156_n.jpg',
+  customAutomation:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883997/818443341_1800198281153233_3417928797306308459_n.jpg',
+  customerService:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883179/818075191_1115987964333249_1393699877683613432_n.jpg',
+  documentProcessing:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883178/818133246_2111726673554111_7094790966613170147_n.jpg',
+  dataProcessing:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883178/816394333_4717468435148344_6455644252070295893_n.jpg',
+  systemsIntegration:
+    'https://res.cloudinary.com/b5i5bwwa/image/upload/f_auto,q_auto/v1789883197/795704726_4530308263854726_754283952295949774_n.jpg',
+} as const
+
 /** Dedicated Automation catalogue — shown when carousel selects Automation */
 export const automationServices: Service[] = [
   {
@@ -8,6 +24,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '01',
     name: 'Workflow Automation',
+    image: IMG.customAutomation,
     shortDescription:
       'Connect business tasks into structured digital processes so work moves automatically from one step to the next.',
     description:
@@ -41,6 +58,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '02',
     name: 'Business Process Automation',
+    image: IMG.customAutomation,
     shortDescription:
       'Automate structured end-to-end business processes across departments, systems, approvals, and records.',
     description:
@@ -73,6 +91,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '03',
     name: 'AI Automation',
+    image: IMG.aiAutomation,
     shortDescription:
       'Combine automation with AI for language, classification, extraction, summarization, and intelligent routing.',
     description:
@@ -106,6 +125,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '04',
     name: 'Customer Service Automation',
+    image: IMG.customerService,
     shortDescription:
       'Automate repetitive support work—routing, FAQs, tickets, follow-ups—while keeping complex cases with people.',
     description:
@@ -140,6 +160,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '05',
     name: 'Email Automation',
+    image: IMG.customAutomation,
     shortDescription:
       'Trigger, send, organize, and route emails from business events, customer actions, and system data.',
     description:
@@ -174,6 +195,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '06',
     name: 'Lead & Sales Automation',
+    image: IMG.customAutomation,
     shortDescription:
       'Automate lead capture, qualification, assignment, follow-up, CRM updates, and sales handoffs.',
     description:
@@ -208,6 +230,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '07',
     name: 'Data & Reporting Automation',
+    image: IMG.dataProcessing,
     shortDescription:
       'Collect, organize, and process data from connected systems into recurring reports and dashboards.',
     description:
@@ -241,6 +264,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '08',
     name: 'Document Automation',
+    image: IMG.documentProcessing,
     shortDescription:
       'Generate, update, organize, route, and process business documents from predefined data and rules.',
     description:
@@ -274,6 +298,7 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '09',
     name: 'HR & Workforce Automation',
+    image: IMG.customAutomation,
     shortDescription:
       'Automate recruitment admin, onboarding, employee requests, documentation, notifications, and offboarding.',
     description:
@@ -308,167 +333,30 @@ export const automationServices: Service[] = [
     category: 'it',
     number: '10',
     name: 'Finance & Invoicing Automation',
+    image: IMG.customAutomation,
     shortDescription:
       'Streamline invoice preparation, delivery, payment reminders, approvals, and financial workflow routing.',
     description:
-      'Finance & Invoicing Automation streamlines repetitive financial administration such as invoice preparation, payment notifications, reminders, record updates, and financial workflow routing. Operava understands the client\'s invoicing and finance workflow, identifies data sources and financial events, defines invoice, approval, notification, and reminder rules, connects systems, automates document and communication steps, adds approval and exception handling, and maintains clear controls. Examples include invoice generation and delivery, payment reminders, status updates, receipt notifications, approval workflows, recurring billing admin, and financial reporting workflows.',
+      'Finance & Invoicing Automation streamlines repetitive financial administration such as invoice preparation, payment notifications, reminders, record updates, and financial workflow routing. Operava understands the client\'s invoicing and finance workflow, identifies data sources and financial events, defines invoice, approval, notification, and reminder rules, connects systems, builds automated invoice generation and delivery, configures payment reminders and escalation paths, and monitors financial process health.',
     serviceMessage:
-      'Use automation to support financial administration while important decisions and approvals stay with authorized people.',
+      'Connect invoicing and finance workflows to the systems and events that already generate the data—so fewer manual steps are required.',
     capabilities: [
-      'Map invoicing and finance workflows and data sources',
-      'Define invoice, approval, notification, and reminder rules',
-      'Automate invoice generation, delivery, and status updates',
-      'Payment reminders, receipts, and escalation notices',
-      'Approval workflows and exception handling',
-      'Connect finance systems, CRM, and document tools',
-      'Test calculations, records, and notifications',
-      'Monitor processes with clear traceability and controls',
+      'Map invoicing and finance events and data sources',
+      'Automate invoice generation, delivery, and status tracking',
+      'Configure payment reminders and escalation rules',
+      'Connect accounting, CRM, and operational systems',
+      'Support approval workflows for financial documents',
+      'Monitor delivery, payment status, and exception cases',
     ],
     benefits: [
-      'Less repetitive finance administration',
-      'Faster invoice processing',
-      'Fewer missed payment reminders',
-      'More consistent financial records',
-      'Better visibility of invoice status',
+      'Faster invoice cycles',
+      'Fewer missed payments and follow-ups',
+      'Lower manual finance administration',
+      'Clearer visibility of receivables and workflow status',
     ],
-    industries: ['Professional Services', 'SaaS', 'Retail', 'Logistics', 'Finance'],
-    relatedPositions: ['Finance Operations', 'AP/AR Specialist', 'Billing Analyst'],
-    icon: 'briefcase',
-    cta: 'Discuss Your Requirements',
-  },
-  {
-    id: 'system-application-integration',
-    slug: 'system-application-integration',
-    category: 'it',
-    number: '11',
-    name: 'System & Application Integration',
-    shortDescription:
-      'Connect applications so information and actions move between systems without manual copying.',
-    description:
-      'System & Application Integration connects software applications so information and actions move between them without unnecessary manual copying. Operava identifies systems that need to communicate, maps the data to move, reviews APIs, webhooks, and connectors, defines authentication and access, builds the integration with error handling, validates data mapping, tests transactions, and monitors as systems change. Typical connections include website to CRM, forms to databases, CRM to email, HR to communication tools, e-commerce to inventory, payments to records, helpdesk to internal systems, and cloud apps to custom applications.',
-    serviceMessage:
-      'Help clients get more value from the software they already have by connecting systems instead of replacing everything.',
-    capabilities: [
-      'Identify systems that must exchange data or trigger actions',
-      'Map fields, events, and ownership between applications',
-      'Use APIs, webhooks, connectors, or custom integration methods',
-      'Define authentication, access, and security requirements',
-      'Build bi-directional or event-driven integrations',
-      'Add error handling, retries, and logging',
-      'Validate data mapping and test system-to-system transactions',
-      'Monitor integrations and maintain them as systems change',
-    ],
-    benefits: [
-      'Less duplicate data entry',
-      'Fewer disconnected systems',
-      'Better data consistency',
-      'Smoother digital processes',
-      'More value from existing technology',
-    ],
-    industries: ['Technology', 'E-commerce', 'Logistics', 'Finance', 'Healthcare'],
-    relatedPositions: ['Integration Engineer', 'Solutions Architect', 'API Developer'],
-    icon: 'git-merge',
-    cta: 'Discuss Your Requirements',
-  },
-  {
-    id: 'notification-alert-automation',
-    slug: 'notification-alert-automation',
-    category: 'it',
-    number: '12',
-    name: 'Notification & Alert Automation',
-    shortDescription:
-      'Inform the right person or team when a business event, condition, deadline, or exception occurs.',
-    description:
-      'Notification & Alert Automation automatically informs the right person or team when a specific business event, condition, deadline, or exception occurs. Operava identifies events that need attention, defines recipients, priority, timing, and escalation rules, connects notification channels to business applications, builds and tests alert logic (including delayed, duplicate, and exception cases), and adjusts thresholds as needs change. Examples include new lead alerts, payment-status alerts, ticket escalations, deadline reminders, system-error notices, workflow reminders, low-inventory alerts, approval notifications, and operational or security alerts.',
-    serviceMessage:
-      'Move from passive checking to event-driven operations—important events trigger the right notification automatically.',
-    capabilities: [
-      'Identify events and conditions that require attention',
-      'Define recipients, priority, timing, and escalation rules',
-      'Connect alerts to CRM, helpdesk, finance, and ops systems',
-      'Deliver across email, chat, SMS, and internal channels',
-      'Handle quiet hours, duplicates, and alert fatigue controls',
-      'Test normal, delayed, and exception scenarios',
-      'Monitor notification activity and response outcomes',
-      'Adjust thresholds and rules as operations change',
-    ],
-    benefits: [
-      'Fewer missed deadlines and events',
-      'Faster response to important situations',
-      'Clearer accountability',
-      'Less constant manual system checking',
-      'Better prioritization of exceptions',
-    ],
-    industries: ['Technology', 'Logistics', 'Healthcare', 'Finance', 'Support'],
-    relatedPositions: ['SRE', 'Operations Analyst', 'Support Lead'],
-    icon: 'life-buoy',
-    cta: 'Discuss Your Requirements',
-  },
-  {
-    id: 'scheduling-recurring-operations',
-    slug: 'scheduling-recurring-operations',
-    category: 'it',
-    number: '13',
-    name: 'Scheduling & Recurring Operations',
-    shortDescription:
-      'Automate tasks that must run at specific times, intervals, dates, or recurring schedules.',
-    description:
-      'Scheduling & Recurring Operations automates work that needs to happen at specific times, intervals, dates, or recurring schedules. Operava identifies recurring activities and frequency, defines timing, conditions, and dependencies, builds scheduled automation with logging and failure handling, tests timing rules, monitors executions, and updates schedules when requirements change. Typical uses include daily reports, weekly summaries, monthly invoicing tasks, recurring data sync, scheduled reminders, system maintenance jobs, customer or employee notifications, and scheduled operational workflows.',
-    serviceMessage:
-      'Turn predictable recurring work into dependable digital processes while keeping exceptions visible to people.',
-    capabilities: [
-      'Identify recurring activities and required frequency',
-      'Define exact timing, conditions, and dependencies',
-      'Build calendar- and interval-based automation jobs',
-      'Add logging, failure handling, and retries',
-      'Schedule reports, syncs, reminders, and maintenance tasks',
-      'Test timing and recurrence rules thoroughly',
-      'Monitor scheduled executions and alert on failures',
-      'Update schedules when operational needs change',
-    ],
-    benefits: [
-      'Less calendar-based manual work',
-      'Fewer missed recurring tasks',
-      'Reliable operational routines',
-      'Consistent execution outside manual work cycles',
-    ],
-    industries: ['Operations', 'Finance', 'Retail', 'Technology', 'Logistics'],
-    relatedPositions: ['Operations Analyst', 'DevOps Engineer', 'Systems Administrator'],
-    icon: 'terminal',
-    cta: 'Discuss Your Requirements',
-  },
-  {
-    id: 'custom-automation-solutions',
-    slug: 'custom-automation-solutions',
-    category: 'it',
-    number: '14',
-    name: 'Custom Automation Solutions',
-    shortDescription:
-      'Tailored automation for processes that do not fit a standard category—built around your operations and stack.',
-    description:
-      'Custom Automation Solutions are designed when a process does not fit a standard automation category. Operava can combine workflows, applications, databases, APIs, AI, notifications, documents, reporting, and custom software as needed. Engagement follows discovery, process mapping, solution design, development, testing, deployment, monitoring, and optimization. Examples include custom internal systems, multi-system operational platforms, specialized approval flows, client portals, industry-specific automation, automated recruitment systems, custom reporting platforms, AI-assisted applications, and end-to-end digital operations.',
-    serviceMessage:
-      'When off-the-shelf is not enough, we design around the client\'s actual operations, systems, and constraints.',
-    capabilities: [
-      'Discovery of business objectives, users, systems, and constraints',
-      'Process mapping of current and desired operating models',
-      'Solution design: architecture, integrations, rules, and UX',
-      'Development of workflows, integrations, interfaces, and supporting systems',
-      'Testing of functionality, data handling, permissions, and edge cases',
-      'Deployment into the client operating environment',
-      'Monitoring of performance and operational issues',
-      'Ongoing optimization as the business grows',
-    ],
-    benefits: [
-      'Designed around real client operations',
-      'Can connect multiple technologies in one solution',
-      'Supports unique and industry-specific requirements',
-      'Reduces workarounds and manual processes',
-      'Foundation for scalable, evolving digital operations',
-    ],
-    industries: ['All industries', 'Technology', 'Professional Services', 'Manufacturing', 'Healthcare'],
-    relatedPositions: ['Automation Architect', 'Solutions Consultant', 'Technical Project Manager'],
-    icon: 'lightbulb',
+    industries: ['Professional Services', 'SaaS', 'Agencies', 'Wholesale', 'Healthcare'],
+    relatedPositions: ['Finance Operations', 'Billing Specialist', 'Accounts Receivable Analyst'],
+    icon: 'bar-chart',
     cta: 'Discuss Your Requirements',
   },
 ]
