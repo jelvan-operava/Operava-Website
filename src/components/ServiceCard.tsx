@@ -22,7 +22,7 @@ const automationSlugSet = new Set(automationServices.map((s) => s.slug))
 
 /**
  * Service card — Cloudinary diagram + brand accent line + Learn More.
- * Theme-aligned (logo gradient), minimal chrome.
+ * No title text (name is on the diagram asset).
  */
 export default function ServiceCard({
   service,
@@ -71,16 +71,14 @@ export default function ServiceCard({
         )}
       </div>
 
-      {/* Footer: title + Learn More */}
-      <div className="flex flex-col gap-3 px-4 sm:px-5 pb-4 sm:pb-5 pt-1">
-        <h3 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight leading-snug line-clamp-2 min-h-[2.5rem]">
-          {service.name}
-        </h3>
+      {/* Learn More only */}
+      <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-1">
         <Link
           to={href}
           id={`btn-explore-${service.slug}`}
-          className="mt-auto inline-flex items-center justify-center gap-1.5 w-full px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:opacity-95 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
+          className="inline-flex items-center justify-center gap-1.5 w-full px-4 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:opacity-95 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600"
           style={{ background: GRADIENT }}
+          aria-label={`${t('common.learnMore', 'Learn More')}: ${service.name}`}
         >
           <span>{t('common.learnMore', 'Learn More')}</span>
           <ArrowRight className="w-3.5 h-3.5" />
