@@ -128,15 +128,9 @@ const SERVICES: ServiceCard[] = [
 ]
 
 const N = SERVICES.length
-const AUTOPLAY_MS = 7000
-const RESUME_MS = 9000
 const TRANSITION =
   'transform 780ms cubic-bezier(0.22, 1, 0.36, 1), opacity 780ms cubic-bezier(0.22, 1, 0.36, 1)'
 
-/**
- * Stronger depth hierarchy: center card dominates the stage;
- * side cards remain partially visible for continuous carousel feel.
- */
 function cardTransform(offset: number, mobile: boolean) {
   const a = Math.abs(offset)
   if (a === 0) {
@@ -184,13 +178,10 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
   const [active, setActive] = useState(0)
   const [contentKey, setContentKey] = useState(0)
   const [mobile, setMobile] = useState(false)
-  const [paused, setPaused] = useState(false)
   const [dragging, setDragging] = useState(false)
   const reduceMotion = useRef(false)
   const dragStartX = useRef(0)
   const dragDelta = useRef(0)
-  const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const resumeRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
 
   const activeService = SERVICES[active]
@@ -225,30 +216,6 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
   const next = useCallback(() => goTo(active + 1), [active, goTo])
   const prev = useCallback(() => goTo(active - 1), [active, goTo])
 
-  const pauseAutoplay = useCallback(() => {
-    setPaused(true)
-    if (autoplayRef.current) {
-      clearInterval(autoplayRef.current)
-      autoplayRef.current = null
-    }
-    if (resumeRef.current) clearTimeout(resumeRef.current)
-    resumeRef.current = setTimeout(() => setPaused(false), RESUME_MS)
-  }, [])
-
-  useEffect(() => {
-    if (paused || reduceMotion.current) return
-    autoplayRef.current = setInterval(() => {
-      setActive((a) => {
-        const n = (a + 1) % N
-        setContentKey((k) => k + 1)
-        return n
-      })
-    }, AUTOPLAY_MS)
-    return () => {
-      if (autoplayRef.current) clearInterval(autoplayRef.current)
-    }
-  }, [paused, active])
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!sectionRef.current) return
@@ -256,23 +223,20 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
       if (!focused && document.activeElement !== document.body) return
       if (e.key === 'ArrowRight') {
         e.preventDefault()
-        pauseAutoplay()
         next()
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault()
-        pauseAutoplay()
         prev()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [next, prev, pauseAutoplay])
+  }, [next, prev])
 
   const onPointerDown = (e: React.PointerEvent) => {
     setDragging(true)
     dragStartX.current = e.clientX
     dragDelta.current = 0
-    pauseAutoplay()
     ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
   }
 
@@ -299,10 +263,6 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
     })
   }, [active])
 
-  const halfCaps = Math.ceil(activeService.capabilities.length / 2)
-  const leftCaps = activeService.capabilities.slice(0, halfCaps)
-  const rightCaps = activeService.capabilities.slice(halfCaps)
-
   const stageHeight = mobile ? 440 : 560
   const cardWidth = mobile ? 'min(86vw, 340px)' : 'min(42vw, 520px)'
   const cardHeight = mobile ? 380 : 500
@@ -313,7 +273,6 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
       id="services"
       aria-label="OPERAVA Services"
       className="relative w-full bg-white overflow-hidden pt-10 pb-2 sm:pt-12 sm:pb-4 lg:pt-14 lg:pb-6"
-      onMouseEnter={pauseAutoplay}
     >
       <div className="w-full max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 text-center mb-6 sm:mb-8 lg:mb-10">
         <h2 className="whitespace-nowrap font-bold tracking-tight text-gray-900 leading-none text-[clamp(1.05rem,3.8vw,2.5rem)] mx-auto">
@@ -383,7 +342,6 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                 type="button"
                 onClick={() => {
                   if (Math.abs(dragDelta.current) > 8) return
-                  pauseAutoplay()
                   goTo(idx)
                 }}
                 aria-label={`${service.number} ${service.title}`}
@@ -405,9 +363,7 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                 <div
                   className="h-full w-full rounded-2xl flex flex-col text-left overflow-hidden relative"
                   style={{
-                    border: isActive
-                      ? '1.5px solid transparent'
-                      : '1px solid #E8E8EC',
+                    border: isActive ? '1.5px solid transparent' : '1px solid #E8E8EC',
                     background: isActive
                       ? 'linear-gradient(#ffffff, #ffffff) padding-box, linear-gradient(135deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF) border-box'
                       : '#ffffff',
@@ -461,9 +417,7 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                           background: isActive
                             ? 'linear-gradient(135deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)'
                             : '#F3F4F6',
-                          boxShadow: isActive
-                            ? '0 4px 14px rgba(109, 40, 217, 0.35)'
-                            : 'none',
+                          boxShadow: isActive ? '0 4px 14px rgba(109, 40, 217, 0.35)' : 'none',
                         }}
                       >
                         <Icon
@@ -476,9 +430,7 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
 
                     <h3
                       className="text-lg sm:text-xl lg:text-2xl font-bold tracking-tight mb-2"
-                      style={{
-                        color: isActive ? '#1f1235' : '#111827',
-                      }}
+                      style={{ color: isActive ? '#1f1235' : '#111827' }}
                     >
                       {service.title}
                     </h3>
@@ -513,61 +465,17 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
                       <Link
                         to={service.href}
                         onClick={(e) => e.stopPropagation()}
-                        className="mt-4 sm:mt-5 inline-flex items-center gap-1.5 text-sm font-semibold transition-all"
-                        style={{
-                          backgroundImage:
-                            'linear-gradient(90deg, #FF8B4A, #FF4DB8, #C44DFF, #3B6BFF)',
-                          WebkitBackgroundClip: 'text',
-                          backgroundClip: 'text',
-                          color: 'transparent',
-                        }}
+                        className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-violet-700 hover:text-violet-900 transition-colors"
                       >
-                        View services
-                        <ArrowRight className="w-3.5 h-3.5 text-violet-600" />
+                        <span>Explore {service.title}</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
-                    )}
-                    {!isActive && (
-                      <span className="mt-auto text-xs text-gray-400 font-medium">View services →</span>
                     )}
                   </div>
                 </div>
               </button>
             )
           })}
-        </div>
-      </div>
-
-      <div className="w-full max-w-[56rem] mx-auto px-4 sm:px-6 lg:px-8 mt-5 sm:mt-6 lg:mt-7 text-center">
-        <div
-          key={contentKey}
-          className="animate-[fadeUpContent_0.7s_cubic-bezier(0.22,1,0.36,1)_both]"
-        >
-          <p className="text-xs font-semibold tracking-[0.18em] text-gray-400 mb-2">
-            {activeService.number} / 0{N}
-          </p>
-          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-            {activeService.title}
-          </h3>
-          <p className="mt-2 sm:mt-3 text-sm sm:text-base text-gray-500 leading-relaxed max-w-2xl mx-auto">
-            {activeService.description}
-          </p>
-          <div className="mt-5 sm:mt-6 hidden sm:grid sm:grid-cols-2 gap-x-8 gap-y-2 text-left max-w-2xl mx-auto">
-            {[leftCaps, rightCaps].map((col, ci) => (
-              <ul key={ci} className="space-y-1.5">
-                {col.map((cap) => (
-                  <li key={cap} className="flex items-start gap-2 text-sm text-gray-600">
-                    <span
-                      className="mt-1.5 h-1.5 w-1.5 rounded-full shrink-0"
-                      style={{
-                        background: 'linear-gradient(90deg, #FF8B4A, #C44DFF, #3B6BFF)',
-                      }}
-                    />
-                    {cap}
-                  </li>
-                ))}
-              </ul>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -581,10 +489,7 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
             <button
               key={s.id}
               type="button"
-              onClick={() => {
-                pauseAutoplay()
-                goTo(i)
-              }}
+              onClick={() => goTo(i)}
               aria-label={`Show ${s.title}`}
               aria-current={isOn ? 'true' : undefined}
               className={`px-3.5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 ${
@@ -609,10 +514,7 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
       <div className="mt-4 sm:mt-5 flex items-center justify-center gap-3">
         <button
           type="button"
-          onClick={() => {
-            pauseAutoplay()
-            prev()
-          }}
+          onClick={() => prev()}
           aria-label="Previous service"
           className="h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-700 transition-colors flex items-center justify-center"
         >
@@ -632,10 +534,7 @@ export default function ServicesCarousel3D({ onActiveChange }: ServicesCarousel3
         </div>
         <button
           type="button"
-          onClick={() => {
-            pauseAutoplay()
-            next()
-          }}
+          onClick={() => next()}
           aria-label="Next service"
           className="h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-violet-300 hover:text-violet-700 transition-colors flex items-center justify-center"
         >
