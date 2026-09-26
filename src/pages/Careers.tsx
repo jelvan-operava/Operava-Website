@@ -469,7 +469,7 @@ export default function Careers() {
               for guided AI screening first.
             </p>
           </div>
-          <OperavaIntakeForm formType="CAREERS" defaultPosition={selectedRole} />
+          <OperavaIntakeForm kind="CAREERS" defaultPosition={selectedRole} />
         </div>
       </section>
     </main>

@@ -52,9 +52,9 @@ export default function Footer() {
     },
   ]
 
-  const footerCompany = [
+  const footerQuickLinks = [
     { label: t('nav.about', 'About'), href: '/about' },
-    { label: t('nav.academy', 'Operava Academy'), href: '/academy' },
+    { label: t('nav.academy', 'Learning'), href: '/academy' },
     { label: t('nav.careers', 'Careers'), href: '/careers' },
     { label: t('nav.insights', 'Insights'), href: '/insights' },
     { label: t('nav.contacts', 'Contacts'), href: '/contacts' },
@@ -138,8 +138,8 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-4">{t('footer.company', 'Company')}</h3>
-              <ul className="space-y-3">{footerCompany.map((item) => (<li key={item.href}>{renderFooterLink(item)}</li>))}</ul>
+              <h3 className="text-xs font-semibold tracking-[0.12em] uppercase text-white mb-4">Quick Links</h3>
+              <ul className="space-y-3">{footerQuickLinks.map((item) => (<li key={item.href}>{renderFooterLink(item)}</li>))}</ul>
             </div>
 
             <div>
