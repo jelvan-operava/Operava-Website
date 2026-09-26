@@ -8,7 +8,6 @@ import ScrollToTopButton from './components/ScrollToTopButton'
 import SmoothScroll from './components/SmoothScroll'
 import AvaAssistant from './components/AvaAssistant'
 import CookieConsent from './components/CookieConsent'
-import OperavaIntroOverlay from './components/OperavaIntroOverlay'
 import { RouteLoadingProgress } from './components/Skeleton'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -96,7 +95,7 @@ const pageTransitionVariants = {
 
 function Layout() {
   const location = useLocation()
-  /** Standalone portals: no main nav / AVA / intro chrome */
+  /** Standalone portals: no main navigation or assistant chrome */
   const isStandalone =
     location.pathname === '/verification' ||
     location.pathname.startsWith('/verification/') ||
@@ -163,7 +162,6 @@ function Layout() {
           <ScrollToTopButton />
           <AvaAssistant />
           <CookieConsent />
-          <OperavaIntroOverlay />
         </>
       )}
     </div>
