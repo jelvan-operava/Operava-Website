@@ -104,7 +104,7 @@ function Layout() {
     location.pathname.startsWith('/ai-job-screening/')
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-white text-gray-900 selection:bg-violet-100 selection:text-violet-800">
+    <div className="operava-site min-h-screen flex flex-col justify-between bg-white text-gray-900 selection:bg-violet-100 selection:text-violet-800">
       <SmoothScroll />
       <RouteManager />
       {!isStandalone && <Navigation />}

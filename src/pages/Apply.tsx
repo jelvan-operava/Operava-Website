@@ -1,15 +1,26 @@
-import { useSearchParams } from 'react-router-dom'
-import OperavaIntakeForm from '../components/forms/OperavaIntakeForm'
+import { useSearchParams } from "react-router-dom"
+import OperavaIntakeForm from "../components/forms/OperavaIntakeForm"
+import PageHero from "../components/PageHero"
 
 export default function Apply() {
   const [params] = useSearchParams()
   return (
-    <main className="bg-white pt-28 pb-20">
-      <div className="max-w-3xl mx-auto px-6">
-        <h1 className="text-4xl font-black text-gray-900 mb-3">Job application</h1>
-        <p className="text-sm text-gray-600 mb-8">Applicants only. Client work inquiries use Request a Quote. Email verification is required before Talent receives the file.</p>
-        <OperavaIntakeForm kind="CAREERS" defaultPosition={params.get('role') || params.get('position') || undefined} />
-      </div>
+    <main className="bg-white">
+      <PageHero
+        eyebrow="OPERAVA / CAREERS"
+        title="Job application"
+        description="Applicants only. Client work inquiries use Request a Quote. Email verification is required before Talent receives the file."
+      />
+      <section className="py-14 lg:py-20">
+        <div className="mx-auto max-w-3xl px-5 sm:px-8">
+          <OperavaIntakeForm
+            kind="CAREERS"
+            defaultPosition={
+              params.get("role") || params.get("position") || undefined
+            }
+          />
+        </div>
+      </section>
     </main>
   )
 }
