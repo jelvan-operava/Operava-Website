@@ -91,6 +91,20 @@ body {
   line-height: 1.55;
 }
 
+/* Shared proportions from the Insights design keep every route visually related. */
+.operava-site {
+  --operava-content-width: 100rem;
+  --operava-page-gutter: clamp(1.25rem, 4vw, 4rem);
+  --operava-card-radius: 1rem;
+  --operava-control-radius: 0.75rem;
+  --operava-border: #e8e8ec;
+  --operava-muted: #6b7280;
+}
+
+.operava-site :where(button, a, input, select, textarea) {
+  -webkit-tap-highlight-color: transparent;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
