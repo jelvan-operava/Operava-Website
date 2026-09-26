@@ -1,16 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
-import { itServices, bpoServices, type Service } from '../data/services'
-import { automationServices } from '../data/automationServices'
+import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
-import { getLocalizedService } from '../i18n/translations/services'
-import ServiceCard from '../components/ServiceCard'
 import DraggableMarquee from '../components/DraggableMarquee'
 import HomeMediaLoader from '../components/HomeMediaLoader'
 import ToolsEcosystemMarquee from '../components/ToolsEcosystemMarquee'
 import OperavaCover from '../components/OperavaCover'
-import ServicesCarousel3D, { type CarouselServiceId } from '../components/ServicesCarousel3D'
+import ServicesCarousel3D from '../components/ServicesCarousel3D'
 
 function useIntersection(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
@@ -46,15 +40,6 @@ const industries = [
   'Enterprise',
 ]
 
-const TALENT_KEYWORDS = /recruit|talent|hr |human|onboard|staffing|sourcing|matching|admin|virtual assist/i
-
-function filterTalent(services: Service[]): Service[] {
-  const matched = services.filter((s) =>
-    TALENT_KEYWORDS.test(s.name + ' ' + s.shortDescription + ' ' + (s.capabilities || []).join(' ')),
-  )
-  return matched.length >= 3 ? matched : services.slice(0, 8)
-}
-
 const SECTION_TITLE =
   'reveal whitespace-nowrap font-bold text-gray-900 tracking-tight leading-none ' +
   'text-[clamp(1.05rem,3.6vw,2.35rem)]'
@@ -63,53 +48,14 @@ const SECTION_TITLE_WHITE =
   'reveal whitespace-nowrap font-bold tracking-tight leading-none text-white ' +
   'text-[clamp(1.05rem,3.6vw,2.35rem)]'
 
-const EYEBROW =
-  'text-[11px] font-semibold tracking-[0.2em] uppercase text-gray-400 mb-2 sm:mb-3'
-
-const SECTION_META: Record<
-  CarouselServiceId,
-  { eyebrow: string; title: string; desc: string; cta: string; href: string }
-> = {
-  automation: {
-    eyebrow: 'OPERAVA / AUTOMATION',
-    title: 'Automation that keeps operations moving.',
-    desc: 'Business automation that reduces repetitive work, connects systems, and keeps operations moving with less manual intervention.',
-    cta: 'View all automation services',
-    href: '/services/automation',
-  },
-  it: {
-    eyebrow: 'OPERAVA / INFORMATION TECHNOLOGY',
-    title: 'Technology and digital systems, connected.',
-    desc: 'Software, cloud, infrastructure and IT services that help organizations build digital products, modernize systems and operate securely at scale.',
-    cta: 'View all IT services',
-    href: '/services/it',
-  },
-  workforce: {
-    eyebrow: 'OPERAVA / OUTSOURCING & OFFSHORING',
-    title: 'Outsourcing that extends operational capacity.',
-    desc: 'Flexible outsourcing and offshoring solutions across customer support, back-office, administration and business operations — built for accuracy, speed and scale.',
-    cta: 'View all outsourcing services',
-    href: '/services/bpo',
-  },
-  talent: {
-    eyebrow: 'OPERAVA / TALENT SOLUTIONS',
-    title: 'Global talent matched to your requirements.',
-    desc: 'Talent solutions connecting businesses with skilled professionals through sourcing, screening, matching, onboarding and workforce administration.',
-    cta: 'Explore careers & talent',
-    href: '/careers',
-  },
-}
-
 export default function Home() {
-  const { t, language } = useLanguage()
+  const { t } = useLanguage()
 
-  const detailRef = useIntersection()
   const modelRef = useIntersection()
   const industriesRef = useIntersection()
   const signatureRef = useIntersection()
 
   const [isHomeReady, setIsHomeReady] = useState(false)
-  const [activeCategory, setActiveCategory] = useState<CarouselServiceId>('automation')
 
   const operatingModelSteps = [
     {
@@ -150,15 +96,6 @@ export default function Home() {
     },
   ]
 
-  const detailServices = useMemo(() => {
-    if (activeCategory === 'automation') return automationServices
-    if (activeCategory === 'it') return itServices
-    if (activeCategory === 'workforce') return bpoServices
-    return filterTalent(bpoServices)
-  }, [activeCategory])
-
-  const meta = SECTION_META[activeCategory]
-
   return (
     <>
       <HomeMediaLoader onLoadingComplete={() => setIsHomeReady(true)} />
@@ -167,42 +104,7 @@ export default function Home() {
           <OperavaCover />
         </section>
 
-        <ServicesCarousel3D onActiveChange={setActiveCategory} />
-
-        <section
-          ref={detailRef}
-          id="service-details"
-          className="pt-4 pb-14 sm:pt-6 sm:pb-16 lg:pt-8 lg:pb-20 bg-white relative scroll-mt-16"
-          key={activeCategory}
-        >
-          <div className="w-full max-w-[100rem] mx-auto px-5 sm:px-8 lg:px-12 xl:px-16">
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 sm:gap-5 mb-8 lg:mb-10">
-              <div className="min-w-0 max-w-3xl">
-                <p className={EYEBROW}>{meta.eyebrow}</p>
-                <h2 className={SECTION_TITLE}>{meta.title}</h2>
-                <p className="reveal reveal-delay-1 text-sm sm:text-base text-gray-500 mt-3 sm:mt-4 leading-relaxed">
-                  {meta.desc}
-                </p>
-              </div>
-              <div className="reveal reveal-delay-3 shrink-0">
-                <Link
-                  to={meta.href}
-                  className="group inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 text-sm font-semibold text-violet-800 bg-violet-50 border border-violet-100 rounded-xl hover:bg-violet-100 hover:border-violet-200 transition-all duration-200"
-                >
-                  <span>{meta.cta}</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Larger tiles: 1 col phone · 2 tablet · 3 desktop */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
-              {detailServices.slice(0, activeCategory === 'automation' ? 14 : 8).map((s, i) => (
-                <ServiceCard key={`${activeCategory}-${s.id}`} service={getLocalizedService(s, language)} index={i} />
-              ))}
-            </div>
-          </div>
-        </section>
+        <ServicesCarousel3D />
 
         <DraggableMarquee />
 
