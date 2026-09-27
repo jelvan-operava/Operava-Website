@@ -108,7 +108,7 @@ function Layout() {
       <RouteManager />
       {!isStandalone && <Navigation />}
 
-      <div className="flex-1 overflow-hidden bg-white">
+      <div className={`flex-1 bg-white ${location.pathname === '/' ? 'overflow-x-clip' : 'overflow-hidden'}`}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={location.pathname}
