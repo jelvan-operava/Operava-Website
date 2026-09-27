@@ -5,6 +5,7 @@ import HomeMediaLoader from '../components/HomeMediaLoader'
 import ToolsEcosystemMarquee from '../components/ToolsEcosystemMarquee'
 import OperavaCover from '../components/OperavaCover'
 import ServicesCarousel3D from '../components/ServicesCarousel3D'
+import BPOHomeSection from '../components/BPOHomeSection'
 
 function useIntersection(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
@@ -99,10 +100,12 @@ export default function Home() {
   return (
     <>
       <HomeMediaLoader onLoadingComplete={() => setIsHomeReady(true)} />
-      <main className={`overflow-x-hidden transition-opacity duration-700 ${isHomeReady ? 'opacity-100' : 'opacity-0'}`}>
+      <main className={`overflow-x-clip transition-opacity duration-700 ${isHomeReady ? 'opacity-100' : 'opacity-0'}`}>
         <section className="relative w-full pt-16 sm:pt-20 lg:pt-0 overflow-hidden bg-white">
           <OperavaCover />
         </section>
+
+        <BPOHomeSection />
 
         <ServicesCarousel3D />
 
