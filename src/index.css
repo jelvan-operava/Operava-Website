@@ -76,6 +76,12 @@ html {
   font-size: 93.75%;
 }
 
+/* Lenis handles home-page easing; avoid two competing smooth-scroll engines. */
+html.home-artifact-mounted {
+  scroll-behavior: auto;
+  scroll-padding-top: 88px;
+}
+
 [dir="rtl"] {
   text-align: right;
 }

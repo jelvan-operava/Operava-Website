@@ -16,6 +16,8 @@ export default function HomeArtifact() {
     root.id = 'root'
     shadow.append(style, root)
 
+    document.documentElement.classList.add('home-artifact-mounted')
+
     // Fragment links inside the encapsulated section need a local scroll target.
     const onClick = (event: Event) => {
       const target = event.target as Element
@@ -25,7 +27,9 @@ export default function HomeArtifact() {
       const destination = id && shadow.getElementById(id)
       if (destination) {
         event.preventDefault()
-        destination.scrollIntoView({ behavior: 'smooth' })
+        const lenis = (window as unknown as { lenis?: { scrollTo: (target: Element, options: { offset: number }) => void } }).lenis
+        if (lenis) lenis.scrollTo(destination, { offset: -88 })
+        else destination.scrollIntoView({ behavior: 'smooth' })
       }
     }
     shadow.addEventListener('click', onClick)
@@ -40,9 +44,10 @@ export default function HomeArtifact() {
     return () => {
       disposed = true
       shadow.removeEventListener('click', onClick)
+      document.documentElement.classList.remove('home-artifact-mounted')
       unmount?.()
     }
   }, [])
 
-  return <div ref={hostRef} className="w-full" aria-label="OPERAVA services and operating model" />
+  return <div id="services" ref={hostRef} className="w-full" aria-label="OPERAVA services and operating model" />
 }
