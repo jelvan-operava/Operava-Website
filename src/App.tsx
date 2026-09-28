@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { LanguageProvider } from './i18n/LanguageContext'
 import Navigation from './components/Navigation'
@@ -8,7 +8,6 @@ import ScrollToTopButton from './components/ScrollToTopButton'
 import SmoothScroll from './components/SmoothScroll'
 import AvaAssistant from './components/AvaAssistant'
 import CookieConsent from './components/CookieConsent'
-import { RouteLoadingProgress } from './components/Skeleton'
 import Home from './pages/Home'
 import About from './pages/About'
 import Academy from './pages/Academy'
@@ -37,8 +36,6 @@ import { injectSchemaMarkup } from './utils/schema'
 
 function RouteManager() {
   const location = useLocation()
-  const [loading, setLoading] = useState(false)
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
     const win = window as unknown as { lenis?: { scrollTo: (target: number, opts?: { immediate?: boolean }) => void } }
@@ -56,15 +53,9 @@ function RouteManager() {
       faqs: metadata.faqs,
     })
 
-    setLoading(true)
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 400)
-
-    return () => clearTimeout(timer)
   }, [location.pathname])
 
-  return <RouteLoadingProgress isLoading={loading} pathname={location.pathname} />
+  return null
 }
 
 const pageTransitionVariants = {

@@ -46,7 +46,7 @@ export default function CookieConsent() {
   const [showDetails, setShowDetails] = useState(false)
 
   useEffect(() => {
-    // Delay slightly so it doesn't compete with first paint / HomeMediaLoader
+    // Keep the consent banner from competing with the first paint.
     const t = window.setTimeout(() => {
       if (readConsent() === null) setVisible(true)
     }, 900)
