@@ -345,10 +345,10 @@ export default function AvaAssistant() {
         <button
           type="button"
           onClick={handleOpen}
-          className="relative h-14 w-14 rounded-full bg-white border border-gray-200 shadow-xl hover:border-violet-200 hover:shadow-2xl flex items-center justify-center transition-all"
+          className="relative h-14 w-14 rounded-full bg-transparent border-0 shadow-none hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-600 flex items-center justify-center transition-transform"
           aria-label="Open AVA assistant"
         >
-          <AvaVideoAvatar size={40} />
+          <AvaVideoAvatar size={52} />
           {hasUnread && <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-fuchsia-400 ring-2 ring-white" />}
         </button>
       </div>
